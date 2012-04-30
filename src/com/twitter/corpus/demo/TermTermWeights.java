@@ -28,23 +28,23 @@ public class TermTermWeights implements java.io.Serializable{
 	public static HashBiMap<String,Integer> termBimap = HashBiMap.create();
 	public static HashMap<Long, ArrayList<Integer>> docTermsMap = new HashMap<Long, ArrayList<Integer>>(); 
 	private StatusStream stream;
-	private HashMap<Integer, TermDocHash> termMatrix;// = new HashMap<Integer, TermWrap>();
+	private HashMap<Integer, HashSet<Long>> termMatrix;// = new HashMap<Integer, TermWrap>();
 
 	@SuppressWarnings("unchecked")
 	public void Index() throws IOException{
-		File inFile = new File("/home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/tweetIndex/index.ser");
+		File inFile = new File("/home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/tweetIndex/index500k.ser");
 
 		if(inFile.exists()){
 			try{
 				ObjectInputStream ois = new ObjectInputStream(new FileInputStream(inFile));
-				termMatrix = (HashMap<Integer, TermDocHash>) ois.readObject();
-				ois.close(); 
+				termMatrix = (HashMap<Integer, HashSet<Long>>) ois.readObject();
+				ois.close();
 			}
 			catch(Exception e){}
 		}
 		else{
 			TweetProcessor.callStops();
-			termMatrix = new HashMap<Integer, TermDocHash>();
+			termMatrix = new HashMap<Integer, HashSet<Long>>();
 			int cnt = 0;
 			int docNum=0;
 			Status status;
@@ -60,22 +60,25 @@ public class TermTermWeights implements java.io.Serializable{
 					for(int i=0; i< pt.termIdList.size() ; i++){
 						if(!termMatrix.containsKey(pt.termIdList.get(i)))
 						{
-							TermDocHash tdh = new TermDocHash();
-							if(!tdh.docHash.contains(status.getId())){
-								tdh.docHash.add(status.getId());
+							HashSet<Long> tdh = new HashSet<Long>();
+							if(!tdh.contains(status.getId())){
+								tdh.add(status.getId());
 							}
 							termMatrix.put(pt.termIdList.get(i), tdh);
 						}
 						else
 						{
-							if(!termMatrix.get(pt.termIdList.get(i)).docHash.contains(status.getId())){
-								termMatrix.get(pt.termIdList.get(i)).docHash.add(status.getId());	// append to linkedlist, will need to be converted to array??? for access speed,, not a sparse array, still flat just taking size of linkedlist as initializer
+							if(!termMatrix.get(pt.termIdList.get(i)).contains(status.getId())){
+								termMatrix.get(pt.termIdList.get(i)).add(status.getId());	// append to linkedlist, will need to be converted to array??? for access speed,, not a sparse array, still flat just taking size of linkedlist as initializer
 							}
 						}
 					}
 					docNum++;
 					if(docNum % 10000 == 0 ){
 						LOG.info(docNum + "tweets processed");
+					}
+					if(docNum > 500000){
+						break;
 					}
 				}
 			}
