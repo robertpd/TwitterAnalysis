@@ -74,8 +74,8 @@ public class TermTermWeights implements java.io.Serializable{
 						}
 					}
 					docNum++;
-					if(docNum == 3000000){
-						break;
+					if(docNum % 10000 == 0 ){
+						LOG.info(docNum + "tweets processed");
 					}
 				}
 			}
@@ -84,7 +84,7 @@ public class TermTermWeights implements java.io.Serializable{
 			}
 			try {
 				if(termMatrix != null){
-					FileOutputStream fileOut = new FileOutputStream("/home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/tweetIndex/index.ser");
+					FileOutputStream fileOut = new FileOutputStream("/home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/tweetIndex/dirindex.ser");
 					ObjectOutputStream objectOut = new ObjectOutputStream(fileOut);
 					objectOut.flush();
 					objectOut.writeObject(termMatrix);
@@ -102,61 +102,61 @@ public class TermTermWeights implements java.io.Serializable{
 		HashMap<Integer, LinkedList<CoWeight>> coSetMap = new HashMap<Integer, LinkedList<CoWeight>>();
 
 		// 	for term i
-		Set<Integer> termMatrixKeys = termMatrix.keySet();
-		for(Integer i : termMatrixKeys){
-			long startTime = System.currentTimeMillis();
-			HashSet<Integer> termsDone = new HashSet<Integer>();
-			LinkedList<CoWeight> termCoSet = new LinkedList<CoWeight>();
-			// get termWrap contains docCount, DocList
-			HashSet<Long> docList = termMatrix.get(i).docHash;
-			Integer termINum = termMatrix.get(i).docHash.size();
-			int termIJNum;
-			// for each doc..
-			for(Long doc : docList){
-				//				termIJNum = 0;	// this is the wrong place to zero termIJNum , i think
-				int termJNum = 0;
-				// for each term i in doc..	
-				CoWeight cs = null;
-				ArrayList<Integer> termList = docTermsMap.get(doc);
-				for(Integer term : termList){
-					if(!termsDone.contains(term)){	//don't want to do same term twice..
-						termIJNum = 0;
-						if(i == 171){	// 171 == rt
-							continue;
-						}
-						HashSet<Long> termDocList = termMatrix.get(term).docHash;
-						termJNum = termDocList.size();
-						// if term produces a smaller doc set, switch to that smaller set
-						if(termINum < termJNum){
-							for(Long document :docList){
-								if(termDocList.contains(document)){
-									termIJNum++;
-								}
-							}
-						}
-						else{
-							for(Long document :termDocList){
-								if(docList.contains(document)){
-									termIJNum++;
-								}
-							}
-						}
-						int denom = termINum + termJNum - termIJNum;
-						if(denom > 0){
-							double m = (double)termIJNum / (double)denom;
-							if(m > 0.0){
-								cs = new CoWeight(term, m);
-							}
-							termCoSet.add(cs);
-						}
-					}
-					termsDone.add(term);	// set a skip list for processed terms
-				}
-			}
-			coSetMap.put(i, termCoSet);
-			Long currTime = System.currentTimeMillis();
-			LOG.info("Term " + termBimap.inverse().get(i)+ " took: " + Admin.getTime(startTime, currTime));
-		}
+//		Set<Integer> termMatrixKeys = termMatrix.keySet();
+//		for(Integer i : termMatrixKeys){
+//			long startTime = System.currentTimeMillis();
+//			HashSet<Integer> termsDone = new HashSet<Integer>();
+//			LinkedList<CoWeight> termCoSet = new LinkedList<CoWeight>();
+//			// get termWrap contains docCount, DocList
+//			HashSet<Long> docList = termMatrix.get(i).docHash;
+//			Integer termINum = termMatrix.get(i).docHash.size();
+//			int termIJNum;
+//			// for each doc..
+//			for(Long doc : docList){
+//				//				termIJNum = 0;	// this is the wrong place to zero termIJNum , i think
+//				int termJNum = 0;
+//				// for each term i in doc..	
+//				CoWeight cs = null;
+//				ArrayList<Integer> termList = docTermsMap.get(doc);
+//				for(Integer term : termList){
+//					if(!termsDone.contains(term)){	//don't want to do same term twice..
+//						termIJNum = 0;
+//						if(i == 171){	// 171 == rt
+//							continue;
+//						}
+//						HashSet<Long> termDocList = termMatrix.get(term).docHash;
+//						termJNum = termDocList.size();
+//						// if term produces a smaller doc set, switch to that smaller set
+//						if(termINum < termJNum){
+//							for(Long document :docList){
+//								if(termDocList.contains(document)){
+//									termIJNum++;
+//								}
+//							}
+//						}
+//						else{
+//							for(Long document :termDocList){
+//								if(docList.contains(document)){
+//									termIJNum++;
+//								}
+//							}
+//						}
+//						int denom = termINum + termJNum - termIJNum;
+//						if(denom > 0){
+//							double m = (double)termIJNum / (double)denom;
+//							if(m > 0.0){
+//								cs = new CoWeight(term, m);
+//							}
+//							termCoSet.add(cs);
+//						}
+//					}
+//					termsDone.add(term);	// set a skip list for processed terms
+//				}
+//			}
+//			coSetMap.put(i, termCoSet);
+//			Long currTime = System.currentTimeMillis();
+//			LOG.info("Term " + termBimap.inverse().get(i)+ " took: " + Admin.getTime(startTime, currTime));
+//		}
 	}
 //	private class TermWrap implements java.io.Serializable{
 //		TermWrap(){
