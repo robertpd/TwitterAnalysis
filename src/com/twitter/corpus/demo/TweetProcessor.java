@@ -51,11 +51,11 @@ public class TweetProcessor {
 					if(!TermTermWeights.termBimap.containsKey(prepTweet[i])){
 						TermTermWeights.termBimap.put(prepTweet[i], uniqueTermCounter);
 						uniqueTermCounter++;
-					}	
+					}
+					
 					int termId = TermTermWeights.termBimap.get(prepTweet[i]);
 					pt.termIdList.add(termId);
 					termsInDoc.add(termId);
-//					pt.termList.add(prepTweet[i]);
 				}
 			}
 		}

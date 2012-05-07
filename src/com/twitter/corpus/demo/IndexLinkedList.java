@@ -37,23 +37,25 @@ public class IndexLinkedList {
 					if (tweet == null){
 						continue;
 					}
+					// do processing on each tweet
 					ProcessedTweet pt = TweetProcessor.processTweet(status.getText(), status.getId());
 
 					for(int i=0; i< pt.termList.size() ; i++){
 						if(!termMatrix.containsKey(pt.termList.get(i)))
 						{
-							if(!docMap.containsKey(status.getId()))	{
-								docMap.put(status.getId(), docCount);
-							}
+							// removed docmapping from long to int
+//							if(!docMap.containsKey(status.getId()))	{
+//								docMap.put(status.getId(), docCount);
+//							}
 							LinkedList<Integer> termDocTrueIndex = new LinkedList<Integer>();
 							termDocTrueIndex.add(docCount);
 							termMatrix.put(pt.termList.get(i), termDocTrueIndex);
 						}
 						else
 						{
-							if(!docMap.containsKey(status.getId()))	{
-								docMap.put(status.getId(), docCount);
-							}
+//							if(!docMap.containsKey(status.getId()))	{
+//								docMap.put(status.getId(), docCount);
+//							}
 							termMatrix.get(pt.termList.get(i)).add(docCount);	// append to linkedlist, will need to be converted to array??? for access speed,, not a sparse array, still flat just taking size of linkedlist as initializer
 						}
 					}
