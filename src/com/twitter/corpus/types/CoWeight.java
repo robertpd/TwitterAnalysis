@@ -14,9 +14,4 @@ public class CoWeight implements Serializable {
 	}
 	public int termId;
 	public double correlate;
-
-//	public void clear(){
-//		this.termId = 0;
-//		this.correlate = 0.0;
-//	}
 }
