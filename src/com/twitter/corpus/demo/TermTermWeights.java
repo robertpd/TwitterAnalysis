@@ -96,7 +96,7 @@ public class TermTermWeights implements java.io.Serializable{
 						lastTime = currTime;
 
 					}
-					if(docNum > 200000){
+					if(docNum > 300000){
 						break;
 					}
 				}
@@ -142,6 +142,7 @@ public class TermTermWeights implements java.io.Serializable{
 		// 	for term i
 		//		CoWeight cs = new CoWeight(0, 0.0); 	// declare blank CoWeight, this object is reused with .clear() rather than create a new each time. Avoids a GC error ?? really?
 		int cnt=0;
+		long lastTime2=0;
 		Set<Integer> termMatrixKeys = termMatrix.keySet();
 		for(Integer i : termMatrixKeys){
 			long startTime = System.currentTimeMillis();
@@ -156,7 +157,8 @@ public class TermTermWeights implements java.io.Serializable{
 			for(Long doc : docList){
 				tdSize += docTermsMap.get(doc).size();
 			}
-			HashSet<Integer> termsDone = new HashSet<Integer>((tdSize/4));
+			HashSet<Integer> termsDone = null;
+			termsDone = new HashSet<Integer>((tdSize/4));
 			for(Long doc : docList){
 				//				termIJNum = 0;	// this is the wrong place to zero termIJNum , i think
 				int termJNum = 0;
@@ -211,7 +213,9 @@ public class TermTermWeights implements java.io.Serializable{
 			cnt++;
 			if(cnt % 1000 ==0){
 				//			LOG.info("Term " + termBimap.get(i) + " " +termBimap.inverse().get(i)+ " took: " + Admin.getTime(startTime, currTime));
-				LOG.info(cnt + " terms didnt exactly take " + Admin.getTime(startTime, currTime));
+				Long currTime2 = System.currentTimeMillis();
+				LOG.info(cnt + " terms didnt exactly take " + Admin.getTime(lastTime2, currTime2));
+				lastTime2 = currTime2;
 			}
 		}
 
@@ -238,7 +242,7 @@ public class TermTermWeights implements java.io.Serializable{
 			//			termBimap = (HashBiMap<String,Integer>) docTermMapois.readObject();
 			//			docTermMapois.close();
 
-			BufferedWriter out = new BufferedWriter(new FileWriter("/home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/tweetIndex/coset200k.txt"));
+			BufferedWriter out = new BufferedWriter(new FileWriter("/home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/tweetIndex/coset300k.txt"));
 			Set<Integer> keyset = coSetMapArray.keySet();
 			if((coSetMapArray != null )&& (termBimap != null)){
 				for(Integer c : keyset){
