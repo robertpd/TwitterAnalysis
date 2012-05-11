@@ -12,15 +12,15 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map.Entry;
 import java.util.Set;
 
-import org.apache.commons.collections.comparators.ReverseComparator;
 import org.apache.log4j.Logger;
 
 import com.google.common.collect.HashBiMap;
 import com.twitter.corpus.data.Status;
 import com.twitter.corpus.data.StatusStream;
-import com.twitter.corpus.demo.TermTermWeights.CustomComparator;
 import com.twitter.corpus.types.CoWeight;
 
 public class TermTermWeights implements java.io.Serializable{
@@ -30,11 +30,14 @@ public class TermTermWeights implements java.io.Serializable{
 		this.stream = stream;
 	}
 	private static final Logger LOG = Logger.getLogger(TermTermWeights.class);
+	// termBiMap -> map term string to int id
 	public static HashBiMap<String,Integer> termBimap = HashBiMap.create();
-	// long docid, 
+
+	// docTermsMap -> docId, list of termIds
 	public static HashMap<Long, ArrayList<Integer>> docTermsMap = new HashMap<Long, ArrayList<Integer>>(); 
 	private StatusStream stream;
-	private HashMap<Integer, HashSet<Long>> termMatrix;// = new HashMap<Integer, TermWrap>();
+	// termMatrix -> termId, set of DocumentIds
+	private HashMap<Integer, HashSet<Long>> termMatrix;
 
 	@SuppressWarnings("unchecked")
 	public void Index() throws IOException{
@@ -174,6 +177,7 @@ public class TermTermWeights implements java.io.Serializable{
 					int termJ = term.next();
 					HashSet<Long> termDocList = termMatrix.get(termJ);
 					int termJNum = termDocList.size();
+					termIJNum = 0;
 					if(termINum < termJNum){
 						for(Long document :docList){
 							if(termDocList.contains(document)){
@@ -195,7 +199,7 @@ public class TermTermWeights implements java.io.Serializable{
 						termIJNum = 0;
 						CoWeight cs = null;
 						m = (double)Math.round(m * 1000) / 1000;
-						if(m > 0.1){
+						if(m > 0.05){
 							cs = new CoWeight(termJ, m);
 						}
 						termCoSetArray.add(cs);
@@ -206,7 +210,7 @@ public class TermTermWeights implements java.io.Serializable{
 
 				//sort le coset array aroundabout here!
 				termCoSetArray.removeAll(Collections.singleton(null));
-				Collections.sort(termCoSetArray,  new CustomComparator());
+				Collections.sort(termCoSetArray,  new CoWeightComparator());
 				coSetMapArray.put(i, termCoSetArray);
 				cnt++;
 				if(cnt % 1000 ==0){
@@ -214,8 +218,11 @@ public class TermTermWeights implements java.io.Serializable{
 					LOG.info(cnt + " terms didnt exactly take " + Admin.getTime(lastTime2, currTime2));
 					lastTime2 = currTime2;
 				}
-			}
+			}// doc count filter
 		}
+		List<Entry<Integer, ArrayList<CoWeight>>> CoSetArrayList = new ArrayList<Entry<Integer, ArrayList<CoWeight>>>(coSetMapArray.entrySet());
+
+		Collections.sort(CoSetArrayList, new CoSetComparator());
 
 		//		FileOutputStream fileOut = new FileOutputStream("/home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/tweetIndex/coset11k.ser");
 		//		ObjectOutputStream objectOut = new ObjectOutputStream(fileOut);
@@ -240,28 +247,27 @@ public class TermTermWeights implements java.io.Serializable{
 			//			termBimap = (HashBiMap<String,Integer>) docTermMapois.readObject();
 			//			docTermMapois.close();
 
-			BufferedWriter out = new BufferedWriter(new FileWriter("/home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/tweetIndex/cosetX.txt"));
-			Set<Integer> keyset = coSetMapArray.keySet();
-			if((coSetMapArray != null )&& (termBimap != null)){
-				for(Integer c : keyset){
-					ArrayList<CoWeight> cwList = coSetMapArray.get(c);
+			BufferedWriter out = new BufferedWriter(new FileWriter("/home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/tweetIndex/coset_400k__0_05m__sorted_3.txt"));
+			if((CoSetArrayList != null )&& (termBimap != null)){
+				for(int i=0; i < CoSetArrayList.size(); i++){
+					ArrayList<CoWeight> cwArl = CoSetArrayList.get(i).getValue();
+					int term = CoSetArrayList.get(i).getKey();
 					StringBuffer sb = new StringBuffer();
-					int docCount = termMatrix.get(c).size();
-					//					if(docCount > 10){
-					sb.append(termBimap.inverse().get(c) + " [" + docCount + "]" + " { ");
+					int docCount = termMatrix.get(term).size();
+//					if(docCount > 10){
+					sb.append(termBimap.inverse().get(term) + " [" + docCount + "]" + " { ");
 					boolean createLine=false;
-					for(CoWeight cw: cwList){
+					for(CoWeight cw: cwArl){
 						if(cw != null){
-							//								if(cw.correlate > 0.2){
+//								if(cw.correlate > 0.2){
 							createLine = true;
 							sb.append(termBimap.inverse().get(cw.termId)+ ": " + cw.correlate + ", ");						
-							//								}
+//								}
 						}
 					}
 					if(createLine){
-						out.write(sb.append("}\n").toString());
+						out.write(sb.append(" }\n").toString());
 					}
-					//					}
 				}
 				out.close();
 			}
@@ -270,10 +276,21 @@ public class TermTermWeights implements java.io.Serializable{
 			System.out.print("asd");
 		}
 	}
-	public class CustomComparator implements Comparator<CoWeight> {
+	public class CoWeightComparator implements Comparator<CoWeight> {
 		@Override
 		public int compare(CoWeight c1, CoWeight c2) {
-			return c1.compareTo(c2);//c1.getCorrelate().compareTo(c2.getCorrelate());
+			return c1.compareTo(c2);
+		}
+	}
+	public class CoSetComparator implements Comparator<Entry<Integer, ArrayList<CoWeight>>>{
+		@Override
+		public int compare(Entry<Integer, ArrayList<CoWeight>> o1, Entry<Integer, ArrayList<CoWeight>> o2) {
+			if(termMatrix.get(o1.getKey()).size() > termMatrix.get(o2.getKey()).size())
+				return -1;
+			else if(termMatrix.get(o1.getKey()).size() < termMatrix.get(o2.getKey()).size())
+				return 1;
+			else
+				return 0;
 		}
 	}
 }
