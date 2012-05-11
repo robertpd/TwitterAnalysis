@@ -3,24 +3,24 @@ package com.twitter.corpus.demo;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
+import java.util.Iterator;
 import java.util.Set;
 
+import org.apache.commons.collections.comparators.ReverseComparator;
 import org.apache.log4j.Logger;
 
 import com.google.common.collect.HashBiMap;
 import com.twitter.corpus.data.Status;
 import com.twitter.corpus.data.StatusStream;
+import com.twitter.corpus.demo.TermTermWeights.CustomComparator;
 import com.twitter.corpus.types.CoWeight;
 
 public class TermTermWeights implements java.io.Serializable{
@@ -41,7 +41,7 @@ public class TermTermWeights implements java.io.Serializable{
 		File indexFile = new File("/home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/tweetIndex/index5.ser");
 		File docTermsMapFile = new File("/home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/tweetIndex/docTermsMap5.ser");
 		File termBiMapFile = new File("/home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/tweetIndex/termBiMap5.ser");
-
+		int rt=0;
 		if(docTermsMapFile.exists() && indexFile.exists() && termBiMapFile.exists()){
 			try{			
 				ObjectInputStream docTermMapois = new ObjectInputStream(new FileInputStream(docTermsMapFile));
@@ -67,10 +67,12 @@ public class TermTermWeights implements java.io.Serializable{
 			try {
 				while ((status = stream.next()) != null)
 				{
-					String tweet = status.getText();
-					if (tweet == null){
+					if(status.getHttpStatusCode() == 302){
+						rt++;
 						continue;
-					}
+					}					
+					String tweet = status.getText();
+					if (tweet == null){	continue;}
 					ProcessedTweet pt = TweetProcessor.processTweet(status.getText(),status.getId());
 
 					for(int i=0; i< pt.termIdList.size() ; i++){
@@ -96,17 +98,18 @@ public class TermTermWeights implements java.io.Serializable{
 						lastTime = currTime;
 
 					}
-					if(docNum > 300000){
+					if(docNum > 40000){
+						LOG.info(termMatrix.size() + " total terms.");
 						break;
 					}
 				}
 				try {
 					if(termBimap != null){
-//						FileOutputStream fileOut = new FileOutputStream("/home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/tweetIndex/termBiMap100k.ser");
-//						ObjectOutputStream objectOut = new ObjectOutputStream(fileOut);
-//						objectOut.flush();
-//						objectOut.writeObject(termBimap);
-//						objectOut.close();
+						//						FileOutputStream fileOut = new FileOutputStream("/home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/tweetIndex/termBiMap100k.ser");
+						//						ObjectOutputStream objectOut = new ObjectOutputStream(fileOut);
+						//						objectOut.flush();
+						//						objectOut.writeObject(termBimap);
+						//						objectOut.close();
 					}
 				}
 				catch(Exception e){	}
@@ -142,80 +145,75 @@ public class TermTermWeights implements java.io.Serializable{
 		// 	for term i
 		//		CoWeight cs = new CoWeight(0, 0.0); 	// declare blank CoWeight, this object is reused with .clear() rather than create a new each time. Avoids a GC error ?? really?
 		int cnt=0;
-		long lastTime2=0;
+		long lastTime2=System.currentTimeMillis();
 		Set<Integer> termMatrixKeys = termMatrix.keySet();
 		for(Integer i : termMatrixKeys){
-			long startTime = System.currentTimeMillis();
-			//			HashSet<Integer> termsDone = new HashSet<Integer>();	// removed to correct scope
-			LinkedList<CoWeight> termCoSet = new LinkedList<CoWeight>();
 			ArrayList<CoWeight> termCoSetArray = new ArrayList<CoWeight>(); 
 			HashSet<Long> docList = termMatrix.get(i);
 			Integer termINum = termMatrix.get(i).size();
-			int termIJNum;
-			
-			int tdSize=0;
-			for(Long doc : docList){
-				tdSize += docTermsMap.get(doc).size();
-			}
-			HashSet<Integer> termsDone = null;
-			termsDone = new HashSet<Integer>((tdSize/4));
-			for(Long doc : docList){
-				//				termIJNum = 0;	// this is the wrong place to zero termIJNum , i think
-				int termJNum = 0;
-				// for each term i in doc..	
-				ArrayList<Integer> termList = docTermsMap.get(doc);
-				for(Integer term : termList){
-					if(term == i){
-						continue;	//skip when i == term, ie. they are the same
-					}
-					termsDone.add(i);
-					if(!termsDone.contains(term)){	//don't want to do same term twice..
-						//						cs.clear();
-						termIJNum = 0;
-						//						if(i == 171){	// 171 == rt
-						//							continue;
-						//						}
-						HashSet<Long> termDocList = termMatrix.get(term);	// really necessary??? look up at doc : docList, here is the docId list...!
-						termJNum = termDocList.size();
-						// if term produces a smaller doc set, switch to that smaller set
-						if(termINum < termJNum){
-							for(Long document :docList){
-								if(termDocList.contains(document)){
-									termIJNum++;
-								}
-							}
-						}
-						else{
-							for(Long document :termDocList){
-								if(docList.contains(document)){
-									termIJNum++;
-								}
-							}
-						}
-						// termINum => num docs with I, termJNum => w/ J, IJ => docs with both
-						int denom = termINum + termJNum - termIJNum;
-						if(denom > 0){
-							double m = (double)termIJNum / (double)denom;
-							CoWeight cs = null;
-							if(m > 0.0){
-								//								cs = new CoWeight(term, (double)(((long)(m*100))/100));
-								cs = new CoWeight(term, m);
-							}
-							termCoSetArray.add(cs);
-						}
-					}
-					termsDone.add(term);	// set a skip list for processed terms
+			if(termINum > 5){
+				int termIJNum=0;
+				HashSet<Integer> uniqueTerms = null;
+
+				int uniqueTermsSize=0;
+				for(Long doc : docList){
+					uniqueTermsSize += docTermsMap.get(doc).size();
 				}
-			}
-			//			coSetMap.put(i, termCoSet);
-			coSetMapArray.put(i, termCoSetArray);
-			Long currTime = System.currentTimeMillis();
-			cnt++;
-			if(cnt % 1000 ==0){
-				//			LOG.info("Term " + termBimap.get(i) + " " +termBimap.inverse().get(i)+ " took: " + Admin.getTime(startTime, currTime));
-				Long currTime2 = System.currentTimeMillis();
-				LOG.info(cnt + " terms didnt exactly take " + Admin.getTime(lastTime2, currTime2));
-				lastTime2 = currTime2;
+				uniqueTerms = new HashSet<Integer>(uniqueTermsSize);
+				for(Long doc : docList){
+					ArrayList<Integer> termList = docTermsMap.get(doc);
+					for(Integer term: termList){
+						if(!uniqueTerms.contains(term)){
+							uniqueTerms.add(term);
+						}
+					}
+					uniqueTerms.remove(i);
+					termList = null;
+				}
+				for(Iterator<Integer> term = uniqueTerms.iterator(); term.hasNext();){
+					int termJ = term.next();
+					HashSet<Long> termDocList = termMatrix.get(termJ);
+					int termJNum = termDocList.size();
+					if(termINum < termJNum){
+						for(Long document :docList){
+							if(termDocList.contains(document)){
+								termIJNum++;
+							}
+						}
+					}
+					else{
+						for(Long document :termDocList){
+							if(docList.contains(document)){
+								termIJNum++;
+							}
+						}
+					}
+					// termINum => num docs with I, termJNum => w/ J, IJ => docs with both
+					int denom = termINum + termJNum - termIJNum;
+					if(denom > 0){
+						double m = (double)termIJNum / (double)denom;
+						termIJNum = 0;
+						CoWeight cs = null;
+						m = (double)Math.round(m * 1000) / 1000;
+						if(m > 0.1){
+							cs = new CoWeight(termJ, m);
+						}
+						termCoSetArray.add(cs);
+						cs = null;
+					}
+					uniqueTerms.remove(term);
+				}
+
+				//sort le coset array aroundabout here!
+				termCoSetArray.removeAll(Collections.singleton(null));
+				Collections.sort(termCoSetArray,  new CustomComparator());
+				coSetMapArray.put(i, termCoSetArray);
+				cnt++;
+				if(cnt % 1000 ==0){
+					Long currTime2 = System.currentTimeMillis();
+					LOG.info(cnt + " terms didnt exactly take " + Admin.getTime(lastTime2, currTime2));
+					lastTime2 = currTime2;
+				}
 			}
 		}
 
@@ -242,32 +240,40 @@ public class TermTermWeights implements java.io.Serializable{
 			//			termBimap = (HashBiMap<String,Integer>) docTermMapois.readObject();
 			//			docTermMapois.close();
 
-			BufferedWriter out = new BufferedWriter(new FileWriter("/home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/tweetIndex/coset300k.txt"));
+			BufferedWriter out = new BufferedWriter(new FileWriter("/home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/tweetIndex/cosetX.txt"));
 			Set<Integer> keyset = coSetMapArray.keySet();
 			if((coSetMapArray != null )&& (termBimap != null)){
 				for(Integer c : keyset){
 					ArrayList<CoWeight> cwList = coSetMapArray.get(c);
 					StringBuffer sb = new StringBuffer();
 					int docCount = termMatrix.get(c).size();
-					if(docCount > 5){
-						sb.append(termBimap.inverse().get(c) + " [" + docCount + "]" + " { ");
-						boolean createLine=false;
-						for(CoWeight cw: cwList){
-							if(cw.correlate > 0.3){
-								createLine = true;
-								sb.append(termBimap.inverse().get(cw.termId)+ ": " + cw.correlate + ", ");						
-							}
-						}
-						if(createLine){
-							out.write(sb.append("\n").toString());
+					//					if(docCount > 10){
+					sb.append(termBimap.inverse().get(c) + " [" + docCount + "]" + " { ");
+					boolean createLine=false;
+					for(CoWeight cw: cwList){
+						if(cw != null){
+							//								if(cw.correlate > 0.2){
+							createLine = true;
+							sb.append(termBimap.inverse().get(cw.termId)+ ": " + cw.correlate + ", ");						
+							//								}
 						}
 					}
+					if(createLine){
+						out.write(sb.append("}\n").toString());
+					}
+					//					}
 				}
 				out.close();
 			}
-			System.out.print("asd");
+			System.out.print("finito");
 		}catch(Exception ex){
 			System.out.print("asd");
+		}
+	}
+	public class CustomComparator implements Comparator<CoWeight> {
+		@Override
+		public int compare(CoWeight c1, CoWeight c2) {
+			return c1.compareTo(c2);//c1.getCorrelate().compareTo(c2.getCorrelate());
 		}
 	}
 }

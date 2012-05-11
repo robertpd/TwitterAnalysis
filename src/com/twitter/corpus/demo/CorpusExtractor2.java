@@ -89,7 +89,8 @@ public class CorpusExtractor2{
 			}
 		}
 
-		
+//		TermTermWeights ill = new TermTermWeights(stream);
+//		ill.Index();
 		TermTermWeights ill = new TermTermWeights(stream);
 		ill.Index();
 //		IndexLinkedList ill = new IndexLinkedList(stream);
