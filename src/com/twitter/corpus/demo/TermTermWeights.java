@@ -40,7 +40,7 @@ public class TermTermWeights implements java.io.Serializable{
 	private HashMap<Integer, HashSet<Long>> termMatrix;
 
 	@SuppressWarnings("unchecked")
-	public void Index() throws IOException{
+	public HashMap<Integer, ArrayList<CoWeight>> Index() throws IOException{
 		File indexFile = new File("/home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/tweetIndex/index5.ser");
 		File docTermsMapFile = new File("/home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/tweetIndex/docTermsMap5.ser");
 		File termBiMapFile = new File("/home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/tweetIndex/termBiMap5.ser");
@@ -101,10 +101,10 @@ public class TermTermWeights implements java.io.Serializable{
 						lastTime = currTime;
 
 					}
-					if(docNum > 40000){
-						LOG.info(termMatrix.size() + " total terms.");
-						break;
-					}
+//					if(docNum > 40000){
+//						LOG.info(termMatrix.size() + " total terms.");
+//						break;
+//					}
 				}
 				try {
 					if(termBimap != null){
@@ -220,61 +220,43 @@ public class TermTermWeights implements java.io.Serializable{
 				}
 			}// doc count filter
 		}
-		List<Entry<Integer, ArrayList<CoWeight>>> CoSetArrayList = new ArrayList<Entry<Integer, ArrayList<CoWeight>>>(coSetMapArray.entrySet());
+		
+		return coSetMapArray;
+		// slight modifaction to program flow aboveth lightly:-)
 
-		Collections.sort(CoSetArrayList, new CoSetComparator());
-
-		//		FileOutputStream fileOut = new FileOutputStream("/home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/tweetIndex/coset11k.ser");
-		//		ObjectOutputStream objectOut = new ObjectOutputStream(fileOut);
-		//		objectOut.flush();
-		//		objectOut.writeObject(coSetMapArray);
-		//		objectOut.close();
-
-		//#######################################################################################################################
-
-		//		File cosetFile = new File("/home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/tweetIndex/coset11k.ser");
-		//		try{
-		//			ObjectInputStream docTermMapois = new ObjectInputStream(new FileInputStream(cosetFile));
-		//			coSetMapArray = (HashMap<Integer, ArrayList<CoWeight>>) docTermMapois.readObject();
-		//			docTermMapois.close();
-		//		}
-		//		catch(Exception ex){}
-
-		//		File termBiMapFile = new File("/home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/tweetIndex/termBiMap11k.ser");
-		//		HashBiMap<String,Integer> termBimap;// = HashBiMap.create();
-		try{
-			//			ObjectInputStream docTermMapois = new ObjectInputStream(new FileInputStream(termBiMapFile));
-			//			termBimap = (HashBiMap<String,Integer>) docTermMapois.readObject();
-			//			docTermMapois.close();
-
-			BufferedWriter out = new BufferedWriter(new FileWriter("/home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/tweetIndex/coset_400k__0_05m__sorted_3.txt"));
-			if((CoSetArrayList != null )&& (termBimap != null)){
-				for(int i=0; i < CoSetArrayList.size(); i++){
-					ArrayList<CoWeight> cwArl = CoSetArrayList.get(i).getValue();
-					int term = CoSetArrayList.get(i).getKey();
-					StringBuffer sb = new StringBuffer();
-					int docCount = termMatrix.get(term).size();
-//					if(docCount > 10){
-					sb.append(termBimap.inverse().get(term) + " [" + docCount + "]" + " { ");
-					boolean createLine=false;
-					for(CoWeight cw: cwArl){
-						if(cw != null){
-//								if(cw.correlate > 0.2){
-							createLine = true;
-							sb.append(termBimap.inverse().get(cw.termId)+ ": " + cw.correlate + ", ");						
-//								}
-						}
-					}
-					if(createLine){
-						out.write(sb.append(" }\n").toString());
-					}
-				}
-				out.close();
-			}
-			System.out.print("finito");
-		}catch(Exception ex){
-			System.out.print("asd");
-		}
+//		List<Entry<Integer, ArrayList<CoWeight>>> CoSetArrayList = new ArrayList<Entry<Integer, ArrayList<CoWeight>>>(coSetMapArray.entrySet());
+//
+//		Collections.sort(CoSetArrayList, new CoSetComparator());
+//
+//		try{
+//			BufferedWriter out = new BufferedWriter(new FileWriter("/home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/tweetIndex/coset_400k__0_05m__sorted_3.txt"));
+//			if((CoSetArrayList != null )&& (termBimap != null)){
+//				for(int i=0; i < CoSetArrayList.size(); i++){
+//					ArrayList<CoWeight> cwArl = CoSetArrayList.get(i).getValue();
+//					int term = CoSetArrayList.get(i).getKey();
+//					StringBuffer sb = new StringBuffer();
+//					int docCount = termMatrix.get(term).size();
+////					if(docCount > 10){
+//					sb.append(termBimap.inverse().get(term) + " [" + docCount + "]" + " { ");
+//					boolean createLine=false;
+//					for(CoWeight cw: cwArl){
+//						if(cw != null){
+////								if(cw.correlate > 0.2){
+//							createLine = true;
+//							sb.append(termBimap.inverse().get(cw.termId)+ ": " + cw.correlate + ", ");						
+////								}
+//						}
+//					}
+//					if(createLine){
+//						out.write(sb.replace(sb.length()-1, sb.length()-1,"").append(" }\n").toString());
+//					}
+//				}
+//				out.close();
+//			}
+//			System.out.print("finito");
+//		}catch(Exception ex){
+//			System.out.print("asd");
+//		}
 	}
 	public class CoWeightComparator implements Comparator<CoWeight> {
 		@Override

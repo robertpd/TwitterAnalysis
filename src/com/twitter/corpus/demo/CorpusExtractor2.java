@@ -1,6 +1,8 @@
 package com.twitter.corpus.demo;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -19,6 +21,7 @@ import com.twitter.corpus.data.HtmlStatusCorpusReader;
 import com.twitter.corpus.data.JsonStatusBlockReader;
 import com.twitter.corpus.data.JsonStatusCorpusReader;
 import com.twitter.corpus.data.StatusStream;
+import com.twitter.corpus.types.CoWeight;
 
 public class CorpusExtractor2{
 	private static final Logger LOG = Logger.getLogger(IndexStatuses.class);
@@ -35,10 +38,8 @@ public class CorpusExtractor2{
 		System.out.println("Classpath = " + System.getProperty("java.class.path"));
 
 		Options options = new Options();
-		options.addOption(OptionBuilder.withArgName("path").hasArg()
-				.withDescription("input directory or file").create(INPUT_OPTION));
-		options.addOption(OptionBuilder.withArgName("path").hasArg()
-				.withDescription("index location").create(INDEX_OPTION));
+		options.addOption(OptionBuilder.withArgName("path").hasArg().withDescription("input directory or file").create(INPUT_OPTION));
+		options.addOption(OptionBuilder.withArgName("path").hasArg().withDescription("index location").create(INDEX_OPTION));
 		options.addOption(HTML_MODE, false, "input is HTML SequenceFile; mutually exclusive with -" + JSON_MODE);
 		options.addOption(JSON_MODE, false, "input is JSON; mutually exclusive with -" + HTML_MODE);
 
@@ -89,11 +90,8 @@ public class CorpusExtractor2{
 			}
 		}
 
-//		TermTermWeights ill = new TermTermWeights(stream);
-//		ill.Index();
 		TermTermWeights ill = new TermTermWeights(stream);
-		ill.Index();
-//		IndexLinkedList ill = new IndexLinkedList(stream);
-//		ill.Index();
+		HashMap<Integer, ArrayList<CoWeight>> gman = ill.Index();
+		
 	}
 }
