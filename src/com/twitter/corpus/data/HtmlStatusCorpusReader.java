@@ -17,6 +17,8 @@ public class HtmlStatusCorpusReader implements StatusStream {
 	private final FileStatus[] files;
 	private final FileSystem fs;
 
+	private int skip = 0;
+	
 	private int nextFile = 0;
 	private HtmlStatusBlockReader currentBlock = null;
 

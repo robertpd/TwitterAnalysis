@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import com.twitter.corpus.analysis.TermTermWeights;
+
 public class TweetProcessor {
 	public static Set<String> stopwords = null;
 	public static int uniqueTermCounter=0;
