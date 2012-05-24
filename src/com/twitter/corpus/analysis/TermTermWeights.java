@@ -110,7 +110,7 @@ public class TermTermWeights implements java.io.Serializable{
 						
 
 					}
-					if(docNum > 1000){
+					if(docNum > 50000){
 						LOG.info(termMatrix.size() + " total terms.");
 						counter++;
 						break;

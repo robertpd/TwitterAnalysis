@@ -110,7 +110,19 @@ public class CorpusExtractor2{
 				trendOut.close();
 
 				Collections.sort(termUniqueness, new UniquenessComparator());
-
+				int perc=0;
+				HashMap<Integer, Double> asd = new HashMap<Integer, Double>(100);
+				for(int i=0; i< termUniqueness.size()-1 ; i++){
+					if(termUniqueness.get(i).uniqueCount == termUniqueness.get(i+1).uniqueCount){
+						perc++;
+					}
+					else if(termUniqueness.get(i).uniqueCount < termUniqueness.get(i+1).uniqueCount){
+						double leval = (double)(perc*100)/(double)termUniqueness.size();
+						leval = (double)Math.round(leval * 1000) / 1000;
+						asd.put(termUniqueness.get(i).uniqueCount, leval);
+						perc=0;
+					}
+				}
 				System.out.print("finito");
 			}
 		}
