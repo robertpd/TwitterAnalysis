@@ -25,17 +25,16 @@ public class TweetProcessor {
 		"/home/dock/Documents/IR/DataSets/stopwords/spanish_stops",
 		"/home/dock/Documents/IR/DataSets/stopwords/analysis",
 	};
-	
+
 	public static void callStops() throws IOException{
 		if(stopwords == null){
 			stopwords = readFile(stopsFile);
 		}
 	}
-	
+
 	public static ProcessedTweet processTweet(String s, long docId){
 		ProcessedTweet pt = new ProcessedTweet();
 		String[] prepTweet = preprocessTweet(s);
-		
 		//	collect hash's and mentions
 		for(String token : prepTweet){
 			if(token.startsWith("#", 0)){
@@ -54,7 +53,7 @@ public class TweetProcessor {
 						TermTermWeights.termBimap.put(prepTweet[i], uniqueTermCounter);
 						uniqueTermCounter++;
 					}
-					
+
 					int termId = TermTermWeights.termBimap.get(prepTweet[i]);
 					pt.termIdList.add(termId);
 					termsInDoc.add(termId);
@@ -69,11 +68,18 @@ public class TweetProcessor {
 		// split
 		// normalize characters
 		// tokenize
-
 		String[] normElements = normalize(tweet.toLowerCase().split(" "));
 		String[] retVal = new String[normElements.length];
-		for(int i=0; i< normElements.length;i++){
-			retVal[i]=normElements[i].replaceAll("[^A-Za-z0-9@#]","");
+
+		if(tweet.contains("http")){
+			for(int i=0; i< normElements.length;i++){
+				retVal[i]=normElements[i].contains("http") ? normElements[i] :normElements[i].replaceAll("[^A-Za-z0-9@#]","");
+			}
+		}
+		else{
+			for(int i=0; i< normElements.length;i++){
+				retVal[i]=normElements[i].replaceAll("[^A-Za-z0-9@#]","");
+			}
 		}
 		return retVal;
 	}

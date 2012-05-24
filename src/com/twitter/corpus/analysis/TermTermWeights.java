@@ -25,7 +25,7 @@ import com.twitter.corpus.types.CoWeight;
 
 public class TermTermWeights implements java.io.Serializable{
 	private static final long serialVersionUID = -3094140138580705422L;
-
+	public static int counter =1;
 	public TermTermWeights(StatusStream stream) throws IOException{
 		this.stream = stream;
 	}
@@ -46,6 +46,7 @@ public class TermTermWeights implements java.io.Serializable{
 		File termBiMapFile = new File("/home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/tweetIndex/termBiMap5.ser");
 		int rt=0;
 		int skip=0;
+		
 		if(docTermsMapFile.exists() && indexFile.exists() && termBiMapFile.exists()){
 			try{			
 				ObjectInputStream docTermMapois = new ObjectInputStream(new FileInputStream(docTermsMapFile));
@@ -104,12 +105,14 @@ public class TermTermWeights implements java.io.Serializable{
 					docNum++;
 					if(docNum % 10000 == 0 ){
 						Long currTime = System.currentTimeMillis();
-						LOG.info(docNum + " tweets processed in " +  Admin.getTime(lastTime, currTime));
+						LOG.info("block: "+counter+" "+docNum + " tweets processed in " +  Admin.getTime(lastTime, currTime));
 						lastTime = currTime;
+						
 
 					}
-					if(docNum > 50000){
+					if(docNum > 1000){
 						LOG.info(termMatrix.size() + " total terms.");
+						counter++;
 						break;
 					}
 				}
