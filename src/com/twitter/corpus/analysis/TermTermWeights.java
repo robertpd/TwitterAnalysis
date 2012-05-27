@@ -26,6 +26,7 @@ import com.twitter.corpus.types.CoWeight;
 public class TermTermWeights implements java.io.Serializable{
 	private static final long serialVersionUID = -3094140138580705422L;
 	public static int counter =1;
+	public static HashSet<String> users = new HashSet<String>(10000);
 	public TermTermWeights(StatusStream stream) throws IOException{
 		this.stream = stream;
 	}
@@ -72,6 +73,7 @@ public class TermTermWeights implements java.io.Serializable{
 			try {
 				while ((status = stream.next()) != null)
 				{
+					users.add(status.getScreenname());
 					//need to implement skip deeper to be more efficient, can't, deal with it...
 //					skip++;
 //					if(skip!=17){
@@ -82,39 +84,40 @@ public class TermTermWeights implements java.io.Serializable{
 //						rt++;
 //						continue;
 //					}					
-					String tweet = status.getText();
-					if (tweet == null){	continue;}
-					ProcessedTweet pt = TweetProcessor.processTweet(status.getText(),status.getId());
-
-					for(int i=0; i< pt.termIdList.size() ; i++){
-						if(!termMatrix.containsKey(pt.termIdList.get(i)))
-						{// tdh - termDocHash
-							HashSet<Long> tdh = new HashSet<Long>();
-							if(!tdh.contains(status.getId())){
-								tdh.add(status.getId());
-							}
-							termMatrix.put(pt.termIdList.get(i), tdh);
-						}
-						else
-						{
-							if(!termMatrix.get(pt.termIdList.get(i)).contains(status.getId())){
-								termMatrix.get(pt.termIdList.get(i)).add(status.getId());
-							}
-						}
-					}
-					docNum++;
-					if(docNum % 10000 == 0 ){
-						Long currTime = System.currentTimeMillis();
-						LOG.info("block: "+counter+" "+docNum + " tweets processed in " +  Admin.getTime(lastTime, currTime));
-						lastTime = currTime;
-						
-
-					}
-					if(docNum > 50000){
-						LOG.info(termMatrix.size() + " total terms.");
-						counter++;
-						break;
-					}
+					
+//					String tweet = status.getText();
+//					if (tweet == null){	continue;}
+//					ProcessedTweet pt = TweetProcessor.processTweet(status.getText(),status.getId());
+//
+//					for(int i=0; i< pt.termIdList.size() ; i++){
+//						if(!termMatrix.containsKey(pt.termIdList.get(i)))
+//						{// tdh - termDocHash
+//							HashSet<Long> tdh = new HashSet<Long>();
+//							if(!tdh.contains(status.getId())){
+//								tdh.add(status.getId());
+//							}
+//							termMatrix.put(pt.termIdList.get(i), tdh);
+//						}
+//						else
+//						{
+//							if(!termMatrix.get(pt.termIdList.get(i)).contains(status.getId())){
+//								termMatrix.get(pt.termIdList.get(i)).add(status.getId());
+//							}
+//						}
+//					}
+//					docNum++;
+//					if(docNum % 10000 == 0 ){
+//						Long currTime = System.currentTimeMillis();
+//						LOG.info("block: "+counter+" "+docNum + " tweets processed in " +  Admin.getTime(lastTime, currTime));
+//						lastTime = currTime;
+//						
+//
+//					}
+//					if(docNum > 50000){
+//						LOG.info(termMatrix.size() + " total terms.");
+//						counter++;
+//						break;
+//					}
 				}
 				try {
 					if(termBimap != null){
@@ -147,9 +150,6 @@ public class TermTermWeights implements java.io.Serializable{
 				}
 			}
 			catch(Exception e){}
-
-
-
 		}
 
 		// weighting scheme
