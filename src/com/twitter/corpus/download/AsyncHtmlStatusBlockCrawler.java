@@ -34,7 +34,7 @@ public class AsyncHtmlStatusBlockCrawler {
   private static final Logger LOG = Logger.getLogger(AsyncHtmlStatusBlockCrawler.class);
   private static final int MAX_RETRY_ATTEMPTS = 3;
   private static final int TWEET_BLOCK_SIZE = 500;
-
+  public static int skip=0;
   private final File file;
   private final String output;
   private final AsyncHttpClient asyncHttpClient;
@@ -87,6 +87,7 @@ public class AsyncHtmlStatusBlockCrawler {
       e.printStackTrace();
     }
 
+    
     // Wait for the last requests to complete.
     try {
       Thread.sleep(10000);
@@ -171,27 +172,28 @@ public class AsyncHtmlStatusBlockCrawler {
 
     private synchronized void retry() throws Exception {
       // Wait before retrying.
-      Thread.sleep(1000);
-
-      if (!retries.containsKey(id)) {
-        retries.put(id, 1);
-        LOG.warn("Retrying: " + url + " attempt 1");
-        asyncHttpClient.prepareGet(url).execute(
-            new TweetFetcherHandler(id, username, url, isRedirect));
-        return;
-      }
-
-      int attempts = retries.get(id);
-      if (attempts > MAX_RETRY_ATTEMPTS) {
-        LOG.warn("Abandoning: " + url + " after max retry attempts");
-        return;
-      }
-
-      attempts++;
-      LOG.warn("Retrying: " + url + " attempt " + attempts);
-      asyncHttpClient.prepareGet(url).execute(
-          new TweetFetcherHandler(id, username, url, isRedirect));
-      retries.put(id, attempts);
+    	skip++;
+//      Thread.sleep(1000);
+//
+//      if (!retries.containsKey(id)) {
+//        retries.put(id, 1);
+//        LOG.warn("Retrying: " + url + " attempt 1");
+//        asyncHttpClient.prepareGet(url).execute(
+//            new TweetFetcherHandler(id, username, url, isRedirect));
+//        return;
+//      }
+//
+//      int attempts = retries.get(id);
+//      if (attempts > MAX_RETRY_ATTEMPTS) {
+//        LOG.warn("Abandoning: " + url + " after max retry attempts");
+//        return;
+//      }
+//
+//      attempts++;
+//      LOG.warn("Retrying: " + url + " attempt " + attempts);
+//      asyncHttpClient.prepareGet(url).execute(
+//          new TweetFetcherHandler(id, username, url, isRedirect));
+//      retries.put(id, attempts);
     }
   }
 

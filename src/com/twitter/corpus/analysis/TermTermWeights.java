@@ -1,9 +1,6 @@
 package com.twitter.corpus.analysis;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -40,120 +37,70 @@ public class TermTermWeights implements java.io.Serializable{
 	// termMatrix -> termId, set of DocumentIds
 	private HashMap<Integer, HashSet<Long>> termMatrix;
 
-	@SuppressWarnings("unchecked")
 	public HashMap<Integer, ArrayList<CoWeight>> Index() throws IOException{
-		File indexFile = new File("/home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/tweetIndex/index5.ser");
-		File docTermsMapFile = new File("/home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/tweetIndex/docTermsMap5.ser");
-		File termBiMapFile = new File("/home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/tweetIndex/termBiMap5.ser");
 		int rt=0;
 		int skip=0;
-		
-		if(docTermsMapFile.exists() && indexFile.exists() && termBiMapFile.exists()){
-			try{			
-				ObjectInputStream docTermMapois = new ObjectInputStream(new FileInputStream(docTermsMapFile));
-				docTermsMap = (HashMap<Long, ArrayList<Integer>>) docTermMapois.readObject();
-				docTermMapois.close();				
 
-				ObjectInputStream indexois = new ObjectInputStream(new FileInputStream(indexFile));
-				termMatrix = (HashMap<Integer, HashSet<Long>>) indexois.readObject();
-				indexois.close();
-
-				ObjectInputStream termBiMapois = new ObjectInputStream(new FileInputStream(termBiMapFile));
-				termBimap = (HashBiMap<String,Integer>) termBiMapois.readObject();
-				termBiMapois.close();				
-			}
-			catch(Exception e){}
-		}
-		else{
-			TweetProcessor.callStops();
-			termMatrix = new HashMap<Integer, HashSet<Long>>();
-			int docNum=0;
-			Status status;
-			Long lastTime = 0l;
-			try {
-				while ((status = stream.next()) != null)
-				{
-					users.add(status.getScreenname());
-					//need to implement skip deeper to be more efficient, can't, deal with it...
-//					skip++;
-//					if(skip!=17){
-//						continue;
-//					}
-//					if(skip==17){skip =0;}
-//					if(status.getHttpStatusCode() == 302){
-//						rt++;
-//						continue;
-//					}					
-					
-//					String tweet = status.getText();
-//					if (tweet == null){	continue;}
-//					ProcessedTweet pt = TweetProcessor.processTweet(status.getText(),status.getId());
-//
-//					for(int i=0; i< pt.termIdList.size() ; i++){
-//						if(!termMatrix.containsKey(pt.termIdList.get(i)))
-//						{// tdh - termDocHash
-//							HashSet<Long> tdh = new HashSet<Long>();
-//							if(!tdh.contains(status.getId())){
-//								tdh.add(status.getId());
-//							}
-//							termMatrix.put(pt.termIdList.get(i), tdh);
-//						}
-//						else
-//						{
-//							if(!termMatrix.get(pt.termIdList.get(i)).contains(status.getId())){
-//								termMatrix.get(pt.termIdList.get(i)).add(status.getId());
-//							}
-//						}
-//					}
-//					docNum++;
-//					if(docNum % 10000 == 0 ){
-//						Long currTime = System.currentTimeMillis();
-//						LOG.info("block: "+counter+" "+docNum + " tweets processed in " +  Admin.getTime(lastTime, currTime));
-//						lastTime = currTime;
-//						
-//
-//					}
-//					if(docNum > 50000){
-//						LOG.info(termMatrix.size() + " total terms.");
-//						counter++;
-//						break;
-//					}
+		TweetProcessor.callStops();
+		termMatrix = new HashMap<Integer, HashSet<Long>>();
+		int docNum=0;
+		Status status;
+		Long lastTime = 0l;
+		try {
+			while ((status = stream.next()) != null)
+			{
+				//					if(status.getText()!=null){
+				//
+				//					}
+				skip++;
+				if(skip!=17){
+					continue;
 				}
-				try {
-					if(termBimap != null){
-						//						FileOutputStream fileOut = new FileOutputStream("/home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/tweetIndex/termBiMap100k.ser");
-						//						ObjectOutputStream objectOut = new ObjectOutputStream(fileOut);
-						//						objectOut.flush();
-						//						objectOut.writeObject(termBimap);
-						//						objectOut.close();
+				if(skip==17){skip =0;}
+				if(status.getHttpStatusCode() == 302){
+					rt++;
+					continue;
+				}					
+
+				String tweet = status.getText();
+				if (tweet == null){	continue;}
+				ProcessedTweet pt = TweetProcessor.processTweet(status.getText(),status.getId());
+
+				for(int i=0; i< pt.termIdList.size() ; i++){
+					if(!termMatrix.containsKey(pt.termIdList.get(i)))
+					{// tdh - termDocHash
+						HashSet<Long> tdh = new HashSet<Long>();
+						if(!tdh.contains(status.getId())){
+							tdh.add(status.getId());
+						}
+						termMatrix.put(pt.termIdList.get(i), tdh);
+					}
+					else
+					{
+						if(!termMatrix.get(pt.termIdList.get(i)).contains(status.getId())){
+							termMatrix.get(pt.termIdList.get(i)).add(status.getId());
+						}
 					}
 				}
-				catch(Exception e){	}
-			}
-			finally
-			{
-			}
-			try {
-				if(termMatrix != null){
-					//					FileOutputStream fileOut = new FileOutputStream("/home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/tweetIndex/index500k.ser");
-					//					ObjectOutputStream objectOut = new ObjectOutputStream(fileOut);
-					//					objectOut.flush();
-					//					objectOut.writeObject(termMatrix);
-					//					objectOut.close();
+				docNum++;
+				if(docNum % 10000 == 0 ){
+					Long currTime = System.currentTimeMillis();
+					LOG.info("block: "+counter+" "+docNum + " tweets processed in " +  Admin.getTime(lastTime, currTime));
+					lastTime = currTime;
 				}
-				if(docTermsMap != null){
-					//					FileOutputStream fileOut = new FileOutputStream("/home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/tweetIndex/docTermsMap500k.ser");
-					//					ObjectOutputStream objectOut = new ObjectOutputStream(fileOut);
-					//					objectOut.flush();
-					//					objectOut.writeObject(docTermsMap);
-					//					objectOut.close();
+				if(docNum > 50000){
+					LOG.info(termMatrix.size() + " total terms.");
+					counter++;
+					break;
 				}
 			}
-			catch(Exception e){}
+		}
+		finally
+		{
 		}
 
 		// weighting scheme
-		
+
 		HashMap<Integer, ArrayList<CoWeight>> coSetMapArray = new HashMap<Integer, ArrayList<CoWeight>>();
 
 		// 	for term i
@@ -231,43 +178,43 @@ public class TermTermWeights implements java.io.Serializable{
 				}
 			}// doc count filter
 		}
-		
+
 		return coSetMapArray;
 		// slight modifaction to program flow aboveth lightly:-)
 
-//		List<Entry<Integer, ArrayList<CoWeight>>> CoSetArrayList = new ArrayList<Entry<Integer, ArrayList<CoWeight>>>(coSetMapArray.entrySet());
-//
-//		Collections.sort(CoSetArrayList, new CoSetComparator());
-//
-//		try{
-//			BufferedWriter out = new BufferedWriter(new FileWriter("/home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/tweetIndex/coset_400k__0_05m__sorted_3.txt"));
-//			if((CoSetArrayList != null )&& (termBimap != null)){
-//				for(int i=0; i < CoSetArrayList.size(); i++){
-//					ArrayList<CoWeight> cwArl = CoSetArrayList.get(i).getValue();
-//					int term = CoSetArrayList.get(i).getKey();
-//					StringBuffer sb = new StringBuffer();
-//					int docCount = termMatrix.get(term).size();
-////					if(docCount > 10){
-//					sb.append(termBimap.inverse().get(term) + " [" + docCount + "]" + " { ");
-//					boolean createLine=false;
-//					for(CoWeight cw: cwArl){
-//						if(cw != null){
-////								if(cw.correlate > 0.2){
-//							createLine = true;
-//							sb.append(termBimap.inverse().get(cw.termId)+ ": " + cw.correlate + ", ");						
-////								}
-//						}
-//					}
-//					if(createLine){
-//						out.write(sb.replace(sb.length()-1, sb.length()-1,"").append(" }\n").toString());
-//					}
-//				}
-//				out.close();
-//			}
-//			System.out.print("finito");
-//		}catch(Exception ex){
-//			System.out.print("asd");
-//		}
+		//		List<Entry<Integer, ArrayList<CoWeight>>> CoSetArrayList = new ArrayList<Entry<Integer, ArrayList<CoWeight>>>(coSetMapArray.entrySet());
+		//
+		//		Collections.sort(CoSetArrayList, new CoSetComparator());
+		//
+		//		try{
+		//			BufferedWriter out = new BufferedWriter(new FileWriter("/home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/tweetIndex/coset_400k__0_05m__sorted_3.txt"));
+		//			if((CoSetArrayList != null )&& (termBimap != null)){
+		//				for(int i=0; i < CoSetArrayList.size(); i++){
+		//					ArrayList<CoWeight> cwArl = CoSetArrayList.get(i).getValue();
+		//					int term = CoSetArrayList.get(i).getKey();
+		//					StringBuffer sb = new StringBuffer();
+		//					int docCount = termMatrix.get(term).size();
+		////					if(docCount > 10){
+		//					sb.append(termBimap.inverse().get(term) + " [" + docCount + "]" + " { ");
+		//					boolean createLine=false;
+		//					for(CoWeight cw: cwArl){
+		//						if(cw != null){
+		////								if(cw.correlate > 0.2){
+		//							createLine = true;
+		//							sb.append(termBimap.inverse().get(cw.termId)+ ": " + cw.correlate + ", ");						
+		////								}
+		//						}
+		//					}
+		//					if(createLine){
+		//						out.write(sb.replace(sb.length()-1, sb.length()-1,"").append(" }\n").toString());
+		//					}
+		//				}
+		//				out.close();
+		//			}
+		//			System.out.print("finito");
+		//		}catch(Exception ex){
+		//			System.out.print("asd");
+		//		}
 	}
 	public class CoWeightComparator implements Comparator<CoWeight> {
 		@Override

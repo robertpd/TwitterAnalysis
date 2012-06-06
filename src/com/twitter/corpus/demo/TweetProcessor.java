@@ -74,7 +74,7 @@ public class TweetProcessor {
 		if(tweet.contains("http")){
 			for(int i=0; i< normElements.length;i++){
 				retVal[i]=normElements[i].contains("http") ? normElements[i] :normElements[i].replaceAll("[^A-Za-z0-9@#]","");
-			}
+			} 
 		}
 		else{
 			for(int i=0; i< normElements.length;i++){
