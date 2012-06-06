@@ -18,6 +18,14 @@ public class InvertedIndex {
 	private static final Logger LOG = Logger.getLogger(TermTermWeights.class);
 	//	public static int counter =1;
 
+	/**
+	 * 
+	 * @param StatusStream stream
+	 * @return HashMap<Integer, HashSet<Long>> InvertIndex
+	 * <br><br>
+	 * Returns the index built from a directory
+	 * @throws IOException
+	 */
 	public HashMap<Integer, HashSet<Long>> buildIndex(StatusStream stream) throws IOException{
 		int skip=0;
 		if(TweetProcessor.stopwords == null){
@@ -30,11 +38,12 @@ public class InvertedIndex {
 		try {
 			while ((status = stream.next()) != null)
 			{
-				skip++;
-				if(skip!=17){
-					continue;
-				}
-				if(skip==17){skip =0;}
+//				skip++;
+//				if(skip!=17){
+//					continue;
+//				}
+//				if(skip==17){skip =0;}
+				// status 302 is a redirect, ie a retweet
 				if(status.getHttpStatusCode() == 302){
 					continue;
 				}					
@@ -65,7 +74,7 @@ public class InvertedIndex {
 					LOG.info("block: "/*+counter+"*/ +docNum + " tweets processed in " +  Admin.getTime(lastTime, currTime));
 					lastTime = currTime;
 				}
-				if(docNum > 50000){
+				if(docNum > 1000){
 					LOG.info(termIndex.size() + " total terms.");
 					//					counter++;
 					break;

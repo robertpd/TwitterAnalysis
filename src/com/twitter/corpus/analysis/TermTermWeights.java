@@ -34,7 +34,11 @@ public class TermTermWeights implements java.io.Serializable{
 	}
 	
 	private HashMap<Integer, HashSet<Long>> termIndex = null;
-
+	/**
+	 * 
+	 * 		@return Returns a HashMap of term and weighted correlates.
+ 	* 		@throws IOException
+ 	*/
 	public HashMap<Integer, ArrayList<CoWeight>> termCosetBuilder() throws IOException{
 
 		HashMap<Integer, ArrayList<CoWeight>> coSetMapArray = new HashMap<Integer, ArrayList<CoWeight>>();
