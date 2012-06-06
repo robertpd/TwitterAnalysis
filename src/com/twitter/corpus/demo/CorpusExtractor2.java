@@ -16,6 +16,8 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
 
+import com.twitter.corpus.analysis.InvertedIndex;
+import com.twitter.corpus.analysis.OutTermCosets;
 import com.twitter.corpus.analysis.TermTermWeights;
 import com.twitter.corpus.data.HtmlStatusCorpusReader;
 import com.twitter.corpus.data.StatusStream;
@@ -24,9 +26,7 @@ import com.twitter.corpus.types.CoWeight;
 public class CorpusExtractor2{
 	private static final Logger LOG = Logger.getLogger(IndexStatuses.class);
 	private CorpusExtractor2() {}
-	//	public static HashMap<Integer, Integer> termUniqueness;
 	public static ArrayList<UniquePairs> termUniqueness;
-
 	//	private static final String INPUT_OPTION = "input";
 	//	private static final String INDEX_OPTION = "index";
 	//	private static final String HTML_MODE = "html";
@@ -47,33 +47,37 @@ public class CorpusExtractor2{
 //				  root + "207", root + "207a", root + "208", root + "208a"};
 		//		File indexLocation = new File(cmdline.getOptionValue(INDEX_OPTION));
 
-		// Figure out if we're reading from HTML SequenceFiles or JSON.
-		int cnt=0;
+//		int cnt=0;
 		HashMap<Integer, ArrayList<CoWeight>> blockCoSet = null;
 		ArrayList<HashMap<Integer, ArrayList<CoWeight>>> corpusCoSetArray = new ArrayList<HashMap<Integer,ArrayList<CoWeight>>>();
 		for(String path : filePaths){
-			LOG.info("Indexing " + filePaths[cnt]);
+			LOG.info("Indexing " + path);
 			StatusStream stream = null;
 			FileSystem fs = FileSystem.get(new Configuration());
-			Path file = new Path(filePaths[cnt]);
+			
+			Path file = new Path(path);
+			
 			if (!fs.exists(file)) {
 				System.err.println("Error: " + file + " does not exist!");
 				System.exit(-1);
 			}
-			File dir = new File(path);
-			File[] files = dir.listFiles();
-
 			if (fs.getFileStatus(file).isDir()) {
 				stream = new HtmlStatusCorpusReader(file, fs);
 			}
-			TermTermWeights ill = new TermTermWeights(stream);
-			blockCoSet = ill.Index();
+			
+			InvertedIndex ii = new InvertedIndex();
+			HashMap<Integer, HashSet<Long>> termIndex = ii.buildIndex(stream);
+			
+			TermTermWeights ill = new TermTermWeights(termIndex);
+			blockCoSet = ill.termCosetBuilder();
 			corpusCoSetArray.add(blockCoSet);
-			cnt++;
-			//			Thread.currentThread();
-			//			Thread.sleep(20000);
+//			cnt++;
+//			Thread.currentThread();
+//			Thread.sleep(20000);
 		}
 
+		// output a day by day breakdown of term co-weights, can set a threshold of terms to skip 
+		// if they don't occur enough over the x day period, slightly dodgy
 		try{
 			if((corpusCoSetArray != null )&& (TermTermWeights.termBimap != null)){
 				Set<Integer> allKeys = new HashSet<Integer>();
@@ -136,69 +140,14 @@ public class CorpusExtractor2{
 		catch(Exception ex){
 			System.out.print("asd");
 		}
-		try{
-			if((corpusCoSetArray != null )&& (TermTermWeights.termBimap != null)){
-				Set<Integer> allKeys = new HashSet<Integer>();
-				for(int day = 0; day < corpusCoSetArray.size()-1; day++){
-					allKeys.addAll(corpusCoSetArray.get(day).keySet());						
-				}
-				BufferedWriter out = new BufferedWriter(new FileWriter("/home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/tweetIndex/all.txt"));
-
-				Iterator<Integer> termKeysIter = allKeys.iterator();
-				while(termKeysIter.hasNext()){
-					Integer term = termKeysIter.next();
-					int skip=0;
-					for(int i=0; i < corpusCoSetArray.size(); i++){
-						ArrayList<CoWeight> coWeightArrayList = corpusCoSetArray.get(i).get(term);
-						if(coWeightArrayList == null)
-							skip ++;
-					}
-					if(skip>10){
-						continue;
-					}
-					for(int i=0; i < corpusCoSetArray.size(); i++){
-						ArrayList<CoWeight> coWeightArrayList = corpusCoSetArray.get(i).get(term);
-
-						// want to block all print outs unless theres is data for 15 out of 17 days
-						StringBuffer sb = new StringBuffer();
-						if(coWeightArrayList==null){
-							out.append("Term: "+TermTermWeights.termBimap.inverse().get(term)+", Day: "+(i+1)+": { NULL }\n");
-						}
-						else{
-							boolean newLine = false;
-							boolean beginLine = true;
-							short printLimit = 0;
-							for(CoWeight cw : coWeightArrayList){
-								if(cw == null){
-									sb.append("Term: "+TermTermWeights.termBimap.inverse().get(term)+", Day: "+(i+1)+" { NULL }\n");
-								}
-								else{
-									if(beginLine){
-										sb.append("Term: "+TermTermWeights.termBimap.inverse().get(term)+", Day : "+(i+1)+" { ");
-										beginLine = false;
-									}
-									//									if(cw.correlate > 0.2){
-									if(printLimit < 5){
-										newLine = true;
-										sb.append(TermTermWeights.termBimap.inverse().get(cw.termId)+ ": " + cw.correlate + ", ");
-										printLimit++;
-									}
-									//									}
-								}
-							}
-							if(newLine){
-								out.write(sb.replace(sb.length()-2, sb.length()-2,"").append(" }\n").toString());
-							}
-						}
-					}
-				}
-				out.close();
-			}
-			System.out.print("finito");
-		}catch(Exception ex){
-			System.out.print("asd");
-		}
+		// output term trends, with static print method. prints term with list of correlates and weight		
+		OutTermCosets.print(corpusCoSetArray);
 	}
+	
+	
+	
+	
+	
 	public static class UniquenessComparator implements Comparator<UniquePairs> {
 		@Override
 		public int compare(UniquePairs arg0, UniquePairs arg1) {

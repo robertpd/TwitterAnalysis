@@ -22,84 +22,20 @@ import com.twitter.corpus.types.CoWeight;
 
 public class TermTermWeights implements java.io.Serializable{
 	private static final long serialVersionUID = -3094140138580705422L;
+	private static final Logger LOG = Logger.getLogger(TermTermWeights.class);
 	public static int counter =1;
 	public static HashSet<String> users = new HashSet<String>(10000);
-	public TermTermWeights(StatusStream stream) throws IOException{
-		this.stream = stream;
-	}
-	private static final Logger LOG = Logger.getLogger(TermTermWeights.class);
-	// termBiMap -> map term string to int id
 	public static HashBiMap<String,Integer> termBimap = HashBiMap.create();
-
 	// docTermsMap -> docId, list of termIds
 	public static HashMap<Long, ArrayList<Integer>> docTermsMap = new HashMap<Long, ArrayList<Integer>>(); 
-	private StatusStream stream;
-	// termMatrix -> termId, set of DocumentIds
-	private HashMap<Integer, HashSet<Long>> termMatrix;
 
-	public HashMap<Integer, ArrayList<CoWeight>> Index() throws IOException{
-		int rt=0;
-		int skip=0;
+	public TermTermWeights(HashMap<Integer, HashSet<Long>> termIndex) throws IOException{
+		this.termIndex = termIndex;
+	}
+	
+	private HashMap<Integer, HashSet<Long>> termIndex = null;
 
-		TweetProcessor.callStops();
-		termMatrix = new HashMap<Integer, HashSet<Long>>();
-		int docNum=0;
-		Status status;
-		Long lastTime = 0l;
-		try {
-			while ((status = stream.next()) != null)
-			{
-				//					if(status.getText()!=null){
-				//
-				//					}
-				skip++;
-				if(skip!=17){
-					continue;
-				}
-				if(skip==17){skip =0;}
-				if(status.getHttpStatusCode() == 302){
-					rt++;
-					continue;
-				}					
-
-				String tweet = status.getText();
-				if (tweet == null){	continue;}
-				ProcessedTweet pt = TweetProcessor.processTweet(status.getText(),status.getId());
-
-				for(int i=0; i< pt.termIdList.size() ; i++){
-					if(!termMatrix.containsKey(pt.termIdList.get(i)))
-					{// tdh - termDocHash
-						HashSet<Long> tdh = new HashSet<Long>();
-						if(!tdh.contains(status.getId())){
-							tdh.add(status.getId());
-						}
-						termMatrix.put(pt.termIdList.get(i), tdh);
-					}
-					else
-					{
-						if(!termMatrix.get(pt.termIdList.get(i)).contains(status.getId())){
-							termMatrix.get(pt.termIdList.get(i)).add(status.getId());
-						}
-					}
-				}
-				docNum++;
-				if(docNum % 10000 == 0 ){
-					Long currTime = System.currentTimeMillis();
-					LOG.info("block: "+counter+" "+docNum + " tweets processed in " +  Admin.getTime(lastTime, currTime));
-					lastTime = currTime;
-				}
-				if(docNum > 50000){
-					LOG.info(termMatrix.size() + " total terms.");
-					counter++;
-					break;
-				}
-			}
-		}
-		finally
-		{
-		}
-
-		// weighting scheme
+	public HashMap<Integer, ArrayList<CoWeight>> termCosetBuilder() throws IOException{
 
 		HashMap<Integer, ArrayList<CoWeight>> coSetMapArray = new HashMap<Integer, ArrayList<CoWeight>>();
 
@@ -107,11 +43,11 @@ public class TermTermWeights implements java.io.Serializable{
 		//		CoWeight cs = new CoWeight(0, 0.0); 	// declare blank CoWeight, this object is reused with .clear() rather than create a new each time. Avoids a GC error ?? really?
 		int cnt=0;
 		long lastTime2=System.currentTimeMillis();
-		Set<Integer> termMatrixKeys = termMatrix.keySet();
+		Set<Integer> termMatrixKeys = termIndex.keySet();
 		for(Integer i : termMatrixKeys){
 			ArrayList<CoWeight> termCoSetArray = new ArrayList<CoWeight>(); 
-			HashSet<Long> docList = termMatrix.get(i);
-			Integer termINum = termMatrix.get(i).size();
+			HashSet<Long> docList = termIndex.get(i);
+			Integer termINum = termIndex.get(i).size();
 			if(termINum > 1){
 				int termIJNum=0;
 				HashSet<Integer> uniqueTerms = null;
@@ -133,7 +69,7 @@ public class TermTermWeights implements java.io.Serializable{
 				}
 				for(Iterator<Integer> term = uniqueTerms.iterator(); term.hasNext();){
 					int termJ = term.next();
-					HashSet<Long> termDocList = termMatrix.get(termJ);
+					HashSet<Long> termDocList = termIndex.get(termJ);
 					int termJNum = termDocList.size();
 					termIJNum = 0;
 					if(termINum < termJNum){
@@ -225,9 +161,9 @@ public class TermTermWeights implements java.io.Serializable{
 	public class CoSetComparator implements Comparator<Entry<Integer, ArrayList<CoWeight>>>{
 		@Override
 		public int compare(Entry<Integer, ArrayList<CoWeight>> o1, Entry<Integer, ArrayList<CoWeight>> o2) {
-			if(termMatrix.get(o1.getKey()).size() > termMatrix.get(o2.getKey()).size())
+			if(termIndex.get(o1.getKey()).size() > termIndex.get(o2.getKey()).size())
 				return -1;
-			else if(termMatrix.get(o1.getKey()).size() < termMatrix.get(o2.getKey()).size())
+			else if(termIndex.get(o1.getKey()).size() < termIndex.get(o2.getKey()).size())
 				return 1;
 			else
 				return 0;
