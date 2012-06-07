@@ -13,21 +13,17 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 
 import com.google.common.collect.HashBiMap;
-import com.twitter.corpus.data.Status;
-import com.twitter.corpus.data.StatusStream;
 import com.twitter.corpus.demo.Admin;
-import com.twitter.corpus.demo.ProcessedTweet;
-import com.twitter.corpus.demo.TweetProcessor;
 import com.twitter.corpus.types.CoWeight;
+import com.twitter.corpus.types.IndexAndDocCount;
 
 public class TermTermWeights implements java.io.Serializable{
 	private static final long serialVersionUID = -3094140138580705422L;
 	private static final Logger LOG = Logger.getLogger(TermTermWeights.class);
 	public static int counter =1;
-	public static HashSet<String> users = new HashSet<String>(10000);
 	public static HashBiMap<String,Integer> termBimap = HashBiMap.create();
 	// docTermsMap -> docId, list of termIds
-	public static HashMap<Long, ArrayList<Integer>> docTermsMap = new HashMap<Long, ArrayList<Integer>>(); 
+	public static HashMap<Long, ArrayList<Integer>> docTermsMap = new HashMap<Long, ArrayList<Integer>>();
 
 	public TermTermWeights(HashMap<Integer, HashSet<Long>> termIndex) throws IOException{
 		this.termIndex = termIndex;
@@ -118,7 +114,6 @@ public class TermTermWeights implements java.io.Serializable{
 				}
 			}// doc count filter
 		}
-
 		return coSetMapArray;
 		// slight modifaction to program flow aboveth lightly:-)
 

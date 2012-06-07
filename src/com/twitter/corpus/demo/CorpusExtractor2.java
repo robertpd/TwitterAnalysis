@@ -9,6 +9,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
+import org.codehaus.jackson.map.introspect.BasicClassIntrospector.GetterMethodFilter;
 
 import com.twitter.corpus.analysis.InvertedIndex;
 import com.twitter.corpus.analysis.OutTermCosets;
@@ -16,6 +17,7 @@ import com.twitter.corpus.analysis.TermTermWeights;
 import com.twitter.corpus.data.HtmlStatusCorpusReader;
 import com.twitter.corpus.data.StatusStream;
 import com.twitter.corpus.types.CoWeight;
+import com.twitter.corpus.types.IndexAndDocCount;
 
 public class CorpusExtractor2{
 	private static final Logger LOG = Logger.getLogger(IndexStatuses.class);
@@ -29,9 +31,10 @@ public class CorpusExtractor2{
 //		System.out.println("Classpath = " + System.getProperty("java.class.path"));
 
 		String root = "/home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/html/20110";
-		String[] filePaths = {root + "123", root + "124", root + "125", root + "126", root + "127", root + "128",
-							  root + "129", root + "130", root + "131", root + "201", root + "202", root + "203",
-							  root + "204", root + "205", root + "206",	root + "207", root + "208"};
+//		String[] filePaths = {root + "123", root + "124", root + "125", root + "126", root + "127", root + "128",
+//							  root + "129", root + "130", root + "131", root + "201", root + "202", root + "203",
+//							  root + "204", root + "205", root + "206",	root + "207", root + "208"};
+		String[] filePaths = {root + "123"};
 //		String[] filePaths = {root + "123", root + "123a", root + "124", root + "124a", root + "125", root + "125a", 
 //				  root + "126", root + "126a", root + "127", root + "127a", root + "128", root + "128a",
 //				  root + "129", root + "129a", root + "130", root + "130a", root + "131", root + "131a",
@@ -60,11 +63,14 @@ public class CorpusExtractor2{
 			
 			// build index
 			InvertedIndex ii = new InvertedIndex();
-			HashMap<Integer, HashSet<Long>> termIndex = ii.buildIndex(stream);
+			HashMap<Integer, HashSet<Long>> termIndex = ii.buildIndex(stream);			
 			
 			// calculate term-term weights
 			TermTermWeights ill = new TermTermWeights(termIndex);
 			blockCoSet = ill.termCosetBuilder();
+			
+			// calculate idf for each term
+			HashMap<Integer, Double> tfidf = ii.getTfidf(termIndex);
 			
 			// add coset of particular day to array
 			corpusCoSetArray.add(blockCoSet);
@@ -79,6 +85,4 @@ public class CorpusExtractor2{
 		// this is now broken, it is supposed to print out coset from one array.... outdated now since i added support for processing all together
 		OutTermCosets.printTermCosets(corpusCoSetArray);
 	}
-	
-	
 }
