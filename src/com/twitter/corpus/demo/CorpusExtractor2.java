@@ -1,7 +1,6 @@
 package com.twitter.corpus.demo;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 
@@ -9,7 +8,6 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
-import org.codehaus.jackson.map.introspect.BasicClassIntrospector.GetterMethodFilter;
 
 import com.twitter.corpus.analysis.InvertedIndex;
 import com.twitter.corpus.analysis.OutTermCosets;
@@ -17,7 +15,6 @@ import com.twitter.corpus.analysis.TermTermWeights;
 import com.twitter.corpus.data.HtmlStatusCorpusReader;
 import com.twitter.corpus.data.StatusStream;
 import com.twitter.corpus.types.CoWeight;
-import com.twitter.corpus.types.IndexAndDocCount;
 
 public class CorpusExtractor2{
 	private static final Logger LOG = Logger.getLogger(IndexStatuses.class);

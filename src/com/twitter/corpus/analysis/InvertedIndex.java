@@ -14,13 +14,11 @@ import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 
-import com.twitter.corpus.analysis.OutTermCosets.UniquePairs;
 import com.twitter.corpus.data.Status;
 import com.twitter.corpus.data.StatusStream;
 import com.twitter.corpus.demo.Admin;
 import com.twitter.corpus.demo.ProcessedTweet;
 import com.twitter.corpus.demo.TweetProcessor;
-import com.twitter.corpus.types.IndexAndDocCount;
 
 public class InvertedIndex {
 	public InvertedIndex(){
@@ -87,7 +85,7 @@ public class InvertedIndex {
 					LOG.info(/*"block: "+counter+"*/ docNum + " tweets processed in " +  Admin.getTime(lastTime, currTime));
 					lastTime = currTime;
 				}
-				if(docNum > 10000){
+				if(docNum > 50000){
 					LOG.info(termIndex.size() + " total terms.");
 					//					counter++;
 					break;

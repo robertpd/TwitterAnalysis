@@ -7,6 +7,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
@@ -15,7 +16,6 @@ import org.apache.log4j.Logger;
 import com.google.common.collect.HashBiMap;
 import com.twitter.corpus.demo.Admin;
 import com.twitter.corpus.types.CoWeight;
-import com.twitter.corpus.types.IndexAndDocCount;
 
 public class TermTermWeights implements java.io.Serializable{
 	private static final long serialVersionUID = -3094140138580705422L;
@@ -25,16 +25,18 @@ public class TermTermWeights implements java.io.Serializable{
 	// docTermsMap -> docId, list of termIds
 	public static HashMap<Long, ArrayList<Integer>> docTermsMap = new HashMap<Long, ArrayList<Integer>>();
 
+	public static int docCount1000=0;
+	
 	public TermTermWeights(HashMap<Integer, HashSet<Long>> termIndex) throws IOException{
 		this.termIndex = termIndex;
 	}
-	
+
 	private HashMap<Integer, HashSet<Long>> termIndex = null;
 	/**
 	 * 
 	 * 		@return Returns a HashMap of term and weighted correlates.
- 	* 		@throws IOException
- 	*/
+	 * 		@throws IOException
+	 */
 	public HashMap<Integer, ArrayList<CoWeight>> termCosetBuilder() throws IOException{
 
 		HashMap<Integer, ArrayList<CoWeight>> coSetMapArray = new HashMap<Integer, ArrayList<CoWeight>>();
@@ -44,18 +46,27 @@ public class TermTermWeights implements java.io.Serializable{
 		int cnt=0;
 		long lastTime2=System.currentTimeMillis();
 		Set<Integer> termMatrixKeys = termIndex.keySet();
-		for(Integer i : termMatrixKeys){
-			ArrayList<CoWeight> termCoSetArray = new ArrayList<CoWeight>(); 
-			HashSet<Long> docList = termIndex.get(i);
-			Integer termINum = termIndex.get(i).size();
+
+		Iterator<Map.Entry<Integer, HashSet<Long>>> iter = termIndex.entrySet().iterator();
+		// iterate keys on termMatrix
+//		for(Integer i : termMatrixKeys){
+		while(iter.hasNext()){
+			Integer i = iter.next().getKey();
+			HashSet<Long> docList = termIndex.get(i);							// doclist -> list of docs for a term
+			Integer termINum = termIndex.get(i).size();		// number of documents with term "i"
+
+			docCount1000+=termINum;
 			if(termINum > 1){
 				int termIJNum=0;
 				HashSet<Integer> uniqueTerms = null;
 
+				// calc size of unique terms array..
 				int uniqueTermsSize=0;
 				for(Long doc : docList){
 					uniqueTermsSize += docTermsMap.get(doc).size();
 				}
+
+				// get the unique terms to process of documents of term i, remove term i itself..
 				uniqueTerms = new HashSet<Integer>(uniqueTermsSize);
 				for(Long doc : docList){
 					ArrayList<Integer> termList = docTermsMap.get(doc);
@@ -67,11 +78,21 @@ public class TermTermWeights implements java.io.Serializable{
 					uniqueTerms.remove(i);
 					termList = null;
 				}
+
+				// confusing, change this
+				//				Iterator<Integer> uniqueTermIter = uniqueTerms.iterator();
+				//				while(uniqueTermIter.hasNext()){
+				//					int termJ = uniqueTermIter.next();
+				//				}
+
+				// coweight array for term "i"
+				ArrayList<CoWeight> termCoSetArray = new ArrayList<CoWeight>(uniqueTerms.size());		// new coset array should have same dim as termMatrix... 
 				for(Iterator<Integer> term = uniqueTerms.iterator(); term.hasNext();){
 					int termJ = term.next();
 					HashSet<Long> termDocList = termIndex.get(termJ);
 					int termJNum = termDocList.size();
 					termIJNum = 0;
+					
 					if(termINum < termJNum){
 						for(Long document :docList){
 							if(termDocList.contains(document)){
@@ -86,20 +107,22 @@ public class TermTermWeights implements java.io.Serializable{
 							}
 						}
 					}
+					
 					// termINum => num docs with I, termJNum => w/ J, IJ => docs with both
 					int denom = termINum + termJNum - termIJNum;
-					if(denom > 0){
-						double m = (double)termIJNum / (double)denom;
-						termIJNum = 0;
-						CoWeight cs = null;
-						m = (double)Math.round(m * 1000) / 1000;
-						if(m > 0.05){
-							cs = new CoWeight(termJ, m);
-						}
-						termCoSetArray.add(cs);
-						cs = null;
+					// ilogical to have a div0
+					//					if(denom > 0){
+					double m = (double)termIJNum / (double)denom;
+					termIJNum = 0;
+					CoWeight cs = null;
+					m = (double)Math.round(m * 1000) / 1000;
+					if(m > 0.05){
+						cs = new CoWeight(termJ, m);
 					}
-					uniqueTerms.remove(term);
+					// arraylist of coweights, to be added to hashmap of terms to coweights
+					termCoSetArray.add(cs);
+					cs = null;
+					//					}
 				}
 
 				//sort le coset array aroundabout here!
@@ -111,6 +134,7 @@ public class TermTermWeights implements java.io.Serializable{
 					Long currTime2 = System.currentTimeMillis();
 					LOG.info(cnt + " terms didnt exactly take " + Admin.getTime(lastTime2, currTime2));
 					lastTime2 = currTime2;
+					docCount1000=0;
 				}
 			}// doc count filter
 		}
