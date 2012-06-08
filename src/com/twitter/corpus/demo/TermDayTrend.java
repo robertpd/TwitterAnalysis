@@ -1,8 +1,5 @@
 package com.twitter.corpus.demo;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
