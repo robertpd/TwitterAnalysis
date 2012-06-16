@@ -24,6 +24,7 @@ public class OutTermCosets {
 	 */
 	public static void printDayByDay(ArrayList<HashMap<Integer, ArrayList<CoWeight>>> corpusCoSetArray){
 		try{
+			// 
 			if((corpusCoSetArray != null )&& (TermTermWeights.termBimap != null)){
 				Set<Integer> allKeys = new HashSet<Integer>();
 				for(int day = 0; day < corpusCoSetArray.size()-1; day++){

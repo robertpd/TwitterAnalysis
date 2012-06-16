@@ -54,10 +54,12 @@ public class HtmlStatus implements Writable {
    * Serializes this object.
    */
   public void write(DataOutput out) throws IOException {
-    out.writeByte(version);
-    out.writeInt(httpStatusCode);
-    out.writeLong(timestamp);
-    out.writeUTF(html);
+//	if(html.length() + String.valueOf(timestamp).length() + Integer.toString(httpStatusCode).length() < 32000){
+		out.writeByte(version);
+	    out.writeInt(httpStatusCode);
+	    out.writeLong(timestamp);
+	    out.writeUTF(html);
+//	}	
   }
 
   @Override

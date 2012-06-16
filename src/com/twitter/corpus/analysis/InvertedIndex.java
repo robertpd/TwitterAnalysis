@@ -24,7 +24,7 @@ public class InvertedIndex {
 	public InvertedIndex(){
 	}
 	private static final Logger LOG = Logger.getLogger(TermTermWeights.class);
-	//	public static int counter =1;
+		public static int counter =1;
 
 	/**
 	 * 
@@ -45,15 +45,10 @@ public class InvertedIndex {
 
 		int docNum=0;
 		Status status;
-		Long lastTime = 0l;
+		Long lastTime = System.currentTimeMillis();
 		try {
 			while ((status = stream.next()) != null)
 			{
-				//				skip++;
-				//				if(skip!=17){
-				//					continue;
-				//				}
-				//				if(skip==17){skip =0;}
 				// status 302 is a redirect, ie a retweet
 				if(status.getHttpStatusCode() == 302){
 					continue;
@@ -82,72 +77,168 @@ public class InvertedIndex {
 				docNum++;
 				if(docNum % 10000 == 0 ){
 					Long currTime = System.currentTimeMillis();
-					LOG.info(/*"block: "+counter+"*/ docNum + " tweets processed in " +  Admin.getTime(lastTime, currTime));
+					LOG.info(/*"block: "+counter+"*/ docNum + " tweets indexed in " +  Admin.getTime(lastTime, currTime));
 					lastTime = currTime;
 				}
-				if(docNum > 100000){
-					LOG.info(termIndex.size() + " total terms.");
-					//					counter++;
-					break;
-				}
+//				if(docNum > 750000){
+//					LOG.info(termIndex.size() + " total terms.");
+//					//					counter++;
+//					break;
+//				}
 			}
+			LOG.info(termIndex.size() + " total terms indexed.");
 		}
 		finally
 		{
 		}
-//		return new IndexAndDocCount(docNum, termIndex);
-				return termIndex;
+		
+		// remove index terms with df less than 8 and > ??
+		// TODO Sort out tf upper threshold. Investigate weighting, currently looking at raw term frequencies over daily corpus, need refined weighting
+		HashMap<Integer, HashSet<Long>> thresholdIndex = new HashMap<Integer, HashSet<Long>>((int)termIndex.size()/3);
+		
+		Iterator<Map.Entry<Integer, HashSet<Long>>> indexIterator = termIndex.entrySet().iterator();
+		while(indexIterator.hasNext()){
+			Map.Entry<Integer, HashSet<Long>> termEntry = indexIterator.next();
+			if(termEntry.getValue().size() > 15 && termEntry.getValue().size() < 2000){
+				thresholdIndex.put(termEntry.getKey(), termEntry.getValue());
+			}
+		}
+		return thresholdIndex;
+
+//		return termIndex;
 	}
+	/**
+	 * 
+	 * @param index
+	 * @return a mapping of terms and their tf's
+	 * @throws IOException
+	 */
 	public HashMap<Integer, Double> getTfidf(HashMap<Integer, HashSet<Long>> index) throws IOException{
 		HashMap<Integer, Double> tfidfMap = new HashMap<Integer, Double>(index.size());
-		Iterator<Entry<Integer, HashSet<Long>>> indexIterator = index.entrySet().iterator();
+		ArrayList<Double> tfidfArrayList = new ArrayList<Double>(index.size());
 
-		// calcualte idf values
-		while(indexIterator.hasNext()){
-			Entry<Integer, HashSet<Long>> term = indexIterator.next();
-			// get IDF portion, ie terms relevance across corpus
-			Double tfidf = Math.log10(((double)TermTermWeights.docTermsMap.size()/(double)index.get(term.getKey()).size()));
-			Double roundTfIdf = (double)Math.round(tfidf * 1000) / 1000;
-			tfidfMap.put(term.getKey(), roundTfIdf);
-		}
-		HashMap<Double, Integer> freqs = new HashMap<Double, Integer>();
-		
-		// count up all idf values
-		Iterator<Map.Entry<Integer, Double>> iter = tfidfMap.entrySet().iterator();
-		while(iter.hasNext()){
-			Map.Entry<Integer, Double> entry = iter.next();
-
-			if(!freqs.containsKey(entry.getValue())){
-				freqs.put(entry.getValue(), 1);
-			}
-			else{
-				freqs.put(entry.getValue(),freqs.get(entry.getValue())+1);
+		Iterator<Entry<Integer, HashSet<Long>>> index2TFIterator = index.entrySet().iterator();
+		int http=0;
+		while(index2TFIterator.hasNext()){
+			Entry<Integer, HashSet<Long>> term = index2TFIterator.next();
+			if(TermTermWeights.termBimap.inverse().get(term.getKey()).contains("http")){
+				http++;
 			}
 		}
 		
-		// sort idf values descending and put in array..
-		ArrayList<Map.Entry<Double,Integer>> sortedArray = new ArrayList<Map.Entry<Double,Integer>>(freqs.size());
-		Iterator<Map.Entry<Double, Integer>> qwe = freqs.entrySet().iterator();
-		while(qwe.hasNext()){
-			Map.Entry<Double,Integer> next = qwe.next();
-			sortedArray.add(next);					
+		Iterator<Entry<Integer, HashSet<Long>>> indexTFIterator = index.entrySet().iterator();
+
+		// print out  list of the low freq terms ie tf=1,2,3,4...
+		BufferedWriter lowTfPtint = new BufferedWriter(new FileWriter("/home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/tweetIndex/"+counter+" lowTf_.txt"));
+		BufferedWriter highTfPtint = new BufferedWriter(new FileWriter("/home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/tweetIndex/"+counter+" highTf.txt"));
+		ArrayList<tfPair> tf = new ArrayList<tfPair>(index.size());
+		BufferedWriter idfPrint = new BufferedWriter(new FileWriter("/home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/tweetIndex/"+counter+" idf.txt"));
+		int lowLineCnt=0;
+		int highLineCnt = 0;
+		while(indexTFIterator.hasNext()){
+			Entry<Integer, HashSet<Long>> term = indexTFIterator.next();
+			// tf lower threshold
+			if(term.getValue().size() < 16){
+				lowTfPtint.append(TermTermWeights.termBimap.inverse().get(term.getKey()) + ", ");
+				lowLineCnt++;
+				if(lowLineCnt ==10){
+					lowLineCnt = 0;
+					lowTfPtint.append("\n");
+				}
+			}
+			
+			// tf upper threshold
+			if(term.getValue().size() >500){
+				highTfPtint.append(TermTermWeights.termBimap.inverse().get(term.getKey()) + ", ");
+				highLineCnt++;
+				if(highLineCnt ==10){
+					highLineCnt = 0;
+					highTfPtint.append("\n");
+				}
+			}
+			tf.add(new tfPair(term.getKey(), term.getValue().size()));
 		}
-		Collections.sort(sortedArray, new idfComparator());
-				
-				
-		BufferedWriter br = new BufferedWriter(new FileWriter("/home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/tweetIndex/idf.txt"));
-		Iterator<Map.Entry<Double,Integer>> it = freqs.entrySet().iterator();
-		while(it.hasNext()){
-			Map.Entry<Double,Integer> ent = it.next();
-			br.append(ent.getKey() + "\t" + ent.getValue() + "\n");
+		lowTfPtint.close();
+		highTfPtint.close();
+		
+		// deal with full tf 
+		Collections.sort(tf, new tfComparator2());
+		Iterator<tfPair> tfIter = tf.iterator();
+		while(tfIter.hasNext()){
+			tfPair tfp = tfIter.next();
+			idfPrint.append(tfp.tf.toString() + "\n");
 		}
-		br.close();
+		idfPrint.close();
+
+		// **********************************************************
+		// get array of term frequencies, cosrt and print them out
+//		
+//		Iterator<Entry<Integer, HashSet<Long>>> indexIterator = index.entrySet().iterator();
+//		ArrayList<Integer> tf = new ArrayList<Integer>(index.size());
+//		while(indexIterator.hasNext()){
+//			Entry<Integer, HashSet<Long>> term = indexIterator.next();
+//			tf.add(term.getValue().size());
+//		}
+//		Collections.sort(tf, new tfComparator());
+//		BufferedWriter bir = new BufferedWriter(new FileWriter("/home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/tweetIndex/idf.txt"));
+//		Iterator<Integer> tfArrayListIterator = tf.iterator();
+//		while(tfArrayListIterator.hasNext()){
+//			Integer idf = tfArrayListIterator.next();
+//			bir.append(idf + ",\n");
+//		}
+//		bir.close();
+
+
+
+//		// calcualte idf values
+//		while(indexIterator.hasNext()){
+//			Entry<Integer, HashSet<Long>> term = indexIterator.next();
+//			// get IDF portion, ie terms relevance across corpus
+//			Double tfidf = Math.log10(((double)TermTermWeights.docTermsMap.size()/(double)index.get(term.getKey()).size()));
+//			Double roundTfIdf = (double)Math.round(tfidf * 10000) / 10000;
+//			tfidfArrayList.add(roundTfIdf);
+//		}
+//		Collections.sort(tfidfArrayList, new idfComparator());
+//
+//		BufferedWriter br = new BufferedWriter(new FileWriter("/home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/tweetIndex/idf.txt"));
+//		Iterator<Double> tfidfArrayListIterator = tfidfArrayList.iterator();
+//		while(tfidfArrayListIterator.hasNext()){
+//			Double idf = tfidfArrayListIterator.next();
+//			br.append(idf + ",\n");
+//		}
+//		br.close();
+		counter++;
 		return tfidfMap;
 	}
-	public static class idfComparator implements Comparator<Map.Entry<Double,Integer>> {
+
+	public class tfPair{
+		public tfPair(Integer term, Integer tf){
+			this.term = term;
+			this.tf = tf;
+		}
+		public Integer term;
+		public Integer tf;
+	}
+
+	public static class idfComparator implements Comparator<Double> {
 		@Override
-		public int compare(Map.Entry<Double,Integer> arg0, Map.Entry<Double,Integer> arg1) {
-			return arg0.getValue().compareTo(arg1.getValue());
+		public int compare(Double arg0, Double arg1) {
+			// -1 to reverese the list, ie descending
+			return (-1)*arg0.compareTo(arg1);
+		}
+	}
+	public static class tfComparator implements Comparator<Integer> {
+		@Override
+		public int compare(Integer arg0, Integer arg1) {
+			// -1 to reverese the list, ie descending
+			return (-1)*arg0.compareTo(arg1);
+		}
+	}
+	public static class tfComparator2 implements Comparator<tfPair> {
+		@Override
+		public int compare(tfPair arg0, tfPair arg1) {
+			// -1 to reverese the list, ie descending
+			return (-1)*arg0.tf.compareTo(arg1.tf);
 		}
 	}
 }

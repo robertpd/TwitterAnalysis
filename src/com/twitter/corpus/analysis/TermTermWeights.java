@@ -89,10 +89,16 @@ public class TermTermWeights implements java.io.Serializable{
 			//				}
 
 			// coweight array for term "i"
-			ArrayList<CoWeight> termCoSetArray = new ArrayList<CoWeight>(uniqueTerms.size());		// new coset array should have same dim as termMatrix... 
+			ArrayList<CoWeight> termCoSetArray = new ArrayList<CoWeight>(uniqueTerms.size());		// new coset array should have same dim as termMatrix...
+			Set<CoWeight> termCosetSet = new HashSet<CoWeight>(uniqueTerms.size());
+			
 			for(Iterator<Integer> term = uniqueTerms.iterator(); term.hasNext();){
 				int termJ = term.next();
 				HashSet<Long> termDocList = termIndex.get(termJ);
+				// can get null here, we iterate uniqueTerms and get doc lists from termIndex. low/hi freq terms are removed from termIndex but may persist in uniqueTerms
+				if(termDocList == null){
+					continue;
+				}
 				int termJNum = termDocList.size();
 				termIJNum = 0;
 
@@ -135,7 +141,7 @@ public class TermTermWeights implements java.io.Serializable{
 			cnt++;
 			if(cnt % 1000 ==0){
 				Long currTime2 = System.currentTimeMillis();
-				LOG.info(cnt + " terms didnt exactly take " + Admin.getTime(lastTime2, currTime2));
+				LOG.info(cnt + " term coweights calculated in: " + Admin.getTime(lastTime2, currTime2));
 				lastTime2 = currTime2;
 				docCount1000=0;
 			}

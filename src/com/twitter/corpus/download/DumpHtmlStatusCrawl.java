@@ -52,8 +52,7 @@ public class DumpHtmlStatusCrawl {
 
     PrintStream out = new PrintStream(System.out, true, "UTF-8");
     while (reader.next(key, value)) {
-      out.println(String.format("========== %s ==========\n%s\n", key.toString(),
-          value.toString()));
+      out.println(String.format("========== %s ==========\n%s\n", key.toString(), value.toString()));
     }
     reader.close();
   }

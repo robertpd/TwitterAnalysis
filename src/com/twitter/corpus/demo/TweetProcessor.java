@@ -33,6 +33,7 @@ public class TweetProcessor {
 	}
 
 	public static ProcessedTweet processTweet(String s, long docId){
+		// TODO Strip retweets
 		ProcessedTweet pt = new ProcessedTweet();
 		String[] prepTweet = preprocessTweet(s);
 		//	collect hash's and mentions
@@ -71,16 +72,17 @@ public class TweetProcessor {
 		String[] normElements = normalize(tweet.toLowerCase().split(" "));
 		String[] retVal = new String[normElements.length];
 
-		if(tweet.contains("http")){
-			for(int i=0; i< normElements.length;i++){
-				retVal[i]=normElements[i].contains("http") ? normElements[i] :normElements[i].replaceAll("[^A-Za-z0-9@#]","");
-			} 
-		}
-		else{
+		// http link processing removed, 730k tweets contain 112k http links
+//		if(tweet.contains("http")){
+//			for(int i=0; i< normElements.length;i++){
+//				retVal[i]=normElements[i].contains("http") ? normElements[i] :normElements[i].replaceAll("[^A-Za-z0-9@#]","");
+//			} 
+//		}
+//		else{
 			for(int i=0; i< normElements.length;i++){
 				retVal[i]=normElements[i].replaceAll("[^A-Za-z0-9@#]","");
 			}
-		}
+//		}
 		return retVal;
 	}
 	private static String[] normalize(String[] str){

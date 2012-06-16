@@ -10,15 +10,16 @@ import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
 
 import com.twitter.corpus.analysis.InvertedIndex;
+import com.twitter.corpus.analysis.Jaccard;
 import com.twitter.corpus.analysis.OutTermCosets;
 import com.twitter.corpus.analysis.TermTermWeights;
 import com.twitter.corpus.data.HtmlStatusCorpusReader;
 import com.twitter.corpus.data.StatusStream;
 import com.twitter.corpus.types.CoWeight;
 
-public class CorpusExtractor2{
+public class TweetAnalysis{
 	private static final Logger LOG = Logger.getLogger(IndexStatuses.class);
-	private CorpusExtractor2() {}
+	private TweetAnalysis() {}
 	//	private static final String INPUT_OPTION = "input";
 	//	private static final String INDEX_OPTION = "index";
 	//	private static final String HTML_MODE = "html";
@@ -28,10 +29,10 @@ public class CorpusExtractor2{
 //		System.out.println("Classpath = " + System.getProperty("java.class.path"));
 
 		String root = "/home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/html/20110";
-//		String[] filePaths = {root + "123", root + "124", root + "125", root + "126", root + "127", root + "128",
-//							  root + "129", root + "130", root + "131", root + "201", root + "202", root + "203",
-//							  root + "204", root + "205", root + "206",	root + "207", root + "208"};
-		String[] filePaths = {root + "123"};
+		String[] filePaths = {root + "123", root + "124", root + "125", root + "126", root + "127", root + "128",
+							  root + "129", root + "130", root + "131", root + "201", root + "202", root + "203",
+							  root + "204", root + "205", root + "206",	root + "207", root + "208"};
+//		String[] filePaths = {root + "123"};
 //		String[] filePaths = {root + "123", root + "123a", root + "124", root + "124a", root + "125", root + "125a", 
 //				  root + "126", root + "126a", root + "127", root + "127a", root + "128", root + "128a",
 //				  root + "129", root + "129a", root + "130", root + "130a", root + "131", root + "131a",
@@ -42,7 +43,7 @@ public class CorpusExtractor2{
 
 //		int cnt=0;
 		HashMap<Integer, ArrayList<CoWeight>> blockCoSet = null;
-		ArrayList<HashMap<Integer, ArrayList<CoWeight>>> corpusCoSetArray = new ArrayList<HashMap<Integer,ArrayList<CoWeight>>>();
+		ArrayList<HashMap<Integer, ArrayList<CoWeight>>> corpusCoSetArray = new ArrayList<HashMap<Integer,ArrayList<CoWeight>>>(2);
 		for(String path : filePaths){
 			LOG.info("Indexing " + path);
 			StatusStream stream = null;
@@ -56,7 +57,7 @@ public class CorpusExtractor2{
 			}
 			if (fs.getFileStatus(file).isDir()) {
 				stream = new HtmlStatusCorpusReader(file, fs);
-			}
+			}		
 			
 			// build index
 			InvertedIndex ii = new InvertedIndex();
@@ -66,16 +67,30 @@ public class CorpusExtractor2{
 			TermTermWeights ill = new TermTermWeights(termIndex);
 			blockCoSet = ill.termCosetBuilder();
 			
+			// prints either day by day or one day... check and fix
+//			OutTermCosets.printDayByDay(blockCoSet);
+			
 			// calculate idf for each term
 			HashMap<Integer, Double> tfidf = ii.getTfidf(termIndex);
 			
+			// print out tfidf graph
+			
 			// add coset of particular day to array
 			corpusCoSetArray.add(blockCoSet);
-			
+			if(corpusCoSetArray.size() == 2){
+				getJaccardSimilarity(corpusCoSetArray);
+				// size is 2 get jaccards
+				// when complete nullify 1st coset array and swap 2nd to 1st position
+				//
+			}
+			Thread.sleep(50000);
 //			cnt++;
-//			Thread.currentThread();
-//			Thread.sleep(20000);
 		}
+		
+		Jaccard jac = new Jaccard();
+		jac.getJaccardSimilarity();
+		
+		OutTermCosets.printDayByDay(corpusCoSetArray);
 
 		// output term trends, with static print method. prints term with list of correlates and weight		
 		OutTermCosets.printDayByDay(corpusCoSetArray);
