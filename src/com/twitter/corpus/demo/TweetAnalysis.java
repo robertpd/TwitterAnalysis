@@ -42,8 +42,8 @@ public class TweetAnalysis{
 		//		File indexLocation = new File(cmdline.getOptionValue(INDEX_OPTION));
 
 //		int cnt=0;
-		HashMap<Integer, HashSet<CoWeight>> blockCoSet = null;
-		ArrayList<HashMap<Integer, HashSet<CoWeight>>> corpusCoSetArray = new ArrayList<HashMap<Integer, HashSet<CoWeight>>>(2);
+		HashMap<Integer, HashMap<Integer, Double>> blockCoSet = null;
+		ArrayList<HashMap<Integer, HashMap<Integer, Double>>> corpusCoSetArray = new ArrayList<HashMap<Integer, HashMap<Integer, Double>>>(2);
 		for(String path : filePaths){
 			LOG.info("Indexing " + path);
 			StatusStream stream = null;
@@ -78,6 +78,7 @@ public class TweetAnalysis{
 			// add coset of particular day to array
 			corpusCoSetArray.add(blockCoSet);
 			if(corpusCoSetArray.size() == 2){
+				Jaccard initJMap = new Jaccard(termIndex.size()/3);
 				HashMap<Integer, Double> abc = Jaccard.getJaccardSimilarity(corpusCoSetArray);
 				corpusCoSetArray.remove(0);
 				corpusCoSetArray.add(0, corpusCoSetArray.get(1));

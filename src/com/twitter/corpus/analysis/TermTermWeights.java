@@ -38,10 +38,10 @@ public class TermTermWeights implements java.io.Serializable{
 	 * 		@return Returns a HashMap of term and weighted correlates.
 	 * 		@throws IOException
 	 */
-	public HashMap<Integer, HashSet<CoWeight>> termCosetBuilder() throws IOException{
+	public HashMap<Integer, HashMap<Integer, Double>> termCosetBuilder() throws IOException{
 
-		HashMap<Integer, ArrayList<CoWeight>> coSetMapArray = new HashMap<Integer, ArrayList<CoWeight>>();
-		HashMap<Integer, HashSet<CoWeight>> cosetMap = new HashMap<Integer, HashSet<CoWeight>>();
+//		HashMap<Integer, ArrayList<CoWeight>> coSetMapArray = new HashMap<Integer, ArrayList<CoWeight>>();
+		HashMap<Integer, HashMap<Integer, Double>> cosetMap = new HashMap<Integer, HashMap<Integer, Double>>();
 
 		// 	for term i
 		//		CoWeight cs = new CoWeight(0, 0.0); 	// declare blank CoWeight, this object is reused with .clear() rather than create a new each time. Avoids a GC error ?? really?
@@ -90,8 +90,9 @@ public class TermTermWeights implements java.io.Serializable{
 			//				}
 
 			// coweight array for term "i"
-			ArrayList<CoWeight> termCoSetArray = new ArrayList<CoWeight>(uniqueTerms.size());		// new coset array should have same dim as termMatrix...
-			Set<CoWeight> termCosetSet = new HashSet<CoWeight>(uniqueTerms.size());
+//			ArrayList<CoWeight> termCoSetArray = new ArrayList<CoWeight>(uniqueTerms.size());		// new coset array should have same dim as termMatrix...
+//			Set<CoWeight> termCosetSet = new HashSet<CoWeight>(uniqueTerms.size());
+			HashMap<Integer,Double> termCosetMap = new HashMap<Integer, Double>(uniqueTerms.size());
 			
 			for(Iterator<Integer> term = uniqueTerms.iterator(); term.hasNext();){
 				int termJ = term.next();
@@ -127,12 +128,13 @@ public class TermTermWeights implements java.io.Serializable{
 				CoWeight cs = null;
 				m = (double)Math.round(m * 1000) / 1000;
 				if(m > 0.05){
-					cs = new CoWeight(termJ, m);
+//					cs = new CoWeight(termJ, m);// old, replaced by below
+					termCosetMap.put(termJ, m);
 				}
 				// arraylist of coweights, to be added to hashmap of terms to coweights
-				termCosetSet.add(cs);// the set replacement
-				termCoSetArray.add(cs);
-				cs = null;
+//				termCosetSet.add(cs);// the set replacement. This has now been replaced also; by a hashMap
+//				termCoSetArray.add(cs); // this was the first imp, used an ArrayList
+//				cs = null;
 				//					}
 			}
 
@@ -142,10 +144,11 @@ public class TermTermWeights implements java.io.Serializable{
 //			coSetMapArray.put(i, termCoSetArray);
 			
 			//TODO NEED TO SORT THIS as treeset has been reverted
-			termCosetSet.removeAll(Collections.singleton(null));
-			HashSet<CoWeight> treeSet = new HashSet<CoWeight>();
-			treeSet.addAll(termCosetSet);
-			cosetMap.put(i, treeSet);
+//			termCosetSet.removeAll(Collections.singleton(null));// meh, this wasnt needed, nulls result from resizing according to bucket ratio
+//			HashSet<CoWeight> treeSet = new HashSet<CoWeight>();
+//			treeSet.addAll(termCosetSet);
+			
+			cosetMap.put(i, termCosetMap);
 			
 			cnt++;
 			if(cnt % 1000 ==0){
