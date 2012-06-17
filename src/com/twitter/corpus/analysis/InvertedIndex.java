@@ -80,11 +80,10 @@ public class InvertedIndex {
 					LOG.info(/*"block: "+counter+"*/ docNum + " tweets indexed in " +  Admin.getTime(lastTime, currTime));
 					lastTime = currTime;
 				}
-//				if(docNum > 750000){
-//					LOG.info(termIndex.size() + " total terms.");
-//					//					counter++;
-//					break;
-//				}
+				if(docNum > 500000){
+					LOG.info(termIndex.size() + " total terms.");
+					break;
+				}
 			}
 			LOG.info(termIndex.size() + " total terms indexed.");
 		}
@@ -99,12 +98,12 @@ public class InvertedIndex {
 		Iterator<Map.Entry<Integer, HashSet<Long>>> indexIterator = termIndex.entrySet().iterator();
 		while(indexIterator.hasNext()){
 			Map.Entry<Integer, HashSet<Long>> termEntry = indexIterator.next();
-			if(termEntry.getValue().size() > 15 && termEntry.getValue().size() < 2000){
+			// frequency threshold
+//			if(termEntry.getValue().size() > 9 && termEntry.getValue().size() < 5000){
 				thresholdIndex.put(termEntry.getKey(), termEntry.getValue());
-			}
+//			}
 		}
 		return thresholdIndex;
-
 //		return termIndex;
 	}
 	/**
@@ -139,7 +138,7 @@ public class InvertedIndex {
 			Entry<Integer, HashSet<Long>> term = indexTFIterator.next();
 			// tf lower threshold
 			if(term.getValue().size() < 16){
-				lowTfPtint.append(TermTermWeights.termBimap.inverse().get(term.getKey()) + ", ");
+				lowTfPtint.append(TermTermWeights.termBimap.inverse().get(term.getKey()) + ": " + term.getValue().size() + ", ");
 				lowLineCnt++;
 				if(lowLineCnt ==10){
 					lowLineCnt = 0;
@@ -149,7 +148,7 @@ public class InvertedIndex {
 			
 			// tf upper threshold
 			if(term.getValue().size() >500){
-				highTfPtint.append(TermTermWeights.termBimap.inverse().get(term.getKey()) + ", ");
+				highTfPtint.append(TermTermWeights.termBimap.inverse().get(term.getKey()) + ": " + term.getValue().size() + ", ");
 				highLineCnt++;
 				if(highLineCnt ==10){
 					highLineCnt = 0;
@@ -166,7 +165,7 @@ public class InvertedIndex {
 		Iterator<tfPair> tfIter = tf.iterator();
 		while(tfIter.hasNext()){
 			tfPair tfp = tfIter.next();
-			idfPrint.append(tfp.tf.toString() + "\n");
+			idfPrint.append(TermTermWeights.termBimap.inverse().get(tfp.term) + ", " + tfp.tf.toString() + "\n");
 		}
 		idfPrint.close();
 
@@ -187,7 +186,6 @@ public class InvertedIndex {
 //			bir.append(idf + ",\n");
 //		}
 //		bir.close();
-
 
 
 //		// calcualte idf values

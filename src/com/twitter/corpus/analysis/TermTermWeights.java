@@ -38,9 +38,10 @@ public class TermTermWeights implements java.io.Serializable{
 	 * 		@return Returns a HashMap of term and weighted correlates.
 	 * 		@throws IOException
 	 */
-	public HashMap<Integer, ArrayList<CoWeight>> termCosetBuilder() throws IOException{
+	public HashMap<Integer, HashSet<CoWeight>> termCosetBuilder() throws IOException{
 
 		HashMap<Integer, ArrayList<CoWeight>> coSetMapArray = new HashMap<Integer, ArrayList<CoWeight>>();
+		HashMap<Integer, HashSet<CoWeight>> cosetMap = new HashMap<Integer, HashSet<CoWeight>>();
 
 		// 	for term i
 		//		CoWeight cs = new CoWeight(0, 0.0); 	// declare blank CoWeight, this object is reused with .clear() rather than create a new each time. Avoids a GC error ?? really?
@@ -129,15 +130,23 @@ public class TermTermWeights implements java.io.Serializable{
 					cs = new CoWeight(termJ, m);
 				}
 				// arraylist of coweights, to be added to hashmap of terms to coweights
+				termCosetSet.add(cs);// the set replacement
 				termCoSetArray.add(cs);
 				cs = null;
 				//					}
 			}
 
-			//sort le coset array aroundabout here!
-			termCoSetArray.removeAll(Collections.singleton(null));
-			Collections.sort(termCoSetArray,  new CoWeightComparator());
-			coSetMapArray.put(i, termCoSetArray);
+			//TODO Coset collection has been converted from ArrayList to HashSet, verify equals and hashcode methods for correctness
+//			termCoSetArray.removeAll(Collections.singleton(null));
+//			Collections.sort(termCoSetArray,  new CoWeightComparator());
+//			coSetMapArray.put(i, termCoSetArray);
+			
+			//TODO NEED TO SORT THIS as treeset has been reverted
+			termCosetSet.removeAll(Collections.singleton(null));
+			HashSet<CoWeight> treeSet = new HashSet<CoWeight>();
+			treeSet.addAll(termCosetSet);
+			cosetMap.put(i, treeSet);
+			
 			cnt++;
 			if(cnt % 1000 ==0){
 				Long currTime2 = System.currentTimeMillis();
@@ -146,42 +155,7 @@ public class TermTermWeights implements java.io.Serializable{
 				docCount1000=0;
 			}
 		}
-		return coSetMapArray;
-		// slight modifaction to program flow aboveth lightly:-)
-
-		//		List<Entry<Integer, ArrayList<CoWeight>>> CoSetArrayList = new ArrayList<Entry<Integer, ArrayList<CoWeight>>>(coSetMapArray.entrySet());
-		//
-		//		Collections.sort(CoSetArrayList, new CoSetComparator());
-		//
-		//		try{
-		//			BufferedWriter out = new BufferedWriter(new FileWriter("/home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/tweetIndex/coset_400k__0_05m__sorted_3.txt"));
-		//			if((CoSetArrayList != null )&& (termBimap != null)){
-		//				for(int i=0; i < CoSetArrayList.size(); i++){
-		//					ArrayList<CoWeight> cwArl = CoSetArrayList.get(i).getValue();
-		//					int term = CoSetArrayList.get(i).getKey();
-		//					StringBuffer sb = new StringBuffer();
-		//					int docCount = termMatrix.get(term).size();
-		////					if(docCount > 10){
-		//					sb.append(termBimap.inverse().get(term) + " [" + docCount + "]" + " { ");
-		//					boolean createLine=false;
-		//					for(CoWeight cw: cwArl){
-		//						if(cw != null){
-		////								if(cw.correlate > 0.2){
-		//							createLine = true;
-		//							sb.append(termBimap.inverse().get(cw.termId)+ ": " + cw.correlate + ", ");						
-		////								}
-		//						}
-		//					}
-		//					if(createLine){
-		//						out.write(sb.replace(sb.length()-1, sb.length()-1,"").append(" }\n").toString());
-		//					}
-		//				}
-		//				out.close();
-		//			}
-		//			System.out.print("finito");
-		//		}catch(Exception ex){
-		//			System.out.print("asd");
-		//		}
+		return cosetMap;
 	}
 	public class CoWeightComparator implements Comparator<CoWeight> {
 		@Override

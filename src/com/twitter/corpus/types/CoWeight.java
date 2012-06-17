@@ -22,4 +22,19 @@ public class CoWeight implements Serializable, Comparable<CoWeight> {
 		else
 			return 0;
 	}
+	@Override
+	public boolean equals(Object b){
+		if(b == null || b.getClass() != this.getClass()){
+			return false;
+		}
+		if(((CoWeight)b).termId== this.termId && ((CoWeight)b).correlate == this.correlate){
+			return true;
+		}
+		return false;
+	}
+	@Override
+	public int hashCode(){
+		// term should be unique
+		return this.termId;
+	}
 }
