@@ -41,7 +41,6 @@ public class Jaccard {
 			Integer term = termIterator.next();
 
 			// TODO sort out programming style
-			
 			//cosets of term from different days
 			// TODO need to remove elements as they are processed to free up memory
 			HashMap<Integer, Double> termCosetA = cosetArray.get(0).get(term);

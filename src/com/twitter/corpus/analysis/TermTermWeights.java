@@ -40,6 +40,7 @@ public class TermTermWeights implements java.io.Serializable{
 	 */
 	public HashMap<Integer, HashMap<Integer, Double>> termCosetBuilder() throws IOException{
 
+		//TODO BIGGEST TODO: remove terms with oob frequency
 //		HashMap<Integer, ArrayList<CoWeight>> coSetMapArray = new HashMap<Integer, ArrayList<CoWeight>>();
 		HashMap<Integer, HashMap<Integer, Double>> cosetMap = new HashMap<Integer, HashMap<Integer, Double>>();
 
@@ -48,6 +49,7 @@ public class TermTermWeights implements java.io.Serializable{
 		int cnt=0;
 		long lastTime2=System.currentTimeMillis();
 //		Set<Integer> termMatrixKeys = termIndex.keySet();
+		// TODO BIGGEST 2ND: termIndex was null the second time around, how???
 		HashMap<Integer,ArrayList<CoWeight>> coset2 = Maps.newHashMapWithExpectedSize(termIndex.size());
 		for(Integer i : termIndex.keySet()){
 			coset2.put(i, null);

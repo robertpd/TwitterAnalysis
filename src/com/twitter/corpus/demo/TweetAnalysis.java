@@ -1,9 +1,9 @@
 package com.twitter.corpus.demo;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.TreeSet;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
@@ -15,7 +15,6 @@ import com.twitter.corpus.analysis.Jaccard;
 import com.twitter.corpus.analysis.TermTermWeights;
 import com.twitter.corpus.data.HtmlStatusCorpusReader;
 import com.twitter.corpus.data.StatusStream;
-import com.twitter.corpus.types.CoWeight;
 
 public class TweetAnalysis{
 	private static final Logger LOG = Logger.getLogger(IndexStatuses.class);
@@ -72,25 +71,23 @@ public class TweetAnalysis{
 			
 			// calculate idf for each term
 //			HashMap<Integer, Double> tfidf = ii.getTfidf(termIndex);
+			int jaccardSize = termIndex.size() / 2;
 			termIndex =null;
 			// print out tfidf graph
 			
 			// add coset of particular day to array
 			corpusCoSetArray.add(blockCoSet);
 			if(corpusCoSetArray.size() == 2){
-				Jaccard initJMap = new Jaccard(termIndex.size()/3);
-				HashMap<Integer, Double> abc = Jaccard.getJaccardSimilarity(corpusCoSetArray);
+				// TODO only calc jaccrd on certain freq terms, is this already imp?
+				Jaccard initJMap = new Jaccard(jaccardSize);
+				Jaccard.getJaccardSimilarity(corpusCoSetArray);
+				
 				corpusCoSetArray.remove(0);
-				corpusCoSetArray.add(0, corpusCoSetArray.get(1));
-				corpusCoSetArray.remove(1);
+				Collections.swap(corpusCoSetArray, 0, 1);				
 			}
 			Thread.sleep(50000);
 //			cnt++;
 		}
-		
-		Jaccard jac = new Jaccard();
-//		jac.getJaccardSimilarity();
-		
 //		OutTermCosets.printDayByDay(corpusCoSetArray);
 
 		// output term trends, with static print method. prints term with list of correlates and weight		
