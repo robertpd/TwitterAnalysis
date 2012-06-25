@@ -2,14 +2,12 @@ package com.twitter.corpus.analysis;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
 
@@ -34,6 +32,11 @@ public class TermTermWeights implements java.io.Serializable{
 
 	private HashMap<Integer, HashSet<Long>> termIndex = null;
 	/**
+	 * <p>TermCosetBuilder:
+	 * 			return a map of coweights for terms.<br>
+	 * 			Ignores terms that < 15 times.<br>
+	 * 			Ignores coweights < 0.05.<br>
+	 * </p>
 	 * 
 	 * 		@return Returns a HashMap of term and weighted correlates.
 	 * 		@throws IOException
@@ -62,6 +65,11 @@ public class TermTermWeights implements java.io.Serializable{
 			HashSet<Long> docList = termIndex.get(i);							// doclist -> list of docs for a term
 			Integer termINum = termIndex.get(i).size();		// number of documents with term "i"
 
+			// Skip rare numbers altogether
+			if(termINum < 15){
+				continue;
+			}
+
 			docCount1000+=termINum;
 			int termIJNum=0;
 			HashSet<Integer> uniqueTerms = null;
@@ -84,8 +92,6 @@ public class TermTermWeights implements java.io.Serializable{
 				uniqueTerms.remove(i);
 				termList = null;
 			}
-
-			// confusing, change this
 			//				Iterator<Integer> uniqueTermIter = uniqueTerms.iterator();
 			//				while(uniqueTermIter.hasNext()){
 			//					int termJ = uniqueTermIter.next();
@@ -129,6 +135,8 @@ public class TermTermWeights implements java.io.Serializable{
 				termIJNum = 0;
 				CoWeight cs = null;
 				m = (double)Math.round(m * 1000) / 1000;
+
+				// Skip low coweights, as well as the above low doc number
 				if(m > 0.05){
 //					cs = new CoWeight(termJ, m);// old, replaced by below
 					termCosetMap.put(termJ, m);
