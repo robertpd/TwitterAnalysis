@@ -60,25 +60,26 @@ public class TweetAnalysis{
 			}		
 
 			// build index
-//			InvertedIndex ii = new InvertedIndex();
-//			HashMap<Integer, HashSet<Long>> termIndex = ii.buildIndex(stream);			
+			InvertedIndex ii = new InvertedIndex();
+			HashMap<Integer, HashSet<Long>> termIndex = ii.buildIndex(stream);			
 
 			// calculate term-term weights
-//			TermTermWeights ill = new TermTermWeights(termIndex);
-//			blockCoSet = ill.termCosetBuilder();
+			TermTermWeights ill = new TermTermWeights(termIndex);
+			blockCoSet = ill.termCosetBuilder();
 
 			// prints either day by day or one day... check and fix
-			//			OutTermCosets.printDayByDay(blockCoSet);
+//						OutTermCosets.printDayByDay(blockCoSet);
 
 			// estimate jaccards array size
-//			int jaccardSize = termIndex.size() / 3;
+			// TODO i think jaccard size can be based on blockcoset size
+			int jaccardSize = termIndex.size() / 3;
 //			termIndex =null;
 
 			corpusCoSetArray.add(blockCoSet);			// add coset of particular day to array
 
 			if(corpusCoSetArray.size() == 2){
 				if(initJMap == null){	// one time initializer
-//					initJMap = new Jaccard(jaccardSize);
+					initJMap = new Jaccard(jaccardSize);
 				}
 				// do the deed
 				Jaccard.getJaccardSimilarity(corpusCoSetArray);
