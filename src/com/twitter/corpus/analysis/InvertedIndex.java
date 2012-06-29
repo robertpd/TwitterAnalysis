@@ -80,10 +80,10 @@ public class InvertedIndex {
 					LOG.info(/*"block: "+counter+"*/ docNum + " tweets indexed in " +  Admin.getTime(lastTime, currTime));
 					lastTime = currTime;
 				}
-				if(docNum > 50000){
-					LOG.info(termIndex.size() + " total terms.");
-					break;
-				}
+//				if(docNum > 50000){
+//					LOG.info(termIndex.size() + " total terms.");
+//					break;
+//				}
 			}
 			LOG.info(termIndex.size() + " total terms indexed.");
 		}

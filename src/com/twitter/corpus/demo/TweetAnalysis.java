@@ -5,6 +5,13 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.GnuParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.OptionBuilder;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -18,16 +25,40 @@ import com.twitter.corpus.data.StatusStream;
 
 public class TweetAnalysis{
 	private static final Logger LOG = Logger.getLogger(IndexStatuses.class);
+	public static String jaccardOutput;
 	private TweetAnalysis() {}
-	//	private static final String INPUT_OPTION = "input";
-	//	private static final String INDEX_OPTION = "index";
+		private static final String INPUT_OPTION = "input";
+		private static final String INDEX_OPTION = "index";
 	//	private static final String HTML_MODE = "html";
 	//	private static final String JSON_MODE = "json";
 
+	
 	public static void main(String[] args) throws Exception {
 		//		System.out.println("Classpath = " + System.getProperty("java.class.path"));
+		Options options = new Options();
+		options.addOption(OptionBuilder.withArgName("path").hasArg().withDescription("input directory or file").create(INPUT_OPTION));
+		options.addOption(OptionBuilder.withArgName("path").hasArg().withDescription("index location").create(INDEX_OPTION));
+		
+		CommandLine cmdline = null;
+		CommandLineParser parser = new GnuParser();
+		try {
+			cmdline = parser.parse(options, args);
+		} catch (ParseException exp) {
+			System.err.println("Error parsing command line: " + exp.getMessage());
+			System.exit(-1);
+		}
 
-		String root = "/home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/html/20110";
+		if (!(cmdline.hasOption(INPUT_OPTION) && cmdline.hasOption(INDEX_OPTION) )) {
+			HelpFormatter formatter = new HelpFormatter();
+			formatter.printHelp(IndexStatuses.class.getName(), options);
+			System.exit(-1);
+		}
+		
+		jaccardOutput = cmdline.getOptionValue(INDEX_OPTION);
+		
+		String rootBase = cmdline.getOptionValue(INPUT_OPTION);
+		String root = rootBase + "/20110";
+//		String root = "/home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/html/20110";
 		String[] filePaths = {root + "123", root + "124", root + "125", root + "126", root + "127", root + "128",
 				root + "129", root + "130", root + "131", root + "201", root + "202", root + "203",
 				root + "204", root + "205", root + "206",	root + "207", root + "208"};
@@ -83,14 +114,17 @@ public class TweetAnalysis{
 				}
 				// do the deed
 				Jaccard.getJaccardSimilarity(corpusCoSetArray);
+				
+//				Jaccard.printResults();
 				// swap positions, makes our life easier
 				Collections.swap(corpusCoSetArray, 0, 1);
 				// remove the first coset array
 				corpusCoSetArray.remove(1);
 			}
-//			Thread.sleep(50000);	// give the poor 2GHZ cpu a break
+			Thread.sleep(60000);	// give the poor 2GHZ cpu a break
 			//			cnt++;
 		}
+		
 		//		OutTermCosets.printDayByDay(corpusCoSetArray);
 
 		// output term trends, with static print method. prints term with list of correlates and weight		
