@@ -27,18 +27,18 @@ public class TweetAnalysis{
 	private static final Logger LOG = Logger.getLogger(IndexStatuses.class);
 	public static String jaccardOutput;
 	private TweetAnalysis() {}
-		private static final String INPUT_OPTION = "input";
-		private static final String INDEX_OPTION = "index";
+	private static final String INPUT_OPTION = "input";
+	private static final String INDEX_OPTION = "index";
 	//	private static final String HTML_MODE = "html";
 	//	private static final String JSON_MODE = "json";
 
-	
+
 	public static void main(String[] args) throws Exception {
 		//		System.out.println("Classpath = " + System.getProperty("java.class.path"));
 		Options options = new Options();
 		options.addOption(OptionBuilder.withArgName("path").hasArg().withDescription("input directory or file").create(INPUT_OPTION));
 		options.addOption(OptionBuilder.withArgName("path").hasArg().withDescription("index location").create(INDEX_OPTION));
-		
+
 		CommandLine cmdline = null;
 		CommandLineParser parser = new GnuParser();
 		try {
@@ -53,12 +53,13 @@ public class TweetAnalysis{
 			formatter.printHelp(IndexStatuses.class.getName(), options);
 			System.exit(-1);
 		}
-		
+
+		int cnt=0;
 		jaccardOutput = cmdline.getOptionValue(INDEX_OPTION);
-		
+
 		String rootBase = cmdline.getOptionValue(INPUT_OPTION);
 		String root = rootBase + "/20110";
-//		String root = "/home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/html/20110";
+		//		String root = "/home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/html/20110";
 		String[] filePaths = {root + "123", root + "124", root + "125", root + "126", root + "127", root + "128",
 				root + "129", root + "130", root + "131", root + "201", root + "202", root + "203",
 				root + "204", root + "205", root + "206",	root + "207", root + "208"};
@@ -68,7 +69,7 @@ public class TweetAnalysis{
 		//				  root + "129", root + "129a", root + "130", root + "130a", root + "131", root + "131a",
 		//				  root + "201", root + "201a", root + "202", root + "202a", root + "203", root + "203a",
 		//				  root + "204", root + "204a", root + "205", root + "205a", root + "206", root + "206a", 
-		//				  root + "207", root + "207a", root + "208", root + "208a"};
+		//				  root + "207", root + "207a", root + "208"};
 		//		File indexLocation = new File(cmdline.getOptionValue(INDEX_OPTION));
 
 		//		int cnt=0;
@@ -76,7 +77,7 @@ public class TweetAnalysis{
 		Jaccard initJMap = null;
 		ArrayList<HashMap<Integer, HashMap<Integer, Double>>> corpusCoSetArray = new ArrayList<HashMap<Integer, HashMap<Integer, Double>>>(2);
 		for(String path : filePaths){
-			LOG.info("Indexing " + path);
+			LOG.info("Stream number : " + (cnt+1) + "\t. Indexing " + path);
 			StatusStream stream = null;
 			FileSystem fs = FileSystem.get(new Configuration());
 
@@ -90,46 +91,34 @@ public class TweetAnalysis{
 				stream = new HtmlStatusCorpusReader(file, fs);
 			}		
 
-			// build index
+			// 1.0 build index
 			InvertedIndex ii = new InvertedIndex();
 			HashMap<Integer, HashSet<Long>> termIndex = ii.buildIndex(stream);			
 
-			// calculate term-term weights
+			// 2.0 calculate term-term weights
 			TermTermWeights ill = new TermTermWeights(termIndex);
 			blockCoSet = ill.termCosetBuilder();
 
-			// prints either day by day or one day... check and fix
-//						OutTermCosets.printDayByDay(blockCoSet);
-
-			// estimate jaccards array size
-			// TODO i think jaccard size can be based on blockcoset size
-			int jaccardSize = termIndex.size() / 3;
-//			termIndex =null;
+			//			termIndex =null;
 
 			corpusCoSetArray.add(blockCoSet);			// add coset of particular day to array
 
-			if(corpusCoSetArray.size() == 2){
-				if(initJMap == null){	// one time initializer
-					initJMap = new Jaccard(jaccardSize);
+			if(corpusCoSetArray.size() == 2){	// only skipped once at the start
+				if(initJMap == null){			// one time initializer
+					initJMap = new Jaccard(termIndex.size() + (int)(0.1 * termIndex.size()));	// init size plus 10% for wiggle
 				}
-				// do the deed
+				// 3.0 do the deed
 				Jaccard.getJaccardSimilarity(corpusCoSetArray);
-				
-//				Jaccard.printResults();
+
+				//				Jaccard.printResults();
+
 				// swap positions, makes our life easier
 				Collections.swap(corpusCoSetArray, 0, 1);
 				// remove the first coset array
 				corpusCoSetArray.remove(1);
 			}
-			Thread.sleep(60000);	// give the poor 2GHZ cpu a break
-			//			cnt++;
+			//			Thread.sleep(60000);
+			cnt++;
 		}
-		
-		//		OutTermCosets.printDayByDay(corpusCoSetArray);
-
-		// output term trends, with static print method. prints term with list of correlates and weight		
-		//		OutTermCosets.printDayByDay(corpusCoSetArray);
-		// this is now broken, it is supposed to print out coset from one array.... outdated now since i added support for processing all together
-		//		OutTermCosets.printTermCosets(corpusCoSetArray);
 	}
 }

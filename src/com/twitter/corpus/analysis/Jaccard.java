@@ -19,8 +19,10 @@ public class Jaccard {
 	public Jaccard(int size){
 		jaccardList = new HashMap<Integer, HashMap<Integer,Double>>(size);
 	}
+	// dayCounter is used for jaccard map, also printed out on entry to jaccard calculator
 	private static int dayCounter = 0;
 	private static int unionZero = 0;
+	private static int termError = 0;
 	public static HashMap<Integer, HashMap<Integer,Double>> jaccardList;
 
 	/*** 
@@ -30,6 +32,7 @@ public class Jaccard {
 	 * @throws IOException 
 	 */
 	public static void getJaccardSimilarity(ArrayList<HashMap<Integer, HashMap<Integer, Double>>> cosetArray) throws IOException{
+		LOG.info("Interval: " + dayCounter);
 		// Get the union of the keys from both arrays
 		ArrayList<HashMap<Integer, HashMap<Integer, Double>>> copyMap = new ArrayList<HashMap<Integer,HashMap<Integer, Double>>>(cosetArray);
 		// TODO coset array contained somewhere 4370, think all entries are null and so size is zero... . why??
@@ -37,24 +40,17 @@ public class Jaccard {
 		// incorrect: union set is set of outer keys, not correlates
 		// need to get innet set of correlates to get the union
 		Set<Integer> allTerms = new HashSet<Integer>(copyMap.get(0).keySet());
-		// need intersection set to keep track of what terms have been checked
-		// Set is good as it wont add a key already present
-		// cant use simple int incremenet for intersection
+		//TODO BIGGEST TODO. ON THE PLANET! sort jaccarding to only take top 5 coweighted terms! 
 		Set<Integer> interSet = null;
 		Set<Integer> unionSet = null;
 		allTerms.addAll(copyMap.get(1).keySet());
 		copyMap = null;
-
 		
-		BufferedWriter out = new BufferedWriter(new FileWriter(TweetAnalysis.jaccardOutput + "jaccard" + dayCounter + ".txt"));
-		StringBuffer sb = new StringBuffer();
-		sb.append("Interval: " + (dayCounter +1)+ "\n" + "-------------------" + "\n");
 		// now have all unique keys and can iterate
 		Iterator<Integer> termIterator = allTerms.iterator();
-
 		while(termIterator.hasNext()){
 			Integer term = termIterator.next();
-			sb.append(TermTermWeights.termBimap.inverse().get(term) + " = ");
+
 			try{
 				interSet = new HashSet<Integer>(cosetArray.get(0).get(term).size());
 
@@ -92,60 +88,42 @@ public class Jaccard {
 					if(interSet.size() > 0 && unionSet.size() > 0){
 						jaccard = (double)interSet.size() / (double) unionSet.size();	// switch to union
 					}
-//					else{
-//						sb.append(0.0);
-//					}
-					sb.append(jaccard);
+					else{
+						jaccard = 0.0; 	// set jaccard = 0 as a placeholder, for diffing want to check agains zero
+					}
 
-//					if(!jaccardList.containsKey(term)){
-//						HashMap<Integer, Double> jEachDayMap = new HashMap<Integer, Double>(33);
-////						ArrayList<Double> jEachDay = new ArrayList<Double>(33);
-//						
-//						jEachDayMap.put(dayCounter, jaccard);
-//						jaccardList.put(term, jEachDayMap);
-//					}
-//					else{
-//						jaccardList.get(term).put(dayCounter, jaccard);
-//					}
+					if(!jaccardList.containsKey(term)){
+						HashMap<Integer, Double> jEachDayMap = new HashMap<Integer, Double>(33);	// 33 intervals
+						jEachDayMap.put(dayCounter, jaccard);
+						jaccardList.put(term, jEachDayMap);
+					}
+					else{
+						jaccardList.get(term).put(dayCounter, jaccard);
+					}
 				}
 				else{
-					sb.append(0.0);
+					// else one of set a or b is null...
+					termError++;
+					LOG.info("termCosetA or termCosetB is null.");
 				}
 			}
 			catch(NullPointerException np){
-				LOG.info("NullPointerException at Line 102 Jaccard, a term is not present one of the days" + np);
-				sb.append(0.0);
-			}
-			finally{
-				sb.append("\n");
+				termError++;
+				LOG.info("NullPointerException at Line 102 Jaccard, a term is not present one of the days");
 			}
 		}
-		out.write(sb.toString());
+		LOG.info("Term error occured " + termError + "times." );
 		dayCounter++; // must be incremented here to ensure continuity
 	}
 	
 	public static void printResults() throws IOException{
-//		BufferedWriter out = new BufferedWriter(new FileWriter("/home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/tweetIndex/jaccard.txt"));
 		BufferedWriter out = new BufferedWriter(new FileWriter(TweetAnalysis.jaccardOutput));
 		Iterator<Entry<Integer, HashMap<Integer, Double>>> termIter = jaccardList.entrySet().iterator();
 		while(termIter.hasNext()){
 			Entry<Integer, HashMap<Integer, Double>> termJacc = termIter.next();
 			StringBuffer sb = new StringBuffer();
 			sb.append(TermTermWeights.termBimap.inverse().get(termJacc.getKey()) + " { ");
-			
-			// le difference??
-//			HashMap<Integer, Double> jaccMap = new HashMap<Integer, Double>(termJacc.getValue());
-//			for(int i =0; i < 33; i++){
-//				if(jaccMap.containsKey(i)){
-//					double val = (double)Math.round(jaccMap.get(i) * 1000) / 1000;
-//					sb.append(Double.toString(val) + ", ");
-//				}
-//				else{
-//					sb.append("0.0, ");
-//				}
-//			}
-			
-			// 
+			 
 			Iterator<Entry<Integer, Double>> jaccIter = termJacc.getValue().entrySet().iterator();
 			while(jaccIter.hasNext()){
 				Entry<Integer, Double> entry = jaccIter.next();

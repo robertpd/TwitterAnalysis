@@ -31,6 +31,7 @@ public class TermTermWeights implements java.io.Serializable{
 	}
 
 	private HashMap<Integer, HashSet<Long>> termIndex = null;
+	
 	/**
 	 * <p>TermCosetBuilder:
 	 * 			return a map of coweights for terms.<br>
@@ -42,21 +43,20 @@ public class TermTermWeights implements java.io.Serializable{
 	 * 		@throws IOException
 	 */
 	public HashMap<Integer, HashMap<Integer, Double>> termCosetBuilder() throws IOException{
-
-		//TODO BIGGEST TODO: remove terms with oob frequency
-//		HashMap<Integer, ArrayList<CoWeight>> coSetMapArray = new HashMap<Integer, ArrayList<CoWeight>>();
-		HashMap<Integer, HashMap<Integer, Double>> cosetMap = new HashMap<Integer, HashMap<Integer, Double>>();
-
-		// 	for term i
-		//		CoWeight cs = new CoWeight(0, 0.0); 	// declare blank CoWeight, this object is reused with .clear() rather than create a new each time. Avoids a GC error ?? really?
-		int cnt=0;
-		long lastTime2=System.currentTimeMillis();
+		LOG.info("Starting term coweighting...");		
+		int cnt=0;	// counter for LOG.info()
+		long lastTime2=System.currentTimeMillis();	// timing for LOG.info()
+		
+		// return object cosetMap, contains terms mapped to coweights
+		HashMap<Integer, HashMap<Integer, Double>> cosetMap = new HashMap<Integer, HashMap<Integer, Double>>(termIndex.size());
 //		Set<Integer> termMatrixKeys = termIndex.keySet();
+		
 		// TODO BIGGEST 2ND: termIndex was null the second time around, how???
-		HashMap<Integer,ArrayList<CoWeight>> coset2 = Maps.newHashMapWithExpectedSize(termIndex.size());
+		HashMap<Integer, ArrayList<CoWeight>> coset2 = Maps.newHashMapWithExpectedSize(termIndex.size());
 		for(Integer i : termIndex.keySet()){
 			coset2.put(i, null);
 		}
+		
 		Iterator<Map.Entry<Integer, HashSet<Long>>> termMatrixIter = termIndex.entrySet().iterator();
 		// iterate keys on termMatrix
 		//		for(Integer i : termMatrixKeys){
@@ -71,7 +71,9 @@ public class TermTermWeights implements java.io.Serializable{
 			}
 
 			docCount1000+=termINum;
+			
 			int termIJNum=0;
+			
 			HashSet<Integer> uniqueTerms = null;
 
 			// calc size of unique terms array..
@@ -92,14 +94,11 @@ public class TermTermWeights implements java.io.Serializable{
 				uniqueTerms.remove(i);
 				termList = null;
 			}
-			//				Iterator<Integer> uniqueTermIter = uniqueTerms.iterator();
-			//				while(uniqueTermIter.hasNext()){
-			//					int termJ = uniqueTermIter.next();
-			//				}
 
 			// coweight array for term "i"
 //			ArrayList<CoWeight> termCoSetArray = new ArrayList<CoWeight>(uniqueTerms.size());		// new coset array should have same dim as termMatrix...
-//			Set<CoWeight> termCosetSet = new HashSet<CoWeight>(uniqueTerms.size());
+
+			// hashmap below will need to be sorted when getting top 5(say) coweight terms
 			HashMap<Integer,Double> termCosetMap = new HashMap<Integer, Double>(uniqueTerms.size());
 			
 			for(Iterator<Integer> term = uniqueTerms.iterator(); term.hasNext();){
@@ -129,11 +128,10 @@ public class TermTermWeights implements java.io.Serializable{
 
 				// termINum => num docs with I, termJNum => w/ J, IJ => docs with both
 				int denom = termINum + termJNum - termIJNum;
-				// ilogical to have a div0
-				//					if(denom > 0){
+
 				double m = (double)termIJNum / (double)denom;
 				termIJNum = 0;
-				CoWeight cs = null;
+//				CoWeight cs = null;
 				m = (double)Math.round(m * 1000) / 1000;
 
 				// Skip low coweights, as well as the above low doc number
@@ -142,21 +140,12 @@ public class TermTermWeights implements java.io.Serializable{
 					termCosetMap.put(termJ, m);
 				}
 				// arraylist of coweights, to be added to hashmap of terms to coweights
-//				termCosetSet.add(cs);// the set replacement. This has now been replaced also; by a hashMap
 //				termCoSetArray.add(cs); // this was the first imp, used an ArrayList
 //				cs = null;
-				//					}
 			}
-
-			//TODO Coset collection has been converted from ArrayList to HashSet, verify equals and hashcode methods for correctness
-//			termCoSetArray.removeAll(Collections.singleton(null));
-//			Collections.sort(termCoSetArray,  new CoWeightComparator());
-//			coSetMapArray.put(i, termCoSetArray);
 			
 			//TODO NEED TO SORT THIS as treeset has been reverted
-//			termCosetSet.removeAll(Collections.singleton(null));// meh, this wasnt needed, nulls result from resizing according to bucket ratio
-//			HashSet<CoWeight> treeSet = new HashSet<CoWeight>();
-//			treeSet.addAll(termCosetSet);
+//			termCosetSet.removeAll(Collections.singleton(null));
 			
 			cosetMap.put(i, termCosetMap);
 			

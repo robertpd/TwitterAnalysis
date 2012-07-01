@@ -35,12 +35,10 @@ public class InvertedIndex {
 	 * @throws IOException
 	 */
 	public HashMap<Integer, HashSet<Long>> buildIndex(StatusStream stream) throws IOException{
-		int skip=0;
 		if(TweetProcessor.stopwords == null){
 			TweetProcessor.callStops();
 		}
 		// Integer -> term id, hashset of long -> doc occurances
-
 		HashMap<Integer, HashSet<Long>> termIndex = new HashMap<Integer, HashSet<Long>>();
 
 		int docNum=0;
@@ -61,11 +59,11 @@ public class InvertedIndex {
 				for(int i=0; i< pt.termIdList.size() ; i++){
 					if(!termIndex.containsKey(pt.termIdList.get(i)))
 					{// tdh - termDocHash
-						HashSet<Long> tdh = new HashSet<Long>();
-						if(!tdh.contains(status.getId())){
-							tdh.add(status.getId());
+						HashSet<Long> termDocHashSet = new HashSet<Long>(15);
+						if(!termDocHashSet.contains(status.getId())){
+							termDocHashSet.add(status.getId());
 						}
-						termIndex.put(pt.termIdList.get(i), tdh);
+						termIndex.put(pt.termIdList.get(i), termDocHashSet);
 					}
 					else
 					{
@@ -77,15 +75,15 @@ public class InvertedIndex {
 				docNum++;
 				if(docNum % 10000 == 0 ){
 					Long currTime = System.currentTimeMillis();
-					LOG.info(/*"block: "+counter+"*/ docNum + " tweets indexed in " +  Admin.getTime(lastTime, currTime));
+					LOG.info(docNum + " tweets indexed in " +  Admin.getTime(lastTime, currTime));
 					lastTime = currTime;
 				}
-//				if(docNum > 50000){
-//					LOG.info(termIndex.size() + " total terms.");
-//					break;
-//				}
+				if(docNum > 500000){
+					LOG.info(termIndex.size() + " total terms.");
+					break;
+				}
 			}
-			LOG.info(termIndex.size() + " total terms indexed.");
+			LOG.info(termIndex.size() + " total terms indexed. Doc count >= 0.");
 		}
 		finally
 		{
@@ -93,21 +91,21 @@ public class InvertedIndex {
 		
 		// remove index terms with df less than 8 and > ??
 		// TODO Sort out tf upper threshold. Investigate weighting, currently looking at raw term frequencies over daily corpus, need refined weighting
-		HashMap<Integer, HashSet<Long>> thresholdIndex = new HashMap<Integer, HashSet<Long>>((int)termIndex.size()/3);
+		HashMap<Integer, HashSet<Long>> thresholdIndex = new HashMap<Integer, HashSet<Long>>((int)termIndex.size()/2);
 		
 		Iterator<Map.Entry<Integer, HashSet<Long>>> indexIterator = termIndex.entrySet().iterator();
 		while(indexIterator.hasNext()){
 			Map.Entry<Integer, HashSet<Long>> termEntry = indexIterator.next();
 			// frequency threshold
-//			if(termEntry.getValue().size() > 9 && termEntry.getValue().size() < 5000){
+			if(termEntry.getValue().size() > 15 && termEntry.getValue().size() < 5000){
 				thresholdIndex.put(termEntry.getKey(), termEntry.getValue());
-//			}
+			}
 		}
+		LOG.info(thresholdIndex.size() + " term after trimming.");
 		return thresholdIndex;
-//		return termIndex;
 	}
 	/**
-	 * 
+	 * Get the tfIdf for each term
 	 * @param index
 	 * @return a mapping of terms and their tf's
 	 * @throws IOException
@@ -168,43 +166,6 @@ public class InvertedIndex {
 			idfPrint.append(TermTermWeights.termBimap.inverse().get(tfp.term) + ", " + tfp.tf.toString() + "\n");
 		}
 		idfPrint.close();
-
-		// **********************************************************
-		// get array of term frequencies, cosrt and print them out
-//		
-//		Iterator<Entry<Integer, HashSet<Long>>> indexIterator = index.entrySet().iterator();
-//		ArrayList<Integer> tf = new ArrayList<Integer>(index.size());
-//		while(indexIterator.hasNext()){
-//			Entry<Integer, HashSet<Long>> term = indexIterator.next();
-//			tf.add(term.getValue().size());
-//		}
-//		Collections.sort(tf, new tfComparator());
-//		BufferedWriter bir = new BufferedWriter(new FileWriter("/home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/tweetIndex/idf.txt"));
-//		Iterator<Integer> tfArrayListIterator = tf.iterator();
-//		while(tfArrayListIterator.hasNext()){
-//			Integer idf = tfArrayListIterator.next();
-//			bir.append(idf + ",\n");
-//		}
-//		bir.close();
-
-
-//		// calcualte idf values
-//		while(indexIterator.hasNext()){
-//			Entry<Integer, HashSet<Long>> term = indexIterator.next();
-//			// get IDF portion, ie terms relevance across corpus
-//			Double tfidf = Math.log10(((double)TermTermWeights.docTermsMap.size()/(double)index.get(term.getKey()).size()));
-//			Double roundTfIdf = (double)Math.round(tfidf * 10000) / 10000;
-//			tfidfArrayList.add(roundTfIdf);
-//		}
-//		Collections.sort(tfidfArrayList, new idfComparator());
-//
-//		BufferedWriter br = new BufferedWriter(new FileWriter("/home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/tweetIndex/idf.txt"));
-//		Iterator<Double> tfidfArrayListIterator = tfidfArrayList.iterator();
-//		while(tfidfArrayListIterator.hasNext()){
-//			Double idf = tfidfArrayListIterator.next();
-//			br.append(idf + ",\n");
-//		}
-//		br.close();
 		counter++;
 		return tfidfMap;
 	}
