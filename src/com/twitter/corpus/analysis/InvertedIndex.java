@@ -73,15 +73,15 @@ public class InvertedIndex {
 					}
 				}
 				docNum++;
-				if(docNum % 10000 == 0 ){
+				if(docNum % 50000 == 0 ){
 					Long currTime = System.currentTimeMillis();
 					LOG.info(docNum + " tweets indexed in " +  Admin.getTime(lastTime, currTime));
 					lastTime = currTime;
 				}
-				if(docNum > 500000){
-					LOG.info(termIndex.size() + " total terms.");
-					break;
-				}
+//				if(docNum > 50000){
+//					LOG.info(termIndex.size() + " total terms.");
+//					break;
+//				}
 			}
 			LOG.info(termIndex.size() + " total terms indexed. Doc count >= 0.");
 		}

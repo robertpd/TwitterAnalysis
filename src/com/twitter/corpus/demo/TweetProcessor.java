@@ -15,15 +15,28 @@ import com.twitter.corpus.analysis.TermTermWeights;
 public class TweetProcessor {
 	public static Set<String> stopwords = null;
 	public static int uniqueTermCounter=0;
-	private static String stopsFile[] = {"/home/dock/Documents/IR/DataSets/stopwords/english",
-		"/home/dock/Documents/IR/DataSets/stopwords/misc",
-		"/home/dock/Documents/IR/DataSets/stopwords/french",
-		"/home/dock/Documents/IR/DataSets/stopwords/english",
-		"/home/dock/Documents/IR/DataSets/stopwords/portuguese",
-		"/home/dock/Documents/IR/DataSets/stopwords/non_eng_stops",
-		"/home/dock/Documents/IR/DataSets/stopwords/portu_stops",
-		"/home/dock/Documents/IR/DataSets/stopwords/spanish_stops",
-		"/home/dock/Documents/IR/DataSets/stopwords/analysis",
+//	private static String stopsFile[] = {"/home/dock/Documents/IR/DataSets/stopwords/english",
+//		"/home/dock/Documents/IR/DataSets/stopwords/misc",
+//		"/home/dock/Documents/IR/DataSets/stopwords/french",
+//		"/home/dock/Documents/IR/DataSets/stopwords/english",
+//		"/home/dock/Documents/IR/DataSets/stopwords/portuguese",
+//		"/home/dock/Documents/IR/DataSets/stopwords/non_eng_stops",
+//		"/home/dock/Documents/IR/DataSets/stopwords/portu_stops",
+//		"/home/dock/Documents/IR/DataSets/stopwords/spanish_stops",
+//		"/home/dock/Documents/IR/DataSets/stopwords/analysis",
+//	};
+	private static String stopDir = "stopwords";
+
+	private static String stopsFile[] = {
+		TweetAnalysis.toolsDir + "/" + stopDir + "/english",
+		TweetAnalysis.toolsDir + "/" + stopDir + "/misc",
+		TweetAnalysis.toolsDir + "/" + stopDir + "/french",
+		TweetAnalysis.toolsDir + "/" + stopDir + "/english",
+		TweetAnalysis.toolsDir + "/" + stopDir + "/portuguese",
+		TweetAnalysis.toolsDir + "/" + stopDir + "/non_eng_stops",
+		TweetAnalysis.toolsDir + "/" + stopDir + "/portu_stops",
+		TweetAnalysis.toolsDir + "/" + stopDir + "/spanish_stops",
+		TweetAnalysis.toolsDir + "/" + stopDir + "/analysis",
 	};
 
 	public static void callStops() throws IOException{

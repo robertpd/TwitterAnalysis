@@ -15,6 +15,7 @@ import org.apache.commons.cli.ParseException;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.record.compiler.JField;
 import org.apache.log4j.Logger;
 
 import com.twitter.corpus.analysis.InvertedIndex;
@@ -24,20 +25,22 @@ import com.twitter.corpus.data.HtmlStatusCorpusReader;
 import com.twitter.corpus.data.StatusStream;
 
 public class TweetAnalysis{
-	private static final Logger LOG = Logger.getLogger(IndexStatuses.class);
+	private static final Logger LOG = Logger.getLogger(TweetAnalysis.class);
 	public static String jaccardOutput;
+	public static String toolsDir;
 	private TweetAnalysis() {}
 	private static final String INPUT_OPTION = "input";
-	private static final String INDEX_OPTION = "index";
+	private static final String OUTPUT_OPTION = "output";
+	private static final String TOOLS = "tools";
 	//	private static final String HTML_MODE = "html";
 	//	private static final String JSON_MODE = "json";
 
 
 	public static void main(String[] args) throws Exception {
-		//		System.out.println("Classpath = " + System.getProperty("java.class.path"));
 		Options options = new Options();
 		options.addOption(OptionBuilder.withArgName("path").hasArg().withDescription("input directory or file").create(INPUT_OPTION));
-		options.addOption(OptionBuilder.withArgName("path").hasArg().withDescription("index location").create(INDEX_OPTION));
+		options.addOption(OptionBuilder.withArgName("path").hasArg().withDescription("index location").create(OUTPUT_OPTION));
+		options.addOption(OptionBuilder.withArgName("path").hasArg().withDescription("stopwords").create(TOOLS));
 
 		CommandLine cmdline = null;
 		CommandLineParser parser = new GnuParser();
@@ -48,30 +51,33 @@ public class TweetAnalysis{
 			System.exit(-1);
 		}
 
-		if (!(cmdline.hasOption(INPUT_OPTION) && cmdline.hasOption(INDEX_OPTION) )) {
+		if (!(cmdline.hasOption(INPUT_OPTION) && cmdline.hasOption(OUTPUT_OPTION) && cmdline.hasOption(TOOLS))) {
 			HelpFormatter formatter = new HelpFormatter();
-			formatter.printHelp(IndexStatuses.class.getName(), options);
+			formatter.printHelp(TweetAnalysis.class.getName(), options);
 			System.exit(-1);
 		}
 
 		int cnt=0;
-		jaccardOutput = cmdline.getOptionValue(INDEX_OPTION);
-
+		jaccardOutput = cmdline.getOptionValue(OUTPUT_OPTION);
+		toolsDir = cmdline.getOptionValue(TOOLS);
 		String rootBase = cmdline.getOptionValue(INPUT_OPTION);
-		String root = rootBase + "/20110";
-		//		String root = "/home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/html/20110";
-		String[] filePaths = {root + "123", root + "124", root + "125", root + "126", root + "127", root + "128",
-				root + "129", root + "130", root + "131", root + "201", root + "202", root + "203",
-				root + "204", root + "205", root + "206",	root + "207", root + "208"};
-		//		String[] filePaths = {root + "123"};
-		//		String[] filePaths = {root + "123", root + "123a", root + "124", root + "124a", root + "125", root + "125a", 
-		//				  root + "126", root + "126a", root + "127", root + "127a", root + "128", root + "128a",
-		//				  root + "129", root + "129a", root + "130", root + "130a", root + "131", root + "131a",
-		//				  root + "201", root + "201a", root + "202", root + "202a", root + "203", root + "203a",
-		//				  root + "204", root + "204a", root + "205", root + "205a", root + "206", root + "206a", 
-		//				  root + "207", root + "207a", root + "208"};
-		//		File indexLocation = new File(cmdline.getOptionValue(INDEX_OPTION));
 
+		String root = rootBase + "/20110";
+//				String root = "/home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/html/20110";
+//				String[] filePaths = {root + "123", root + "124", root + "125", root + "126", root + "127", root + "128",
+//						root + "129", root + "130", root + "131", root + "201", root + "202", root + "203",
+//						root + "204", root + "205", root + "206",	root + "207", root + "208"};
+
+		String[] filePaths = {root + "123", root + "123a", root + "124", root + "124a", root + "125", root + "125a", 
+				root + "126", root + "126a", root + "127", root + "127a", root + "128", root + "128a",
+				root + "129", root + "129a", root + "130", root + "130a", root + "131", root + "131a",
+				root + "201", root + "201a", root + "202", root + "202a", root + "203", root + "203a",
+				root + "204", root + "204a", root + "205", root + "205a", root + "206", root + "206a", 
+				root + "207", root + "207a", root + "208"};
+		//		File indexLocation = new File(cmdline.getOptionValue(INDEX_OPTION));
+//		String[] filePaths = {rootBase};
+//		String[] filePaths = {root + "124"};
+		
 		//		int cnt=0;
 		HashMap<Integer, HashMap<Integer, Double>> blockCoSet = null;
 		Jaccard initJMap = null;
@@ -99,8 +105,6 @@ public class TweetAnalysis{
 			TermTermWeights ill = new TermTermWeights(termIndex);
 			blockCoSet = ill.termCosetBuilder();
 
-			//			termIndex =null;
-
 			corpusCoSetArray.add(blockCoSet);			// add coset of particular day to array
 
 			if(corpusCoSetArray.size() == 2){	// only skipped once at the start
@@ -109,9 +113,6 @@ public class TweetAnalysis{
 				}
 				// 3.0 do the deed
 				Jaccard.getJaccardSimilarity(corpusCoSetArray);
-
-				//				Jaccard.printResults();
-
 				// swap positions, makes our life easier
 				Collections.swap(corpusCoSetArray, 0, 1);
 				// remove the first coset array
@@ -120,5 +121,7 @@ public class TweetAnalysis{
 			//			Thread.sleep(60000);
 			cnt++;
 		}
+		HashMap<Integer, ArrayList<Double>> jDiffs = Jaccard.calcJaccardDifferences();
+		Jaccard.serializeJDiff(jDiffs, jaccardOutput);
 	}
 }

@@ -58,8 +58,8 @@ public class IndexStatuses {
     }
   };
 
-  private static final String INPUT_OPTION = "input";
-  private static final String INDEX_OPTION = "index";
+  private static final String INPUT_OPTION = "inputG";
+  private static final String INDEX_OPTION = "indexG";
 
   private static final String HTML_MODE = "html";
   private static final String JSON_MODE = "json";
