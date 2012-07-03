@@ -251,6 +251,14 @@ public class Jaccard {
 		objectOut.writeObject(jDiffs);
 		objectOut.close();
 	}
+	public static void serializeJaccards(String outputPath) throws IOException{
+		String path = outputPath + "/jaccard.ser";
+		FileOutputStream fileOut = new FileOutputStream(path);
+		ObjectOutputStream objectOut = new ObjectOutputStream(fileOut);
+		objectOut.flush();
+		objectOut.writeObject(jaccardList);
+		objectOut.close();
+	}
 	public static void printResults() throws IOException{
 		BufferedWriter out = new BufferedWriter(new FileWriter(TweetAnalysis.jaccardOutput));
 		Iterator<Entry<Integer, HashMap<Integer, Double>>> termIter = jaccardList.entrySet().iterator();

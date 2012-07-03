@@ -121,6 +121,7 @@ public class TweetAnalysis{
 			//			Thread.sleep(60000);
 			cnt++;
 		}
+		Jaccard.serializeJaccards(jaccardOutput);
 		HashMap<Integer, ArrayList<Double>> jDiffs = Jaccard.calcJaccardDifferences();
 		Jaccard.serializeJDiff(jDiffs, jaccardOutput);
 	}
