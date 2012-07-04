@@ -41,17 +41,17 @@ public class Jaccard {
 	 */
 	public static void getJaccardSimilarity(ArrayList<HashMap<Integer, HashMap<Integer, Double>>> cosetArray) throws IOException{
 		LOG.info("Interval: " + (dayCounter+1));
-		// Get the union of the keys from both arrays
+		
+		// Get the list of all terms 
+		
 		ArrayList<HashMap<Integer, HashMap<Integer, Double>>> copyMap = new ArrayList<HashMap<Integer,HashMap<Integer, Double>>>(cosetArray);
 		// TODO coset array contained somewhere 4370, think all entries are null and so size is zero... . why??
-
 		Set<Integer> allTerms = new HashSet<Integer>(copyMap.get(0).keySet());
-		//		Set<Integer> interSet = null;
-		//		Set<Integer> unionSet = null;
 		allTerms.addAll(copyMap.get(1).keySet());
 		copyMap = null;
+		
+		// iterate all terms
 
-		// now have all unique keys and can iterate
 		Iterator<Integer> termIterator = allTerms.iterator();
 		while(termIterator.hasNext()){
 			Integer term = termIterator.next();
@@ -59,14 +59,15 @@ public class Jaccard {
 			// need to re-arch to take only top 5 coweights
 			//			try{
 			//				interSet = new HashSet<Integer>(cosetArray.get(0).get(term).size());
-			// copy incoming cosets
-			//				HashMap<Integer, Double> termCosetA = cosetArray.get(0).get(term);	// grab term correlates from both hashmaps
-			//				HashMap<Integer, Double> termCosetB = cosetArray.get(1).get(term);
-			// init arraylist for ranked coweight entries
 
+			// cutoff is init size for the trimmed 
+			
 			int cutoff = 5;
 			HashSet<Integer> a = null;
 			HashSet<Integer> b = null;
+			
+			// try get coweight set for term from both days
+			
 			try{
 				a = sortList(cosetArray.get(0).get(term), cutoff);
 			}
@@ -80,11 +81,21 @@ public class Jaccard {
 				//  gulp!
 			}
 
+			// set default jaccard to 0.0
+			
 			Double jac = 0.0;
+			
+			// if either a or b is null, then jaccard is just z. 0 is kept in the loop to provide continuity			
+			
 			if(a != null && b != null){	// if either are null jac == 0.0 will be added
-				Set<Integer> inters = new HashSet<Integer>(cutoff);
-				Set<Integer> unions =  new HashSet<Integer>(cutoff * 2);
+				
+				// init intersection and union sets
+				
+				HashSet<Integer> inters = new HashSet<Integer>(cutoff);
+//				HashSet<Integer> unions =  new HashSet<Integer>(cutoff * 2);
 
+				// iterate one coweight set for intersection
+				
 				Iterator<Integer> aIter2 = a.iterator();
 				while(aIter2.hasNext()){
 					Integer a2 = aIter2.next();
@@ -92,94 +103,66 @@ public class Jaccard {
 						inters.add(a2);
 					}
 				}
+				
+				// get union set
+				
 				a.addAll(b);
-				unions.addAll(a);
-				unions.addAll(b);			
+				
+//				unions.addAll(a);
+//				unions.addAll(b);			
+				
+				// get jaccard, dont bother if union is 0
 
-				if(unions.size() != 0){
+				if(a.size() != 0){
 					jac = (double)Math.round(((double)inters.size() / (double)a.size()) * 1000) / 1000;
 				}
 			}
+			
+			// add jaccard value for the interval, if first time add term first
+			
 			if(!jaccardList.containsKey(term)){
-				HashMap<Integer, Double> jEachDayMap = new HashMap<Integer, Double>(33);	// 33 intervals
+				
+				// init map of jaccard to interval and add j
+				
+				HashMap<Integer, Double> jEachDayMap = new HashMap<Integer, Double>(32);	// 17 + 16 = 33 days => 32 intervals
+				
+				// scratch that - pre init this map with 9.9 so we have an entry for every interval and we can distinguish the 9.9 as interval in which term was missing on a particular day!
+				
+				// pre init this map with 0.0
+				
+				for(int i =0 ; i < 32 ;i++){
+					jEachDayMap.put(i, 0.0);
+				}
 				jEachDayMap.put(dayCounter, jac);
+				
+				// add mapping for term
 				jaccardList.put(term, jEachDayMap);
 			}
 			else{
 				jaccardList.get(term).put(dayCounter, jac);
 			}
 
-			//				int unionInit = 0;
-			//				if( termCosetA != null ) { unionInit += termCosetA.size(); }
-			//				if(termCosetB!=null){ unionInit += termCosetB.size(); }
-			//
-			//				unionSet = new HashSet<Integer>(unionInit);
-			//				if(termCosetA != null){ unionSet.addAll(termCosetA.keySet()); }
-			//				if(termCosetB != null){	unionSet.addAll(termCosetB.keySet()); }
-
-			// if term doesn't occur on particular day (unlightly, given thresholds performed already), termCoset will be null, this would give a 0 jaccard
-			//				if(termCosetB != null && termCosetA != null){
-			//					// iterate A, get coweight and check i
-			//					Iterator<Integer> aIter = termCosetA.keySet().iterator();
-			//					while(aIter.hasNext()){
-			//						Integer t = aIter.next();
-			//						if(termCosetB.containsKey(t)){
-			//							interSet.add(t);
-			//						}
-			//					}
-			//					termCosetB.keySet().removeAll(interSet);	// remove all keys that have already been detected
-			//					Iterator<Integer> iterB = termCosetB.keySet().iterator();
-			//					while(iterB.hasNext()){
-			//						Integer t = iterB.next();
-			//						if(termCosetA.containsKey(t)){
-			//							interSet.add(t);
-			//						}
-			//					}
-			//					double jaccard = 0.0;
-			//					if(unionSet.size() == 0){ unionZero++;}
-			//					if(interSet.size() > 0 && unionSet.size() > 0){
-			//						jaccard = (double)interSet.size() / (double) unionSet.size();	// switch to union
-			//					}
-			//					else{
-			//						jaccard = 0.0; 	// set jaccard = 0 as a placeholder, for diffing want to check agains zero
-			//					}
-
-			//					if(!jaccardList.containsKey(term)){
-			//						HashMap<Integer, Double> jEachDayMap = new HashMap<Integer, Double>(33);	// 33 intervals
-			//						jEachDayMap.put(dayCounter, jaccard);
-			//						jaccardList.put(term, jEachDayMap);
-			//					}
-			//					else{
-			//						jaccardList.get(term).put(dayCounter, jaccard);
-			//					}
-			//				}
-			//				else{
-			//					// else one of set a or b is null...
-			//					termError++;
-			//					LOG.info("termCosetA or termCosetB is null.");
-			//				}
-			//			}
-			//			catch(NullPointerException np){
-			//				termError++;
-			//				LOG.info("NullPointerException at Line 102 Jaccard, a term is not present one of the days");
-			//			}
 		}
 		LOG.info("Jacard size = " + jaccardList.size());
-		LOG.info("Term error occured " + termError + "times." );
+//		LOG.info("Term error occured " + termError + "times." );
 		dayCounter++; // must be incremented here to ensure continuity
 	}
 	/***
 	 * Calculate jaccard differences across intervals.
 	 *  @return HashMap of term and jaccard differences for each interval
 	 */
-	public static HashMap<Integer, ArrayList<Double>> calcJaccardDifferences(){
+	public static HashMap<Integer, ArrayList<Double>> calcJaccardDifferences(HashMap<Integer, HashMap<Integer,Double>> jaccardList){	// previous prototype was empty and jaccardList below was the static object from Jaccard class..
 		LOG.info("Calc'ing jaccard differences");
+		
+		// retVal hashmap is init to size of jaccard list, jaccardList is a hashmap
+		
 		HashMap<Integer , ArrayList<Double>> retVal = new HashMap<Integer, ArrayList<Double>>(jaccardList.size());
 		Iterator<Entry<Integer, HashMap<Integer, Double>>> jaccardIter = jaccardList.entrySet().iterator();
 
 		while(jaccardIter.hasNext()){
 			Entry<Integer, HashMap<Integer, Double>> termJSet = jaccardIter.next();
 			HashMap<Integer, Double> termJIntervals = termJSet.getValue();
+			Integer outerTerm = termJSet.getKey();
 			Iterator<Entry<Integer, Double>> jaccardSetIter = termJIntervals.entrySet().iterator();
 			Double last = 0.0;
 			boolean firstIter = false;
@@ -188,6 +171,7 @@ public class Jaccard {
 
 				Entry<Integer, Double> jVal = jaccardSetIter.next();
 				Double value = jVal.getValue();
+				Integer interval = jVal.getKey();
 				if(!firstIter){	// exec once to buffer 1st jaccard value
 					firstIter = true;
 					last = value;
@@ -195,13 +179,18 @@ public class Jaccard {
 				}
 
 				if(!retVal.containsKey(termJSet.getKey())){
-					ArrayList<Double> intervalDiffs = new ArrayList<Double>(33);
+					ArrayList<Double> intervalDiffs = new ArrayList<Double>(31);
+					for( int i =0; i<31 ;i++){
+						intervalDiffs.add(0.0);
+					}
 					// can we be sure that the intervalDiffs array will be filled from 0?? YES
-					intervalDiffs.add(jVal.getKey(), value - last);
-					retVal.put(termJSet.getKey(), intervalDiffs);
+					intervalDiffs.add((interval - 1) , value - last);
+					// add jaccard difference for a term
+					retVal.put(outerTerm, intervalDiffs);
 				}
 				else{
-					retVal.get(termJSet.getKey()).add(jVal.getKey(), value-last);
+					// get a terms jaccard difference set
+					retVal.get(outerTerm).add(jVal.getKey()-1, value-last);
 				}
 
 				last = value;
@@ -218,24 +207,35 @@ public class Jaccard {
 	 * @return
 	 */
 	public static HashSet<Integer> sortList(HashMap<Integer, Double> termCoset, int cutoff){
+		
 		ArrayList<Entry<Integer, Double>> top5Aranked = new ArrayList<Entry<Integer, Double>>(termCoset.size());
-		// iterator for termCosetA
+		
+		// add all from hashmap to arraylist so they can be sorted
 		Iterator<Entry<Integer, Double>> coweightAIter = termCoset.entrySet().iterator();
 		while(coweightAIter.hasNext()){
 			top5Aranked.add(coweightAIter.next());
 		}
+		
 		// sort by weight
 		Collections.sort(top5Aranked, new top5Comp());
+
 		// init sorted top 5 list
 		ArrayList<Integer> sortedTop5A = new ArrayList<Integer>(cutoff);
-		Iterator<Entry<Integer, Double>> liter = top5Aranked.iterator();
-		int breakCounter = 0;
+		
+		// get and add top 5 from already sorted list
+		
+		Iterator<Entry<Integer, Double>> liter = top5Aranked.iterator();		
+		int breakCounter = 0;		
 		while(liter.hasNext() && breakCounter < cutoff){
 			// i can imagine that future enhancements will require the coweight type to keep term and weight together
 			sortedTop5A.add(liter.next().getKey());
 			breakCounter++;
 		}
+		
+		// convert to hashset
+		
 		HashSet<Integer> retVal = new HashSet<Integer>(sortedTop5A);
+		
 		return retVal;
 	}
 	/***
@@ -252,7 +252,7 @@ public class Jaccard {
 		objectOut.close();
 	}
 	public static void serializeJaccards(String outputPath) throws IOException{
-		String path = outputPath + "/jaccard.ser";
+		String path = outputPath + "/jaccard2.ser";
 		FileOutputStream fileOut = new FileOutputStream(path);
 		ObjectOutputStream objectOut = new ObjectOutputStream(fileOut);
 		objectOut.flush();

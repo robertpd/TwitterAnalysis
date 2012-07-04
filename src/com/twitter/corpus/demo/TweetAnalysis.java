@@ -74,6 +74,8 @@ public class TweetAnalysis{
 				root + "201", root + "201a", root + "202", root + "202a", root + "203", root + "203a",
 				root + "204", root + "204a", root + "205", root + "205a", root + "206", root + "206a", 
 				root + "207", root + "207a", root + "208"};
+		
+		
 		//		File indexLocation = new File(cmdline.getOptionValue(INDEX_OPTION));
 //		String[] filePaths = {rootBase};
 //		String[] filePaths = {root + "124"};
@@ -95,7 +97,7 @@ public class TweetAnalysis{
 			}
 			if (fs.getFileStatus(file).isDir()) {
 				stream = new HtmlStatusCorpusReader(file, fs);
-			}		
+			}
 
 			// 1.0 build index
 			InvertedIndex ii = new InvertedIndex();
@@ -113,6 +115,7 @@ public class TweetAnalysis{
 				}
 				// 3.0 do the deed
 				Jaccard.getJaccardSimilarity(corpusCoSetArray);
+
 				// swap positions, makes our life easier
 				Collections.swap(corpusCoSetArray, 0, 1);
 				// remove the first coset array
@@ -122,7 +125,9 @@ public class TweetAnalysis{
 			cnt++;
 		}
 		Jaccard.serializeJaccards(jaccardOutput);
-		HashMap<Integer, ArrayList<Double>> jDiffs = Jaccard.calcJaccardDifferences();
-		Jaccard.serializeJDiff(jDiffs, jaccardOutput);
+		
+		
+//		HashMap<Integer, ArrayList<Double>> jDiffs = Jaccard.calcJaccardDifferences();
+//		Jaccard.serializeJDiff(jDiffs, jaccardOutput);
 	}
 }
