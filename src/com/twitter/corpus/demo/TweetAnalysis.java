@@ -18,6 +18,7 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.record.compiler.JField;
 import org.apache.log4j.Logger;
 
+import com.twitter.corpus.analysis.CosetSerializer;
 import com.twitter.corpus.analysis.InvertedIndex;
 import com.twitter.corpus.analysis.Jaccard;
 import com.twitter.corpus.analysis.TermTermWeights;
@@ -26,7 +27,7 @@ import com.twitter.corpus.data.StatusStream;
 
 public class TweetAnalysis{
 	private static final Logger LOG = Logger.getLogger(TweetAnalysis.class);
-	public static String jaccardOutput;
+	public static String output;
 	public static String toolsDir;
 	private TweetAnalysis() {}
 	private static final String INPUT_OPTION = "input";
@@ -58,7 +59,7 @@ public class TweetAnalysis{
 		}
 
 		int cnt=0;
-		jaccardOutput = cmdline.getOptionValue(OUTPUT_OPTION);
+		output = cmdline.getOptionValue(OUTPUT_OPTION);
 		toolsDir = cmdline.getOptionValue(TOOLS);
 		String rootBase = cmdline.getOptionValue(INPUT_OPTION);
 
@@ -107,6 +108,9 @@ public class TweetAnalysis{
 			TermTermWeights ill = new TermTermWeights(termIndex);
 			blockCoSet = ill.termCosetBuilder();
 
+			// serialize term coset
+			CosetSerializer.cosetSerializer(blockCoSet, output);
+			
 			corpusCoSetArray.add(blockCoSet);			// add coset of particular day to array
 
 			if(corpusCoSetArray.size() == 2){	// only skipped once at the start
@@ -116,6 +120,7 @@ public class TweetAnalysis{
 				// 3.0 do the deed
 				Jaccard.getJaccardSimilarity(corpusCoSetArray);
 
+				
 				// swap positions, makes our life easier
 				Collections.swap(corpusCoSetArray, 0, 1);
 				// remove the first coset array
@@ -124,7 +129,7 @@ public class TweetAnalysis{
 			//			Thread.sleep(60000);
 			cnt++;
 		}
-		Jaccard.serializeJaccards(jaccardOutput);
+		Jaccard.serializeJaccards(output);
 		
 		
 //		HashMap<Integer, ArrayList<Double>> jDiffs = Jaccard.calcJaccardDifferences();

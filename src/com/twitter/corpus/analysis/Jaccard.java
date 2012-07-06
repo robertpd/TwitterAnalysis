@@ -178,19 +178,23 @@ public class Jaccard {
 					continue;
 				}
 
+				Double jd = (double)Math.round(((double)(value - last)) * 1000) / 1000;
+//				Double jd = 2.1;
 				if(!retVal.containsKey(termJSet.getKey())){
-					ArrayList<Double> intervalDiffs = new ArrayList<Double>(31);
-					for( int i =0; i<31 ;i++){
-						intervalDiffs.add(0.0);
+					ArrayList<Double> intervalDiffs = new ArrayList<Double>();
+					int capacity = 31;
+					intervalDiffs.ensureCapacity(capacity);
+					for( int i =0; i<capacity ;i++){
+						intervalDiffs.add(i, 0.0);
 					}
 					// can we be sure that the intervalDiffs array will be filled from 0?? YES
-					intervalDiffs.add((interval - 1) , value - last);
+					intervalDiffs.set((interval - 1) , jd);
 					// add jaccard difference for a term
 					retVal.put(outerTerm, intervalDiffs);
 				}
 				else{
 					// get a terms jaccard difference set
-					retVal.get(outerTerm).add(jVal.getKey()-1, value-last);
+					retVal.get(outerTerm).set(jVal.getKey()-1, jd);
 				}
 
 				last = value;
@@ -260,7 +264,7 @@ public class Jaccard {
 		objectOut.close();
 	}
 	public static void printResults() throws IOException{
-		BufferedWriter out = new BufferedWriter(new FileWriter(TweetAnalysis.jaccardOutput));
+		BufferedWriter out = new BufferedWriter(new FileWriter(TweetAnalysis.output));
 		Iterator<Entry<Integer, HashMap<Integer, Double>>> termIter = jaccardList.entrySet().iterator();
 		while(termIter.hasNext()){
 			Entry<Integer, HashMap<Integer, Double>> termJacc = termIter.next();

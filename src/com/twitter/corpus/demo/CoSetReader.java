@@ -9,8 +9,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
 
-import org.apache.lucene.search.TermsFilter;
-
 import com.google.common.collect.HashBiMap;
 import com.twitter.corpus.types.CoWeight;
 
