@@ -1,0 +1,468 @@
+#
+# A fatal error has been detected by the Java Runtime Environment:
+#
+#  SIGSEGV (0xb) at pc=0xb6dc6dd0, pid=3492, tid=2405194560
+#
+# JRE version: 6.0_26-b03
+# Java VM: Java HotSpot(TM) Server VM (20.1-b02 mixed mode linux-x86 )
+# Problematic frame:
+# V  [libjvm.so+0x486dd0]  unsigned+0x110
+#
+# If you would like to submit a bug report, please visit:
+#   http://java.sun.com/webapps/bugreport/crash.jsp
+#
+
+---------------  T H R E A D  ---------------
+
+Current thread (0xb67a2c00):  JavaThread "JDWP Transport Listener: dt_socket" daemon [_thread_in_vm, id=3509, stack(0x8f575000,0x8f5c6000)]
+
+siginfo:si_signo=SIGSEGV: si_errno=0, si_code=1 (SEGV_MAPERR), si_addr=0x3b737472
+
+Registers:
+EAX=0x3b737472, EBX=0xb7141dc8, ECX=0x3b737472, EDX=0x00000580
+ESP=0x8f5c4e60, EBP=0x8f5c4eb8, ESI=0x00000000, EDI=0xb6706d08
+EIP=0xb6dc6dd0, EFLAGS=0x00210206, CR2=0x3b737472
+
+Top of Stack: (sp=0x8f5c4e60)
+0x8f5c4e60:   b67a2c00 08e835e0 00000076 8f5c4e70
+0x8f5c4e70:   b67a2c00 00000000 00000000 00000000
+0x8f5c4e80:   b67a2c00 00000076 8f5c4eb8 b6861438
+0x8f5c4e90:   b67a2c00 8f5c4fa0 8f5c4ed8 b685610a
+0x8f5c4ea0:   b6706d08 08e835e0 b6dc6ccb b6861438
+0x8f5c4eb0:   b6861320 8f5c4f0b 8f5c4ed8 b6854846
+0x8f5c4ec0:   b6706d08 3b737472 8f5c4f0b b6861438
+0x8f5c4ed0:   3b737472 8f5c4fa0 8f5c4f18 b682d874 
+
+Instructions: (pc=0xb6dc6dd0)
+0xb6dc6db0:   03 00 00 8a 8f c4 00 00 00 83 e1 10 84 c9 0f 84
+0xb6dc6dc0:   a3 02 00 00 8b 45 0c 31 f6 85 c0 74 1a 8b 4d 0c
+0xb6dc6dd0:   8b 01 85 c0 0f 84 86 02 00 00 89 c6 3d fe fe fe
+0xb6dc6de0:   fe 0f 84 79 02 00 00 85 f6 74 1c 8b 46 04 83 ec 
+
+Register to memory mapping:
+
+EAX=0x3b737472 is an unknown value
+EBX=0xb7141dc8: <offset 0x801dc8> in /usr/lib/jvm/java-6-sun-1.6.0.26/jre/lib/i386/server/libjvm.so at 0xb6940000
+ECX=0x3b737472 is an unknown value
+EDX=0x00000580 is an unknown value
+ESP=0x8f5c4e60 is pointing into the stack for thread: 0xb67a2c00
+EBP=0x8f5c4eb8 is pointing into the stack for thread: 0xb67a2c00
+ESI=0x00000000 is an unknown value
+EDI=0xb6706d08 is an unknown value
+
+
+Stack: [0x8f575000,0x8f5c6000],  sp=0x8f5c4e60,  free space=319k
+Native frames: (J=compiled Java code, j=interpreted, Vv=VM code, C=native code)
+V  [libjvm.so+0x486dd0]  unsigned+0x110
+C  [libjdwp.so+0x2d846]  int+0x46
+C  [libjdwp.so+0x6874]  wchar_t+0x44
+C  [libjdwp.so+0x6a73]  unsigned long+0xf3
+C  [libjdwp.so+0x6b20]  unsigned long+0x20
+C  [libjdwp.so+0x13143]  double+0x233
+C  [libjdwp.so+0x27fd5]  char+0x75
+C  [libjdwp.so+0x282d3]  signed char+0x33
+V  [libjvm.so+0x4f8829]  JvmtiAgentThread::start_function_wrapper(JavaThread*, Thread*)+0x79
+V  [libjvm.so+0x6e16bf]  JavaThread::run()+0x11f
+V  [libjvm.so+0x5e2aee]  java_start(Thread*)+0x14e
+C  [libpthread.so.0+0x6d4c]  short+0xcc
+
+
+---------------  P R O C E S S  ---------------
+
+Java Threads: ( => current thread )
+  0xb67b4400 JavaThread "Low Memory Detector" daemon [_thread_blocked, id=3516, stack(0x8f380000,0x8f3d1000)]
+  0xb67a9400 JavaThread "C2 CompilerThread1" daemon [_thread_blocked, id=3515, stack(0x8f3d1000,0x8f452000)]
+  0xb67a6c00 JavaThread "C2 CompilerThread0" daemon [_thread_blocked, id=3514, stack(0x8f452000,0x8f4d3000)]
+  0x08e76000 JavaThread "JDWP Command Reader" daemon [_thread_in_native, id=3511, stack(0x8f4d3000,0x8f524000)]
+  0xb67a5400 JavaThread "JDWP Event Helper Thread" daemon [_thread_blocked, id=3510, stack(0x8f524000,0x8f575000)]
+=>0xb67a2c00 JavaThread "JDWP Transport Listener: dt_socket" daemon [_thread_in_vm, id=3509, stack(0x8f575000,0x8f5c6000)]
+  0xb6799000 JavaThread "Signal Dispatcher" daemon [_thread_blocked, id=3505, stack(0x8f5c6000,0x8f617000)]
+  0xb678b000 JavaThread "Finalizer" daemon [_thread_blocked, id=3503, stack(0x8f617000,0x8f668000)]
+  0xb6789800 JavaThread "Reference Handler" daemon [_thread_blocked, id=3502, stack(0x8f92e000,0x8f97f000)]
+  0xb670a000 JavaThread "main" [_thread_blocked, id=3498, stack(0xb68c3000,0xb6914000)]
+
+Other Threads:
+  0xb6785c00 VMThread [stack: 0x8f97f000,0x8fa00000] [id=3501]
+  0xb67cf800 WatcherThread [stack: 0x8f2ff000,0x8f380000] [id=3517]
+
+VM state:not at safepoint (normal execution)
+
+VM Mutex/Monitor currently owned by a thread: None
+
+Heap
+ PSYoungGen      total 107520K, used 30967K [0xa8cf0000, 0xb1770000, 0xb3440000)
+  eden space 88960K, 34% used [0xa8cf0000,0xaab2dc98,0xae3d0000)
+  from space 18560K, 0% used [0xae3d0000,0xae3d0000,0xaf5f0000)
+  to   space 18240K, 0% used [0xb05a0000,0xb05a0000,0xb1770000)
+ PSOldGen        total 114496K, used 82768K [0x93e40000, 0x9ae10000, 0xa8cf0000)
+  object space 114496K, 72% used [0x93e40000,0x98f14398,0x9ae10000)
+ PSPermGen       total 16384K, used 3392K [0x8fe40000, 0x90e40000, 0x93e40000)
+  object space 16384K, 20% used [0x8fe40000,0x901903c8,0x90e40000)
+
+Code Cache  [0xb3500000, 0xb3740000, 0xb6500000)
+ total_blobs=288 nmethods=182 adapters=68 free_code_cache=49681152 largest_free_block=16000
+
+Dynamic libraries:
+08048000-08052000 r-xp 00000000 08:07 3280870    /usr/lib/jvm/java-6-sun-1.6.0.26/jre/bin/java
+08052000-08053000 rwxp 00009000 08:07 3280870    /usr/lib/jvm/java-6-sun-1.6.0.26/jre/bin/java
+08e73000-091fc000 rwxp 00000000 00:00 0          [heap]
+8e500000-8e5f1000 rwxp 00000000 00:00 0 
+8e5f1000-8e600000 ---p 00000000 00:00 0 
+8e700000-8e7d4000 rwxp 00000000 00:00 0 
+8e7d4000-8e800000 ---p 00000000 00:00 0 
+8e800000-8e8ec000 rwxp 00000000 00:00 0 
+8e8ec000-8e900000 ---p 00000000 00:00 0 
+8e900000-8ea00000 rwxp 00000000 00:00 0 
+8ea67000-8ea88000 r-xs 00172000 00:14 4997282    /home/dock/code/Java_Libraries/Guava_Release _1.0.2/guava-11.0.2.jar
+8ea88000-8ea96000 r-xs 0007f000 00:14 4992679    /home/dock/code/Java_Libraries/commons-collections-3.2.1/commons-collections-3.2.1.jar
+8ea96000-8ea9d000 r-xs 00040000 00:14 5255376    /home/dock/Documents/IR/SW/mahout-distribution-0.6/mahout-math-0.6.jar
+8ea9d000-8eaa2000 r-xs 00041000 00:14 5255379    /home/dock/Documents/IR/SW/mahout-distribution-0.6/mahout-integration-0.6.jar
+8eaa2000-8ec15000 r-xs 0150e000 00:14 5255380    /home/dock/Documents/IR/SW/mahout-distribution-0.6/mahout-examples-0.6-job.jar
+8ec15000-8ec1c000 r-xs 00056000 00:14 5255381    /home/dock/Documents/IR/SW/mahout-distribution-0.6/mahout-examples-0.6.jar
+8ec1c000-8ece2000 r-xs 009e6000 00:14 5255377    /home/dock/Documents/IR/SW/mahout-distribution-0.6/mahout-core-0.6-job.jar
+8ece2000-8ed00000 r-xs 00178000 00:14 5255378    /home/dock/Documents/IR/SW/mahout-distribution-0.6/mahout-core-0.6.jar
+8ed00000-8edf4000 rwxp 00000000 00:00 0 
+8edf4000-8ee00000 ---p 00000000 00:00 0 
+8ee04000-8ee1c000 r-xs 0014e000 00:14 4990888    /home/dock/Documents/IR/SW/lucene-3.5.0/lucene-core-3.5.0.jar
+8ee1c000-8ee1d000 r-xs 00003000 00:14 5129767    /home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/lib/xmlenc-0.52.jar
+8ee1d000-8ee22000 r-xs 00016000 00:14 5129772    /home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/lib/xml-apis-1.0.b2.jar
+8ee22000-8ee23000 r-xs 00002000 00:14 5129872    /home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/lib/slf4j-log4j12-1.6.1-sources.jar
+8ee23000-8ee24000 r-xs 0000c000 00:14 5129832    /home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/lib/slf4j-log4j12-1.6.1-javadoc.jar
+8ee24000-8ee25000 r-xs 00002000 00:14 5129797    /home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/lib/slf4j-log4j12-1.6.1.jar
+8ee25000-8ee27000 r-xs 00005000 00:14 5129873    /home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/lib/slf4j-api-1.6.1.jar
+8ee27000-8ee2a000 r-xs 0001e000 00:14 5129858    /home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/lib/servlet-api-2.5-6.1.14.jar
+8ee2a000-8ee59000 r-xs 00274000 00:14 5129833    /home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/lib/pcj-1.2.jar
+8ee59000-8ee5b000 r-xs 0000e000 00:14 5129773    /home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/lib/oro-2.0.8.jar
+8ee5b000-8ee6a000 r-xs 000b2000 00:14 5129793    /home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/lib/netty-3.2.4.Final.jar
+8ee6a000-8ee87000 r-xs 0013e000 00:14 5130040    /home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/lib/mockito-all-1.8.5.jar
+8ee87000-8ee8e000 r-xs 00067000 00:14 5129802    /home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/lib/mail-1.4.1.jar
+8ee8e000-8ee95000 r-xs 0006d000 00:14 5129728    /home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/lib/log4j-1.2.16-sources.jar
+8ee95000-8eea3000 r-xs 00156000 00:14 5129795    /home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/lib/log4j-1.2.16-javadoc.jar
+8eea3000-8eeac000 r-xs 0006d000 00:14 5129757    /home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/lib/log4j-1.2.16.jar
+8eeac000-8eead000 r-xs 00002000 00:14 5130044    /home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/lib/kfs-0.3.jar
+8eead000-8eeb2000 r-xs 0001f000 00:14 5129763    /home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/lib/junit-4.8.2-sources.jar
+8eeb2000-8eeb6000 r-xs 0005d000 00:14 5129852    /home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/lib/junit-4.8.2-javadoc.jar
+8eeb6000-8eebc000 r-xs 00034000 00:14 5129671    /home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/lib/junit-4.8.2.jar
+8eebc000-8eebe000 r-xs 0000e000 00:14 5129672    /home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/lib/jung-graph-impl-2.0.1.jar
+8eebe000-8eec3000 r-xs 00034000 00:14 5130041    /home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/lib/jung-algorithms-2.0.1.jar
+8eec3000-8eec6000 r-xs 00008000 00:14 5129769    /home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/lib/jung-api-2.0.1.jar
+8eec6000-8eec9000 r-xs 0001e000 00:14 5129841    /home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/lib/jsp-api-2.1-6.1.14.jar
+8eec9000-8eeda000 r-xs 000ea000 00:14 5129857    /home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/lib/jsp-2.1-6.1.14.jar
+8eeda000-8eedd000 r-xs 00025000 00:14 5129853    /home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/lib/jetty-util-6.1.14.jar
+8eedd000-8eee4000 r-xs 00078000 00:14 5129639    /home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/lib/jetty-6.1.14.jar
+8eee4000-8eeea000 r-xs 00057000 00:14 5129835    /home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/lib/jets3t-0.7.1.jar
+8eeea000-8eeec000 r-xs 00011000 00:14 5129766    /home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/lib/jasper-runtime-5.5.12.jar
+8eeec000-8eef1000 r-xs 0005e000 00:14 5129799    /home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/lib/jasper-compiler-5.5.12.jar
+8eef1000-8eef7000 r-xs 00041000 00:14 5129755    /home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/lib/htmlparser-1.6.jar
+8eef7000-8ef00000 r-xs 000a4000 00:14 5129840    /home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/lib/hsqldb-1.8.0.10.jar
+8ef00000-8effc000 rwxp 00000000 00:00 0 
+8effc000-8f000000 ---p 00000000 00:00 0 
+8f000000-8f100000 rwxp 00000000 00:00 0 
+8f100000-8f1fe000 rwxp 00000000 00:00 0 
+8f1fe000-8f200000 ---p 00000000 00:00 0 
+8f201000-8f203000 r-xs 0000c000 00:14 5129791    /home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/lib/hadoop-mrunit-0.20.2-320.jar
+8f203000-8f229000 r-xs 00294000 00:14 5129675    /home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/lib/hadoop-core-0.20.2-320.jar
+8f229000-8f24e000 r-xs 0026c000 00:14 5129879    /home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/lib/hadoop-core-0.20.2.jar
+8f24e000-8f265000 r-xs 000fa000 00:14 5129702    /home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/lib/guava-r08.jar
+8f265000-8f268000 r-xs 00020000 00:14 5129854    /home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/lib/gson-1.6-sources.jar
+8f268000-8f26b000 r-xs 00035000 00:14 5129836    /home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/lib/gson-1.6-javadoc.jar
+8f26b000-8f270000 r-xs 00024000 00:14 5129871    /home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/lib/gson-1.6.jar
+8f270000-8f272000 r-xs 00005000 00:14 5129673    /home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/lib/geronimo-jms_1.1_spec-1.0.jar
+8f272000-8f295000 r-xs 00344000 00:14 5129850    /home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/lib/core-3.1.1.jar
+8f295000-8f29c000 r-xs 00028000 00:14 5129874    /home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/lib/concurrent-1.3.4.jar
+8f29c000-8f29f000 r-xs 0001f000 00:14 5129794    /home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/lib/commons-validator-1.3.1.jar
+8f29f000-8f2a4000 r-xs 00028000 00:14 5129876    /home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/lib/commons-net-1.4.1.jar
+8f2a4000-8f2a6000 r-xs 0000d000 00:14 5129618    /home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/lib/commons-logging-1.1.1.jar
+8f2a6000-8f2aa000 r-xs 0003c000 00:14 5129875    /home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/lib/commons-lang-2.4.jar
+8f2aa000-8f2b0000 r-xs 00045000 00:14 5129617    /home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/lib/commons-httpclient-3.1.jar
+8f2b0000-8f2b3000 r-xs 00019000 00:14 5129736    /home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/lib/commons-el-1.0.jar
+8f2b3000-8f2b7000 r-xs 00026000 00:14 5129834    /home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/lib/commons-digester-1.6.jar
+8f2b7000-8f2bb000 r-xs 00020000 00:14 5129849    /home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/lib/commons-compress-1.0.jar
+8f2bb000-8f2c1000 r-xs 00023000 00:14 5129695    /home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/lib/commons-collections-2.1.jar
+8f2c1000-8f2c3000 r-xs 0000a000 00:14 5129730    /home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/lib/commons-codec-1.3.jar
+8f2c3000-8f2c4000 r-xs 0000b000 00:14 5129838    /home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/lib/commons-cli-1.2-sources.jar
+8f2c4000-8f2c7000 r-xs 00032000 00:14 5129731    /home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/lib/commons-cli-1.2-javadoc.jar
+8f2c7000-8f2c9000 r-xs 00009000 00:14 5129855    /home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/lib/commons-cli-1.2.jar
+8f2c9000-8f2d7000 r-xs 00081000 00:14 5129837    /home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/lib/colt-1.2.0.jar
+8f2d7000-8f2e3000 r-xs 00076000 00:14 5129680    /home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/lib/collections-generic-4.01.jar
+8f2e3000-8f2ff000 r-xs 00256000 00:14 5129792    /home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/lib/cloud9-1.2.1-javadoc.jar
+8f2ff000-8f300000 ---p 00000000 00:00 0 
+8f300000-8f380000 rwxp 00000000 00:00 0 
+8f380000-8f383000 ---p 00000000 00:00 0 
+8f383000-8f3d1000 rwxp 00000000 00:00 0 
+8f3d1000-8f3d4000 ---p 00000000 00:00 0 
+8f3d4000-8f452000 rwxp 00000000 00:00 0 
+8f452000-8f455000 ---p 00000000 00:00 0 
+8f455000-8f4d3000 rwxp 00000000 00:00 0 
+8f4d3000-8f4d6000 ---p 00000000 00:00 0 
+8f4d6000-8f524000 rwxp 00000000 00:00 0 
+8f524000-8f527000 ---p 00000000 00:00 0 
+8f527000-8f575000 rwxp 00000000 00:00 0 
+8f575000-8f578000 ---p 00000000 00:00 0 
+8f578000-8f5c6000 rwxp 00000000 00:00 0 
+8f5c6000-8f5c9000 ---p 00000000 00:00 0 
+8f5c9000-8f617000 rwxp 00000000 00:00 0 
+8f617000-8f61a000 ---p 00000000 00:00 0 
+8f61a000-8f668000 rwxp 00000000 00:00 0 
+8f668000-8f800000 r-xs 03029000 08:07 2366522    /usr/lib/jvm/java-6-sun-1.6.0.26/jre/lib/rt.jar
+8f800000-8f840000 rwxp 00000000 00:00 0 
+8f840000-8f900000 ---p 00000000 00:00 0 
+8f901000-8f90f000 r-xs 000d4000 00:14 5129737    /home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/lib/cloud9-1.2.1-sources.jar
+8f90f000-8f926000 r-xs 00168000 00:14 5129878    /home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/lib/cloud9-1.2.1.jar
+8f926000-8f92e000 r-xs 00065000 00:14 5129732    /home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/lib/bliki-core-3.0.15.jar
+8f92e000-8f931000 ---p 00000000 00:00 0 
+8f931000-8f97f000 rwxp 00000000 00:00 0 
+8f97f000-8f980000 ---p 00000000 00:00 0 
+8f980000-8fa00000 rwxp 00000000 00:00 0 
+8fa00000-8fa43000 rwxp 00000000 00:00 0 
+8fa43000-8fb00000 ---p 00000000 00:00 0 
+8fb01000-8fb05000 r-xs 00030000 00:14 5129851    /home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/lib/async-http-client-1.6.2-sources.jar
+8fb05000-8fb10000 r-xs 000d3000 00:14 5130042    /home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/lib/async-http-client-1.6.2-javadoc.jar
+8fb10000-8fb17000 r-xs 00048000 00:14 5129679    /home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/lib/async-http-client-1.6.2.jar
+8fb17000-8fb26000 r-xs 000ee000 00:14 5129646    /home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/lib/ant-1.6.5.jar
+8fb26000-8fb5a000 rwxp 00000000 00:00 0 
+8fb5a000-8fb5b000 ---p 00000000 00:00 0 
+8fb5b000-8fbdb000 rwxp 00000000 00:00 0 
+8fbdb000-8fbdc000 ---p 00000000 00:00 0 
+8fbdc000-8fc64000 rwxp 00000000 00:00 0 
+8fc64000-8fc7c000 rwxp 00000000 00:00 0 
+8fc7c000-8fcb4000 rwxp 00000000 00:00 0 
+8fcb4000-8fd24000 rwxp 00000000 00:00 0 
+8fd24000-8fd2c000 rwxp 00000000 00:00 0 
+8fd2c000-8fd44000 rwxp 00000000 00:00 0 
+8fd44000-8fd7c000 rwxp 00000000 00:00 0 
+8fd7c000-8fdeb000 rwxp 00000000 00:00 0 
+8fdeb000-8fe31000 rwxp 00000000 00:00 0 
+8fe31000-8fe3f000 rwxp 00000000 00:00 0 
+8fe3f000-90e40000 rwxp 00000000 00:00 0 
+90e40000-93e40000 rwxp 00000000 00:00 0 
+93e40000-9ae10000 rwxp 00000000 00:00 0 
+9ae10000-a8cf0000 rwxp 00000000 00:00 0 
+a8cf0000-b1770000 rwxp 00000000 00:00 0 
+b1770000-b3440000 rwxp 00000000 00:00 0 
+b3440000-b3449000 rwxp 00000000 00:00 0 
+b3449000-b3500000 rwxp 00000000 00:00 0 
+b3500000-b3740000 rwxp 00000000 00:00 0 
+b3740000-b6500000 rwxp 00000000 00:00 0 
+b6500000-b6700000 r-xp 00000000 08:07 132511     /usr/lib/locale/locale-archive
+b6700000-b67fc000 rwxp 00000000 00:00 0 
+b67fc000-b6800000 ---p 00000000 00:00 0 
+b6800000-b6805000 r-xs 0002a000 00:14 5129796    /home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/lib/commons-beanutils-1.7.0.jar
+b6805000-b6810000 r-xp 00000000 08:07 5791087    /lib/i386-linux-gnu/libnss_files-2.15.so
+b6810000-b6811000 r-xp 0000a000 08:07 5791087    /lib/i386-linux-gnu/libnss_files-2.15.so
+b6811000-b6812000 rwxp 0000b000 08:07 5791087    /lib/i386-linux-gnu/libnss_files-2.15.so
+b6812000-b681c000 r-xp 00000000 08:07 5791089    /lib/i386-linux-gnu/libnss_nis-2.15.so
+b681c000-b681d000 r-xp 00009000 08:07 5791089    /lib/i386-linux-gnu/libnss_nis-2.15.so
+b681d000-b681e000 rwxp 0000a000 08:07 5791089    /lib/i386-linux-gnu/libnss_nis-2.15.so
+b681e000-b6825000 r-xp 00000000 08:07 5791085    /lib/i386-linux-gnu/libnss_compat-2.15.so
+b6825000-b6826000 r-xp 00006000 08:07 5791085    /lib/i386-linux-gnu/libnss_compat-2.15.so
+b6826000-b6827000 rwxp 00007000 08:07 5791085    /lib/i386-linux-gnu/libnss_compat-2.15.so
+b6827000-b6861000 r-xp 00000000 08:07 2366507    /usr/lib/jvm/java-6-sun-1.6.0.26/jre/lib/i386/libjdwp.so
+b6861000-b6862000 rwxp 00039000 08:07 2366507    /usr/lib/jvm/java-6-sun-1.6.0.26/jre/lib/i386/libjdwp.so
+b6862000-b6878000 r-xp 00000000 08:07 5791084    /lib/i386-linux-gnu/libnsl-2.15.so
+b6878000-b6879000 r-xp 00015000 08:07 5791084    /lib/i386-linux-gnu/libnsl-2.15.so
+b6879000-b687a000 rwxp 00016000 08:07 5791084    /lib/i386-linux-gnu/libnsl-2.15.so
+b687a000-b687c000 rwxp 00000000 00:00 0 
+b687c000-b688b000 r-xp 00000000 08:07 2366493    /usr/lib/jvm/java-6-sun-1.6.0.26/jre/lib/i386/libzip.so
+b688b000-b688d000 rwxp 0000e000 08:07 2366493    /usr/lib/jvm/java-6-sun-1.6.0.26/jre/lib/i386/libzip.so
+b688d000-b6895000 rwxs 00000000 08:07 1182845    /tmp/hsperfdata_dock/3492
+b6895000-b68b8000 r-xp 00000000 08:07 2364482    /usr/lib/jvm/java-6-sun-1.6.0.26/jre/lib/i386/libjava.so
+b68b8000-b68ba000 rwxp 00023000 08:07 2364482    /usr/lib/jvm/java-6-sun-1.6.0.26/jre/lib/i386/libjava.so
+b68ba000-b68c1000 r-xp 00000000 08:07 5791094    /lib/i386-linux-gnu/librt-2.15.so
+b68c1000-b68c2000 r-xp 00006000 08:07 5791094    /lib/i386-linux-gnu/librt-2.15.so
+b68c2000-b68c3000 rwxp 00007000 08:07 5791094    /lib/i386-linux-gnu/librt-2.15.so
+b68c3000-b68c6000 ---p 00000000 00:00 0 
+b68c6000-b6914000 rwxp 00000000 00:00 0 
+b6914000-b693e000 r-xp 00000000 08:07 5791082    /lib/i386-linux-gnu/libm-2.15.so
+b693e000-b693f000 r-xp 00029000 08:07 5791082    /lib/i386-linux-gnu/libm-2.15.so
+b693f000-b6940000 rwxp 0002a000 08:07 5791082    /lib/i386-linux-gnu/libm-2.15.so
+b6940000-b70f2000 r-xp 00000000 08:07 3019015    /usr/lib/jvm/java-6-sun-1.6.0.26/jre/lib/i386/server/libjvm.so
+b70f2000-b7146000 rwxp 007b1000 08:07 3019015    /usr/lib/jvm/java-6-sun-1.6.0.26/jre/lib/i386/server/libjvm.so
+b7146000-b7565000 rwxp 00000000 00:00 0 
+b7565000-b7704000 r-xp 00000000 08:07 5791078    /lib/i386-linux-gnu/libc-2.15.so
+b7704000-b7706000 r-xp 0019f000 08:07 5791078    /lib/i386-linux-gnu/libc-2.15.so
+b7706000-b7707000 rwxp 001a1000 08:07 5791078    /lib/i386-linux-gnu/libc-2.15.so
+b7707000-b770a000 rwxp 00000000 00:00 0 
+b770a000-b770d000 r-xp 00000000 08:07 5791081    /lib/i386-linux-gnu/libdl-2.15.so
+b770d000-b770e000 r-xp 00002000 08:07 5791081    /lib/i386-linux-gnu/libdl-2.15.so
+b770e000-b770f000 rwxp 00003000 08:07 5791081    /lib/i386-linux-gnu/libdl-2.15.so
+b770f000-b7716000 r-xp 00000000 08:07 3019020    /usr/lib/jvm/java-6-sun-1.6.0.26/jre/lib/i386/jli/libjli.so
+b7716000-b7718000 rwxp 00006000 08:07 3019020    /usr/lib/jvm/java-6-sun-1.6.0.26/jre/lib/i386/jli/libjli.so
+b7718000-b772f000 r-xp 00000000 08:07 5791092    /lib/i386-linux-gnu/libpthread-2.15.so
+b772f000-b7730000 r-xp 00016000 08:07 5791092    /lib/i386-linux-gnu/libpthread-2.15.so
+b7730000-b7731000 rwxp 00017000 08:07 5791092    /lib/i386-linux-gnu/libpthread-2.15.so
+b7731000-b7734000 rwxp 00000000 00:00 0 
+b7734000-b7736000 r-xs 0000e000 00:14 5129674    /home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/lib/activation-1.1.jar
+b7736000-b7739000 r-xp 00000000 08:07 2364483    /usr/lib/jvm/java-6-sun-1.6.0.26/jre/lib/i386/libdt_socket.so
+b7739000-b773a000 rwxp 00003000 08:07 2364483    /usr/lib/jvm/java-6-sun-1.6.0.26/jre/lib/i386/libdt_socket.so
+b773a000-b773b000 r-xp 002bf000 08:07 132511     /usr/lib/locale/locale-archive
+b773b000-b773e000 r-xp 00000000 08:07 2366488    /usr/lib/jvm/java-6-sun-1.6.0.26/jre/lib/i386/libnpt.so
+b773e000-b773f000 rwxp 00002000 08:07 2366488    /usr/lib/jvm/java-6-sun-1.6.0.26/jre/lib/i386/libnpt.so
+b773f000-b7740000 rwxp 00000000 00:00 0 
+b7740000-b7741000 r-xp 00000000 00:00 0 
+b7741000-b774c000 r-xp 00000000 08:07 2366498    /usr/lib/jvm/java-6-sun-1.6.0.26/jre/lib/i386/libverify.so
+b774c000-b774d000 rwxp 0000b000 08:07 2366498    /usr/lib/jvm/java-6-sun-1.6.0.26/jre/lib/i386/libverify.so
+b774d000-b774f000 rwxp 00000000 00:00 0 
+b774f000-b7750000 r-xp 00000000 00:00 0          [vdso]
+b7750000-b7770000 r-xp 00000000 08:07 5767335    /lib/i386-linux-gnu/ld-2.15.so
+b7770000-b7771000 r-xp 0001f000 08:07 5767335    /lib/i386-linux-gnu/ld-2.15.so
+b7771000-b7772000 rwxp 00020000 08:07 5767335    /lib/i386-linux-gnu/ld-2.15.so
+bf851000-bf874000 rwxp 00000000 00:00 0          [stack]
+
+VM Arguments:
+jvm_args: -agentlib:jdwp=transport=dt_socket,suspend=y,address=localhost:34338 -Dfile.encoding=UTF-8 
+java_command: com.twitter.corpus.analysis.JaccardDeserializer /home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/Output/jaccard2.ser
+Launcher Type: SUN_STANDARD
+
+Environment Variables:
+JAVA_HOME=/usr/lib/jvm/java-1.6.0-openjdk/
+PATH=/usr/lib/lightdm/lightdm:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/lib/jvm/java-1.6.0-openjdk//bin
+LD_LIBRARY_PATH=/usr/lib/jvm/java-6-sun-1.6.0.26/jre/lib/i386/server:/usr/lib/jvm/java-6-sun-1.6.0.26/jre/lib/i386:/usr/lib/jvm/java-6-sun-1.6.0.26/jre/../lib/i386:/usr/lib/jvm/java-6-openjdk-i386/jre/lib/i386/client:/usr/lib/jvm/java-6-openjdk-i386/jre/lib/i386:
+SHELL=/bin/zsh
+DISPLAY=:0.0
+
+Signal Handlers:
+SIGSEGV: [libjvm.so+0x725510], sa_mask[0]=0x7ffbfeff, sa_flags=0x10000004
+SIGBUS: [libjvm.so+0x725510], sa_mask[0]=0x7ffbfeff, sa_flags=0x10000004
+SIGFPE: [libjvm.so+0x5dff20], sa_mask[0]=0x7ffbfeff, sa_flags=0x10000004
+SIGPIPE: [libjvm.so+0x5dff20], sa_mask[0]=0x7ffbfeff, sa_flags=0x10000004
+SIGXFSZ: [libjvm.so+0x5dff20], sa_mask[0]=0x7ffbfeff, sa_flags=0x10000004
+SIGILL: [libjvm.so+0x5dff20], sa_mask[0]=0x7ffbfeff, sa_flags=0x10000004
+SIGUSR1: SIG_DFL, sa_mask[0]=0x00000000, sa_flags=0x00000000
+SIGUSR2: [libjvm.so+0x5e3160], sa_mask[0]=0x00000004, sa_flags=0x10000004
+SIGHUP: [libjvm.so+0x5e2d40], sa_mask[0]=0x7ffbfeff, sa_flags=0x10000004
+SIGINT: [libjvm.so+0x5e2d40], sa_mask[0]=0x7ffbfeff, sa_flags=0x10000004
+SIGTERM: [libjvm.so+0x5e2d40], sa_mask[0]=0x7ffbfeff, sa_flags=0x10000004
+SIGQUIT: [libjvm.so+0x5e2d40], sa_mask[0]=0x7ffbfeff, sa_flags=0x10000004
+
+
+---------------  S Y S T E M  ---------------
+
+OS:wheezy/sid
+
+uname:Linux 3.2.0-26-generic #41-Ubuntu SMP Thu Jun 14 16:26:01 UTC 2012 i686
+libc:glibc 2.15 NPTL 2.15 
+rlimit: STACK 8192k, CORE 0k, NPROC 15873, NOFILE 4096, AS infinity
+load average:1.00 1.06 1.16
+
+/proc/meminfo:
+MemTotal:        2052236 kB
+MemFree:          169804 kB
+Buffers:           72544 kB
+Cached:           720732 kB
+SwapCached:         1020 kB
+Active:          1079260 kB
+Inactive:         680236 kB
+Active(anon):     749488 kB
+Inactive(anon):   351708 kB
+Active(file):     329772 kB
+Inactive(file):   328528 kB
+Unevictable:           0 kB
+Mlocked:               0 kB
+HighTotal:       1178120 kB
+HighFree:          23060 kB
+LowTotal:         874116 kB
+LowFree:          146744 kB
+SwapTotal:       2084860 kB
+SwapFree:        2082296 kB
+Dirty:               768 kB
+Writeback:             0 kB
+AnonPages:        965760 kB
+Mapped:           136832 kB
+Shmem:            134816 kB
+Slab:              96256 kB
+SReclaimable:      63940 kB
+SUnreclaim:        32316 kB
+KernelStack:        3360 kB
+PageTables:         7704 kB
+NFS_Unstable:          0 kB
+Bounce:                0 kB
+WritebackTmp:          0 kB
+CommitLimit:     3110976 kB
+Committed_AS:    3030332 kB
+VmallocTotal:     122880 kB
+VmallocUsed:       15564 kB
+VmallocChunk:     103588 kB
+HardwareCorrupted:     0 kB
+AnonHugePages:         0 kB
+HugePages_Total:       0
+HugePages_Free:        0
+HugePages_Rsvd:        0
+HugePages_Surp:        0
+Hugepagesize:       4096 kB
+DirectMap4k:       24568 kB
+DirectMap4M:      884736 kB
+
+
+CPU:total 2 (2 cores per cpu, 1 threads per core) family 6 model 14 stepping 12, cmov, cx8, fxsr, mmx, sse, sse2, sse3
+
+/proc/cpuinfo:
+processor	: 0
+vendor_id	: GenuineIntel
+cpu family	: 6
+model		: 14
+model name	: Intel(R) Core(TM) Duo CPU      T2450  @ 2.00GHz
+stepping	: 12
+microcode	: 0x54
+cpu MHz		: 1067.000
+cache size	: 2048 KB
+physical id	: 0
+siblings	: 2
+core id		: 0
+cpu cores	: 2
+apicid		: 0
+initial apicid	: 0
+fdiv_bug	: no
+hlt_bug		: no
+f00f_bug	: no
+coma_bug	: no
+fpu		: yes
+fpu_exception	: yes
+cpuid level	: 10
+wp		: yes
+flags		: fpu vme de pse tsc msr pae mce cx8 apic mtrr pge mca cmov clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe nx constant_tsc arch_perfmon bts aperfmperf pni monitor est tm2 xtpr pdcm dts
+bogomips	: 3989.75
+clflush size	: 64
+cache_alignment	: 64
+address sizes	: 32 bits physical, 32 bits virtual
+power management:
+
+processor	: 1
+vendor_id	: GenuineIntel
+cpu family	: 6
+model		: 14
+model name	: Intel(R) Core(TM) Duo CPU      T2450  @ 2.00GHz
+stepping	: 12
+microcode	: 0x54
+cpu MHz		: 800.000
+cache size	: 2048 KB
+physical id	: 0
+siblings	: 2
+core id		: 1
+cpu cores	: 2
+apicid		: 1
+initial apicid	: 1
+fdiv_bug	: no
+hlt_bug		: no
+f00f_bug	: no
+coma_bug	: no
+fpu		: yes
+fpu_exception	: yes
+cpuid level	: 10
+wp		: yes
+flags		: fpu vme de pse tsc msr pae mce cx8 apic mtrr pge mca cmov clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe nx constant_tsc arch_perfmon bts aperfmperf pni monitor est tm2 xtpr pdcm dts
+bogomips	: 3989.99
+clflush size	: 64
+cache_alignment	: 64
+address sizes	: 32 bits physical, 32 bits virtual
+power management:
+
+
+
+Memory: 4k page, physical 2052236k(169804k free), swap 2084860k(2082296k free)
+
+vm_info: Java HotSpot(TM) Server VM (20.1-b02) for linux-x86 JRE (1.6.0_26-b03), built on May  4 2011 01:04:10 by "java_re" with gcc 3.2.1-7a (J2SE release)
+
+time: Wed Jul  4 08:29:57 2012
+elapsed time: 748 seconds
+

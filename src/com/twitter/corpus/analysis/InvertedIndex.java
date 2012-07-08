@@ -27,7 +27,6 @@ public class InvertedIndex {
 		public static int counter =1;
 
 	/**
-	 * 
 	 * @param StatusStream stream
 	 * @return <del>HashMap<Integer, HashSet<Long>> InvertIndex</del> IndexAndDocCount
 	 * <br><br>
@@ -50,7 +49,7 @@ public class InvertedIndex {
 				// status 302 is a redirect, ie a retweet
 				if(status.getHttpStatusCode() == 302){
 					continue;
-				}					
+				}
 
 				String tweet = status.getText();
 				if (tweet == null){	continue;}
@@ -78,7 +77,7 @@ public class InvertedIndex {
 					LOG.info(docNum + " tweets indexed in " +  Admin.getTime(lastTime, currTime));
 					lastTime = currTime;
 				}
-				if(docNum > 200000){
+				if(docNum > 20000){
 					LOG.info(termIndex.size() + " total terms.");
 					break;
 				}

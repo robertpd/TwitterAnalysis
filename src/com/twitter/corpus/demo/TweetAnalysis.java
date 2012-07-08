@@ -38,6 +38,7 @@ public class TweetAnalysis{
 
 
 	public static void main(String[] args) throws Exception {
+
 		Options options = new Options();
 		options.addOption(OptionBuilder.withArgName("path").hasArg().withDescription("input directory or file").create(INPUT_OPTION));
 		options.addOption(OptionBuilder.withArgName("path").hasArg().withDescription("index location").create(OUTPUT_OPTION));
@@ -109,7 +110,7 @@ public class TweetAnalysis{
 			blockCoSet = ill.termCosetBuilder();
 
 			// serialize term coset
-			CosetSerializer.cosetSerializer(blockCoSet, output);
+			CosetSerializer.cosetSerializer(blockCoSet, output, cnt+1);
 			
 			corpusCoSetArray.add(blockCoSet);			// add coset of particular day to array
 
@@ -120,7 +121,6 @@ public class TweetAnalysis{
 				// 3.0 do the deed
 				Jaccard.getJaccardSimilarity(corpusCoSetArray);
 
-				
 				// swap positions, makes our life easier
 				Collections.swap(corpusCoSetArray, 0, 1);
 				// remove the first coset array
@@ -130,8 +130,7 @@ public class TweetAnalysis{
 			cnt++;
 		}
 		Jaccard.serializeJaccards(output);
-		
-		
+				
 //		HashMap<Integer, ArrayList<Double>> jDiffs = Jaccard.calcJaccardDifferences();
 //		Jaccard.serializeJDiff(jDiffs, jaccardOutput);
 	}

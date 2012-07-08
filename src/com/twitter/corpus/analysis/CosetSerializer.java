@@ -7,8 +7,9 @@ import java.util.HashMap;
 
 public class CosetSerializer {
 
-	public static void cosetSerializer(HashMap<Integer, HashMap<Integer, Double>> coset , String output) throws IOException{
-		String path = output + "/termCoset" +3 +".ser";
+	public static void cosetSerializer(HashMap<Integer, HashMap<Integer, Double>> coset , String output, int count) throws IOException{
+		
+		String path = output + "/termCoset_" + count + ".ser";
 		FileOutputStream fileOut = new FileOutputStream(path);
 		ObjectOutputStream objectOut = new ObjectOutputStream(fileOut);
 		objectOut.flush();

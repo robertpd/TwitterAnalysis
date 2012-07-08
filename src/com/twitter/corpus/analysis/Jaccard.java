@@ -11,16 +11,12 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.apache.cassandra.cli.CliParser.newColumnFamily_return;
 import org.apache.log4j.Logger;
-import org.omg.IOP.ENCODING_CDR_ENCAPS;
 
 import com.twitter.corpus.demo.TweetAnalysis;
-import com.twitter.corpus.types.CoWeight;
 
 public class Jaccard {
 	private static final Logger LOG = Logger.getLogger(Jaccard.class);

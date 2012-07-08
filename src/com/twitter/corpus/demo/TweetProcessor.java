@@ -15,16 +15,16 @@ import com.twitter.corpus.analysis.TermTermWeights;
 public class TweetProcessor {
 	public static Set<String> stopwords = null;
 	public static int uniqueTermCounter=0;
-//	private static String stopsFile[] = {"/home/dock/Documents/IR/DataSets/stopwords/english",
-//		"/home/dock/Documents/IR/DataSets/stopwords/misc",
-//		"/home/dock/Documents/IR/DataSets/stopwords/french",
-//		"/home/dock/Documents/IR/DataSets/stopwords/english",
-//		"/home/dock/Documents/IR/DataSets/stopwords/portuguese",
-//		"/home/dock/Documents/IR/DataSets/stopwords/non_eng_stops",
-//		"/home/dock/Documents/IR/DataSets/stopwords/portu_stops",
-//		"/home/dock/Documents/IR/DataSets/stopwords/spanish_stops",
-//		"/home/dock/Documents/IR/DataSets/stopwords/analysis",
-//	};
+	//	private static String stopsFile[] = {"/home/dock/Documents/IR/DataSets/stopwords/english",
+	//		"/home/dock/Documents/IR/DataSets/stopwords/misc",
+	//		"/home/dock/Documents/IR/DataSets/stopwords/french",
+	//		"/home/dock/Documents/IR/DataSets/stopwords/english",
+	//		"/home/dock/Documents/IR/DataSets/stopwords/portuguese",
+	//		"/home/dock/Documents/IR/DataSets/stopwords/non_eng_stops",
+	//		"/home/dock/Documents/IR/DataSets/stopwords/portu_stops",
+	//		"/home/dock/Documents/IR/DataSets/stopwords/spanish_stops",
+	//		"/home/dock/Documents/IR/DataSets/stopwords/analysis",
+	//	};
 	private static String stopDir = "stopwords";
 
 	private static String stopsFile[] = {
@@ -74,7 +74,9 @@ public class TweetProcessor {
 				}
 			}
 		}
-		TermTermWeights.docTermsMap.put(docId, termsInDoc);
+		if(termsInDoc.size() > 0){	// discarding non alphanumeric chars like asian chars => empty termsInDoc
+			TermTermWeights.docTermsMap.put(docId, termsInDoc);
+		}
 		return pt;
 	}
 	public static String[] preprocessTweet(String tweet){
@@ -86,16 +88,16 @@ public class TweetProcessor {
 		String[] retVal = new String[normElements.length];
 
 		// http link processing removed, 730k tweets contain 112k http links
-//		if(tweet.contains("http")){
-//			for(int i=0; i< normElements.length;i++){
-//				retVal[i]=normElements[i].contains("http") ? normElements[i] :normElements[i].replaceAll("[^A-Za-z0-9@#]","");
-//			} 
-//		}
-//		else{
-			for(int i=0; i< normElements.length;i++){
-				retVal[i]=normElements[i].replaceAll("[^A-Za-z0-9@#]","");
-			}
-//		}
+		//		if(tweet.contains("http")){
+		//			for(int i=0; i< normElements.length;i++){
+		//				retVal[i]=normElements[i].contains("http") ? normElements[i] :normElements[i].replaceAll("[^A-Za-z0-9@#]","");
+		//			} 
+		//		}
+		//		else{
+		for(int i=0; i< normElements.length;i++){
+			retVal[i]=normElements[i].replaceAll("[^A-Za-z0-9@#]","");
+		}
+		//		}
 		return retVal;
 	}
 	private static String[] normalize(String[] str){
