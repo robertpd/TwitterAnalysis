@@ -77,10 +77,10 @@ public class InvertedIndex {
 					LOG.info(docNum + " tweets indexed in " +  Admin.getTime(lastTime, currTime));
 					lastTime = currTime;
 				}
-				if(docNum > 20000){
-					LOG.info(termIndex.size() + " total terms.");
-					break;
-				}
+//				if(docNum > 100000){
+//					LOG.info(termIndex.size() + " total terms.");
+//					break;
+//				}
 			}
 			LOG.info(termIndex.size() + " total terms indexed. Doc count >= 0.");
 		}
@@ -88,7 +88,7 @@ public class InvertedIndex {
 		{
 		}
 		
-		// remove index terms with df less than 8 and > ??
+		// remove index terms with df less than a certain amount and > a certain amount
 		// TODO Sort out tf upper threshold. Investigate weighting, currently looking at raw term frequencies over daily corpus, need refined weighting
 		HashMap<Integer, HashSet<Long>> thresholdIndex = new HashMap<Integer, HashSet<Long>>((int)termIndex.size()/2);
 		
@@ -101,6 +101,58 @@ public class InvertedIndex {
 			}
 		}
 		LOG.info(thresholdIndex.size() + " term after trimming.");
+		
+		// add TF-IDF stopword removal by taking occurance of term over 1000 docs. In a day there are avg 730k docs
+		
+		// iterate and take a term
+		// iterate 1000 docs and count occurances
+		// [ occurances / docs * term count of each doc ] * log[ total Docs / docs ]
+		// store this in a map for inspection and to determine cut point
+		// remove terms that correspond to this cut point
+		
+		// the first time the term occurs take 1000 docs following that .
+		// first time 
+		
+		// take 7300 docs.
+		// add them to arraylist to calc total size termCount
+		// after building arraylist, use to create set for fast checking
+		
+		ArrayList<Integer> termArrayList = new ArrayList<Integer>();
+		Integer cutPoint = 7300;
+		termArrayList.ensureCapacity(cutPoint);
+		
+		// populate window
+		
+		int cutCounter = 0;
+		Iterator<Map.Entry<Integer, HashSet<Long>>> indexIter = termIndex.entrySet().iterator();
+		while(indexIter.hasNext() && cutCounter < cutPoint){			
+			Map.Entry<Integer, HashSet<Long>> termEntry = indexIter.next();
+			Integer term = termEntry.getKey();
+			termArrayList.add(term);
+			cutCounter++;
+		}
+		int arraySize = termArrayList.size();
+		
+		// init TFIDF mapping		
+		HashMap<Integer, Double> termTFIDF = new HashMap<Integer, Double>(termIndex.size());
+		
+		// calc TFIDF's
+		Iterator<Map.Entry<Integer, HashSet<Long>>> termIter2 = termIndex.entrySet().iterator();
+		while(termIter2.hasNext()){
+			Entry<Integer, HashSet<Long>> entry = termIter2.next();
+			Integer term = entry.getKey();
+			
+			int tf=0;
+			Iterator<Integer> arrayListIter = termArrayList.iterator();
+			while(arrayListIter.hasNext()){
+				if(arrayListIter.next() == term){
+					tf++;
+				}
+			}
+			Double tfidf = ((double)tf / (double)arraySize ) * (Math.log(termIndex.size() /termIndex.get(term).size()));
+			tfidf = (double)Math.round(tfidf * 10000) / 10000;
+			termTFIDF.put(term, tfidf);
+		}
 		return thresholdIndex;
 	}
 	/**
@@ -200,28 +252,3 @@ public class InvertedIndex {
 		}
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
