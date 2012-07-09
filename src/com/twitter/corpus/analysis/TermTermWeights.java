@@ -2,6 +2,7 @@ package com.twitter.corpus.analysis;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -42,13 +43,14 @@ public class TermTermWeights implements java.io.Serializable{
 	 * 		@return Returns a HashMap of term and weighted correlates.
 	 * 		@throws IOException
 	 */
-	public HashMap<Integer, HashMap<Integer, Double>> termCosetBuilder() throws IOException{
+	public HashMap<Integer, ArrayList<CoWeight>> termCosetBuilder() throws IOException{
 		LOG.info("Starting term coweighting...");		
 		int cnt=0;	// counter for LOG.info()
 		long lastTime2=System.currentTimeMillis();	// timing for LOG.info()
 		
 		// return object cosetMap, contains terms mapped to coweights
-		HashMap<Integer, HashMap<Integer, Double>> cosetMap = new HashMap<Integer, HashMap<Integer, Double>>(termIndex.size());
+//		HashMap<Integer, HashMap<Integer, Double>> cosetMap = new HashMap<Integer, HashMap<Integer, Double>>(termIndex.size());	
+		HashMap<Integer, ArrayList<CoWeight>> cosetMap = new HashMap<Integer, ArrayList<CoWeight>>(termIndex.size());
 //		Set<Integer> termMatrixKeys = termIndex.keySet();
 		
 		// TODO BIGGEST 2ND: termIndex was null the second time around, how???
@@ -57,6 +59,7 @@ public class TermTermWeights implements java.io.Serializable{
 			coset2.put(i, null);
 		}
 		
+		// term, hashSet<Documents>
 		Iterator<Map.Entry<Integer, HashSet<Long>>> termMatrixIter = termIndex.entrySet().iterator();
 		// iterate keys on termMatrix
 		//		for(Integer i : termMatrixKeys){
@@ -96,10 +99,10 @@ public class TermTermWeights implements java.io.Serializable{
 			}
 
 			// coweight array for term "i"
-//			ArrayList<CoWeight> termCoSetArray = new ArrayList<CoWeight>(uniqueTerms.size());		// new coset array should have same dim as termMatrix...
+			ArrayList<CoWeight> termCoSetArray = new ArrayList<CoWeight>(uniqueTerms.size());		// new coset array should have same dim as termMatrix...
 
 			// hashmap below will need to be sorted when getting top 5(say) coweight terms
-			HashMap<Integer,Double> termCosetMap = new HashMap<Integer, Double>(uniqueTerms.size());
+//			HashMap<Integer,Double> termCosetMap = new HashMap<Integer, Double>(uniqueTerms.size());
 			
 			for(Iterator<Integer> term = uniqueTerms.iterator(); term.hasNext();){
 				int termJ = term.next();
@@ -131,23 +134,26 @@ public class TermTermWeights implements java.io.Serializable{
 
 				double m = (double)termIJNum / (double)denom;
 				termIJNum = 0;
-//				CoWeight cs = null;
+				CoWeight cs = null;
 				m = (double)Math.round(m * 1000) / 1000;
 
 				// Skip low coweights, as well as the above low doc number
 				if(m > 0.05){
-//					cs = new CoWeight(termJ, m);// old, replaced by below
-					termCosetMap.put(termJ, m);
+					cs = new CoWeight(termJ, m);	// old, replaced by below, and.. back by popular demand
+//					termCosetMap.put(termJ, m);
+					termCoSetArray.add(cs); // this was the first imp, used an ArrayList
 				}
 				// arraylist of coweights, to be added to hashmap of terms to coweights
-//				termCoSetArray.add(cs); // this was the first imp, used an ArrayList
+				
 //				cs = null;
 			}
 			
 			//TODO NEED TO SORT THIS as treeset has been reverted
 //			termCosetSet.removeAll(Collections.singleton(null));
+			Collections.sort(termCoSetArray, new CoWeightComparator());
 			
-			cosetMap.put(i, termCosetMap);
+			cosetMap.put(i, termCoSetArray);
+//			cosetMap.put(i, termCosetMap);
 			
 			cnt++;
 			if(cnt % 1000 ==0){

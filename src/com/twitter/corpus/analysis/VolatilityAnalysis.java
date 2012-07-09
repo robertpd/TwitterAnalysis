@@ -40,7 +40,8 @@ public class VolatilityAnalysis {
 			Double num = 0.0;
 			while (jaccEntry2.hasNext()) {
 				// sqrt of the absolute value
-				num += Math.sqrt(Math.abs(jaccEntry2.next().getValue() - avgVol));				
+				//TODO review the power here, i had sqrt in instead and that will surely fuck up the graph!
+				num += Math.pow((Math.abs(jaccEntry2.next().getValue() - avgVol)), 2) ;				
 			}
 			Double stdDev = Math.sqrt(num / 32);
 			stdDev = (double)Math.round(stdDev * 1000) / 1000;

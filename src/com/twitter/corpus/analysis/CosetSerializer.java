@@ -3,17 +3,20 @@ package com.twitter.corpus.analysis;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
+
+import com.twitter.corpus.types.CoWeight;
 
 public class CosetSerializer {
 
-	public static void cosetSerializer(HashMap<Integer, HashMap<Integer, Double>> coset , String output, int count) throws IOException{
+	public static void cosetSerializer(HashMap<Integer, ArrayList<CoWeight>> blockCoSet , String output, int count) throws IOException{
 		
 		String path = output + "/termCoset_" + count + ".ser";
 		FileOutputStream fileOut = new FileOutputStream(path);
 		ObjectOutputStream objectOut = new ObjectOutputStream(fileOut);
 		objectOut.flush();
-		objectOut.writeObject(coset);
+		objectOut.writeObject(blockCoSet);
 		objectOut.close();
 	}
 }

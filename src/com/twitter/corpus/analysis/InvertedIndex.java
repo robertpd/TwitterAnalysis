@@ -94,15 +94,15 @@ public class InvertedIndex {
 		// TODO Sort out tf upper threshold. Investigate weighting, currently looking at raw term frequencies over daily corpus, need refined weighting
 		HashMap<Integer, HashSet<Long>> thresholdIndex = new HashMap<Integer, HashSet<Long>>((int)termIndex.size()/2);
 //		
-//		Iterator<Map.Entry<Integer, HashSet<Long>>> indexIterator = termIndex.entrySet().iterator();
-//		while(indexIterator.hasNext()){
-//			Map.Entry<Integer, HashSet<Long>> termEntry = indexIterator.next();
-//			// frequency threshold
-//			if(termEntry.getValue().size() > 15 && termEntry.getValue().size() < 5000){
-//				thresholdIndex.put(termEntry.getKey(), termEntry.getValue());
-//			}
-//		}
-//		LOG.info(thresholdIndex.size() + " term after trimming.");
+		Iterator<Map.Entry<Integer, HashSet<Long>>> indexIterator = termIndex.entrySet().iterator();
+		while(indexIterator.hasNext()){
+			Map.Entry<Integer, HashSet<Long>> termEntry = indexIterator.next();
+			// frequency threshold
+			if(termEntry.getValue().size() > 15 && termEntry.getValue().size() < 5000){
+				thresholdIndex.put(termEntry.getKey(), termEntry.getValue());
+			}
+		}
+		LOG.info(thresholdIndex.size() + " term after trimming.");
 		
 		// add TF-IDF stopword removal by taking occurance of term over 1000 docs. In a day there are avg 730k docs
 		

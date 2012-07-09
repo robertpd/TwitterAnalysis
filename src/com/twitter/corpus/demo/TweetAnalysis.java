@@ -26,6 +26,7 @@ import com.twitter.corpus.analysis.Jaccard;
 import com.twitter.corpus.analysis.TermTermWeights;
 import com.twitter.corpus.data.HtmlStatusCorpusReader;
 import com.twitter.corpus.data.StatusStream;
+import com.twitter.corpus.types.CoWeight;
 
 public class TweetAnalysis{
 	private static final Logger LOG = Logger.getLogger(TweetAnalysis.class);
@@ -85,9 +86,9 @@ public class TweetAnalysis{
 //		String[] filePaths = {root + "124"};
 		
 		//		int cnt=0;
-		HashMap<Integer, HashMap<Integer, Double>> blockCoSet = null;
+		HashMap<Integer, ArrayList<CoWeight>> blockCoSet = null;
 		Jaccard initJMap = null;
-		ArrayList<HashMap<Integer, HashMap<Integer, Double>>> corpusCoSetArray = new ArrayList<HashMap<Integer, HashMap<Integer, Double>>>(2);
+		ArrayList<HashMap<Integer, ArrayList<CoWeight>>> corpusCoSetArray = new ArrayList<HashMap<Integer, ArrayList<CoWeight>>>(2);
 		for(String path : filePaths){
 			LOG.info("Stream number : " + (cnt+1) + "\t. Indexing " + path);
 			StatusStream stream = null;
@@ -121,7 +122,7 @@ public class TweetAnalysis{
 					initJMap = new Jaccard(termIndex.size() + (int)(0.1 * termIndex.size()));	// init size plus 10% for wiggle
 				}
 				// 3.0 do the deed
-				Jaccard.getJaccardSimilarity(corpusCoSetArray);
+				Jaccard.getJaccardEnhancedSimilarity(corpusCoSetArray);
 
 				// swap positions, makes our life easier
 				Collections.swap(corpusCoSetArray, 0, 1);
@@ -133,16 +134,15 @@ public class TweetAnalysis{
 		}
 		
 		// serialize termbimap
-//		
-		String path = "/analysis/output/termbimap.ser";
+
+		String path = output + "/termbimap.ser";
 		FileOutputStream fileOut = new FileOutputStream(path);
 		ObjectOutputStream objectOut = new ObjectOutputStream(fileOut);
 		objectOut.flush();
 		objectOut.writeObject(TermTermWeights.termBimap);
 		objectOut.close();
-		
-		
-//		Jaccard.serializeJaccards(output);
+				
+		Jaccard.serializeJaccards(output);
 				
 //		HashMap<Integer, ArrayList<Double>> jDiffs = Jaccard.calcJaccardDifferences();
 //		Jaccard.serializeJDiff(jDiffs, jaccardOutput);
