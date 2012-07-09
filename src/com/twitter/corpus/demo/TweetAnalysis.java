@@ -1,5 +1,7 @@
 package com.twitter.corpus.demo;
 
+import java.io.FileOutputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -66,16 +68,16 @@ public class TweetAnalysis{
 
 		String root = rootBase + "/20110";
 //				String root = "/home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/html/20110";
-				String[] filePaths = {root + "123", root + "124", root + "125", root + "126", root + "127", root + "128",
-						root + "129", root + "130", root + "131", root + "201", root + "202", root + "203",
-						root + "204", root + "205", root + "206",	root + "207", root + "208"};
+//				String[] filePaths = {root + "123", root + "124", root + "125", root + "126", root + "127", root + "128",
+//						root + "129", root + "130", root + "131", root + "201", root + "202", root + "203",
+//						root + "204", root + "205", root + "206",	root + "207", root + "208"};
 
-//		String[] filePaths = {root + "123", root + "123a", root + "124", root + "124a", root + "125", root + "125a", 
-//				root + "126", root + "126a", root + "127", root + "127a", root + "128", root + "128a",
-//				root + "129", root + "129a", root + "130", root + "130a", root + "131", root + "131a",
-//				root + "201", root + "201a", root + "202", root + "202a", root + "203", root + "203a",
-//				root + "204", root + "204a", root + "205", root + "205a", root + "206", root + "206a", 
-//				root + "207", root + "207a", root + "208"};
+		String[] filePaths = {root + "123", root + "123a", root + "124", root + "124a", root + "125", root + "125a", 
+				root + "126", root + "126a", root + "127", root + "127a", root + "128", root + "128a",
+				root + "129", root + "129a", root + "130", root + "130a", root + "131", root + "131a",
+				root + "201", root + "201a", root + "202", root + "202a", root + "203", root + "203a",
+				root + "204", root + "204a", root + "205", root + "205a", root + "206", root + "206a", 
+				root + "207", root + "207a", root + "208"};
 		
 		
 		//		File indexLocation = new File(cmdline.getOptionValue(INDEX_OPTION));
@@ -126,10 +128,21 @@ public class TweetAnalysis{
 				// remove the first coset array
 				corpusCoSetArray.remove(1);
 			}
-			//			Thread.sleep(60000);
+//						Thread.sleep(30000);
 			cnt++;
 		}
-		Jaccard.serializeJaccards(output);
+		
+		// serialize termbimap
+//		
+		String path = "/analysis/output/termbimap.ser";
+		FileOutputStream fileOut = new FileOutputStream(path);
+		ObjectOutputStream objectOut = new ObjectOutputStream(fileOut);
+		objectOut.flush();
+		objectOut.writeObject(TermTermWeights.termBimap);
+		objectOut.close();
+		
+		
+//		Jaccard.serializeJaccards(output);
 				
 //		HashMap<Integer, ArrayList<Double>> jDiffs = Jaccard.calcJaccardDifferences();
 //		Jaccard.serializeJDiff(jDiffs, jaccardOutput);

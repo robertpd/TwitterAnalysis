@@ -252,12 +252,14 @@ public class Jaccard {
 		objectOut.close();
 	}
 	public static void serializeJaccards(String outputPath) throws IOException{
-		String path = outputPath + "/jaccard2.ser";
+		LOG.info("Serializing Jaccards.");
+		String path = outputPath + "/jaccard.ser";
 		FileOutputStream fileOut = new FileOutputStream(path);
 		ObjectOutputStream objectOut = new ObjectOutputStream(fileOut);
 		objectOut.flush();
 		objectOut.writeObject(jaccardList);
 		objectOut.close();
+		LOG.info("Finished serializing Jaccards.");
 	}
 	public static void printResults() throws IOException{
 		BufferedWriter out = new BufferedWriter(new FileWriter(TweetAnalysis.output));

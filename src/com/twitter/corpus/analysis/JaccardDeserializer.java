@@ -2,6 +2,7 @@ package com.twitter.corpus.analysis;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,14 +13,17 @@ public class JaccardDeserializer {
 
 	private static final int jDiffThreshold = 10;	// max zero entries, zero could mean zero diff or be propagated from zero jaccard
 	
-	public static void main(String[] args){
-
-		ArrayList<Integer> poop = new ArrayList<Integer>(10);
-		poop.add(0, 1);
+	public static void main(String[] args) throws IOException{
 		String file = args[0].toString() ;
-		HashMap<Integer, HashMap<Integer,Double>> jaccard = deserialize(file);
-		HashMap<Integer, ArrayList<Double>> jacDif = Jaccard.calcJaccardDifferences(jaccard);
-		HashMap<Integer, ArrayList<Double>> jDiffClean = scrubJDiff(jacDif, jDiffThreshold);
+		String out = args[1].toString();
+		HashMap<Integer, HashMap<Integer,Double>> jaccard = deserialize(file + "jaccard.ser");
+//		HashMap<Integer, ArrayList<Double>> jacDif = Jaccard.calcJaccardDifferences(jaccard);
+//		HashMap<Integer, ArrayList<Double>> jDiffClean = scrubJDiff(jacDif, jDiffThreshold);
+		
+		// get avg vol, std dev
+		
+		VolatilityAnalysis.avgVolatility(jaccard, out);
+//		VolatilityAnalysis.printAvgVol(avgVol, out);
 	}
 
 	@SuppressWarnings("unchecked")

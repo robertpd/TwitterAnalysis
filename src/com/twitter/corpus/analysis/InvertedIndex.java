@@ -1,6 +1,7 @@
 package com.twitter.corpus.analysis;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -25,7 +26,7 @@ public class InvertedIndex {
 	}
 	private static final Logger LOG = Logger.getLogger(TermTermWeights.class);
 		public static int counter =1;
-
+		private static int tfCount =1;
 	/**
 	 * @param StatusStream stream
 	 * @return <del>HashMap<Integer, HashSet<Long>> InvertIndex</del> IndexAndDocCount
@@ -54,7 +55,7 @@ public class InvertedIndex {
 				String tweet = status.getText();
 				if (tweet == null){	continue;}
 				ProcessedTweet pt = TweetProcessor.processTweet(status.getText(),status.getId());
-
+				// blacnked for termbimap
 				for(int i=0; i< pt.termIdList.size() ; i++){
 					if(!termIndex.containsKey(pt.termIdList.get(i)))
 					{// tdh - termDocHash
@@ -72,15 +73,16 @@ public class InvertedIndex {
 					}
 				}
 				docNum++;
-				if(docNum % 50000 == 0 ){
+				if(docNum % 10000 == 0 ){
 					Long currTime = System.currentTimeMillis();
 					LOG.info(docNum + " tweets indexed in " +  Admin.getTime(lastTime, currTime));
 					lastTime = currTime;
 				}
-//				if(docNum > 100000){
-//					LOG.info(termIndex.size() + " total terms.");
-//					break;
-//				}
+				
+				if(docNum > 10000){
+					LOG.info(termIndex.size() + " total terms.");
+					break;
+				}
 			}
 			LOG.info(termIndex.size() + " total terms indexed. Doc count >= 0.");
 		}
@@ -91,16 +93,16 @@ public class InvertedIndex {
 		// remove index terms with df less than a certain amount and > a certain amount
 		// TODO Sort out tf upper threshold. Investigate weighting, currently looking at raw term frequencies over daily corpus, need refined weighting
 		HashMap<Integer, HashSet<Long>> thresholdIndex = new HashMap<Integer, HashSet<Long>>((int)termIndex.size()/2);
-		
-		Iterator<Map.Entry<Integer, HashSet<Long>>> indexIterator = termIndex.entrySet().iterator();
-		while(indexIterator.hasNext()){
-			Map.Entry<Integer, HashSet<Long>> termEntry = indexIterator.next();
-			// frequency threshold
-			if(termEntry.getValue().size() > 15 && termEntry.getValue().size() < 5000){
-				thresholdIndex.put(termEntry.getKey(), termEntry.getValue());
-			}
-		}
-		LOG.info(thresholdIndex.size() + " term after trimming.");
+//		
+//		Iterator<Map.Entry<Integer, HashSet<Long>>> indexIterator = termIndex.entrySet().iterator();
+//		while(indexIterator.hasNext()){
+//			Map.Entry<Integer, HashSet<Long>> termEntry = indexIterator.next();
+//			// frequency threshold
+//			if(termEntry.getValue().size() > 15 && termEntry.getValue().size() < 5000){
+//				thresholdIndex.put(termEntry.getKey(), termEntry.getValue());
+//			}
+//		}
+//		LOG.info(thresholdIndex.size() + " term after trimming.");
 		
 		// add TF-IDF stopword removal by taking occurance of term over 1000 docs. In a day there are avg 730k docs
 		
@@ -150,9 +152,20 @@ public class InvertedIndex {
 				}
 			}
 			Double tfidf = ((double)tf / (double)arraySize ) * (Math.log(termIndex.size() /termIndex.get(term).size()));
-			tfidf = (double)Math.round(tfidf * 10000) / 10000;
+			tfidf = (double)Math.round(tfidf * 10000000) / 10000000;
 			termTFIDF.put(term, tfidf);
 		}
+
+		// tfidf term print
+		
+		//		BufferedWriter bf = new BufferedWriter(new FileWriter("/analysis/output/" + tfCount + "_tfidf.txt"));
+//		Iterator<Map.Entry<Integer, Double>> tfIter = termTFIDF.entrySet().iterator();
+//		while(tfIter.hasNext()){
+//			Entry<Integer, Double> ent = tfIter.next();
+//			bf.append(ent.getKey() + ", " + ent.getValue() + "\n");
+//		}
+//		bf.close();
+		tfCount++;
 		return thresholdIndex;
 	}
 	/**

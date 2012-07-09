@@ -68,12 +68,14 @@ public class TweetProcessor {
 						uniqueTermCounter++;
 					}
 
+					// blacnked for termbimap
 					int termId = TermTermWeights.termBimap.get(prepTweet[i]);
 					pt.termIdList.add(termId);
 					termsInDoc.add(termId);
 				}
 			}
 		}
+		// blacnked for termbimap
 		if(termsInDoc.size() > 0){	// discarding non alphanumeric chars like asian chars => empty termsInDoc
 			TermTermWeights.docTermsMap.put(docId, termsInDoc);
 		}
