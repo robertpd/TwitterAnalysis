@@ -33,27 +33,30 @@ public class VolatilityAnalysis {
 			avgVol = (double)Math.round(avgVol * 1000) / 1000;
 			avgVolMap.put(term, avgVol);
 			
-			// using mean calc std deviation			
+			// using mean calculate standard deviation			
 			
 			Iterator<Map.Entry<Integer, Double>> jaccEntry2 = entry.getValue().entrySet().iterator();
 
 			Double num = 0.0;
 			while (jaccEntry2.hasNext()) {
 				// sqrt of the absolute value
-				//TODO review the power here, i had sqrt in instead and that will surely fuck up the graph!
-				num += Math.pow((Math.abs(jaccEntry2.next().getValue() - avgVol)), 2) ;				
+				//DONE review the power here, i had sqrt in instead and that will surely fuck up the graph!
+				num += Math.pow((Math.abs(jaccEntry2.next().getValue() - avgVol)), 2);
 			}
+			
 			Double stdDev = Math.sqrt(num / 32);
 			stdDev = (double)Math.round(stdDev * 1000) / 1000;
 			
 			stdDevMap.put(term, stdDev);
 		}
-		printAnalysisResults(avgVolMap, path, "avgVol2.csv");
-		printAnalysisResults(stdDevMap, path, "stdDev2.csv");
+		String avgVol = "_avgVol.csv";
+		String stdDev = "_stdDev.csv";
+		printAnalysisResults(avgVolMap, (path + avgVol));
+		printAnalysisResults(stdDevMap, (path + stdDev));
 	}
-	public static void printAnalysisResults(HashMap<Integer, Double> avgVol, String path, String name) throws IOException{
+	public static void printAnalysisResults(HashMap<Integer, Double> avgVol, String pathname) throws IOException{
 		
-		BufferedWriter bf =  new BufferedWriter(new FileWriter(path + name));
+		BufferedWriter bf =  new BufferedWriter(new FileWriter(pathname));
 			
 		Iterator<Map.Entry<Integer, Double>> volIter = avgVol.entrySet().iterator();
 		while(volIter.hasNext()){

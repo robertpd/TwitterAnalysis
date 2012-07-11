@@ -14,16 +14,16 @@ public class JaccardDeserializer {
 	private static final int jDiffThreshold = 10;	// max zero entries, zero could mean zero diff or be propagated from zero jaccard
 	
 	public static void main(String[] args) throws IOException{
-		String file = args[0].toString() ;
-		String out = args[1].toString();
-		HashMap<Integer, HashMap<Integer,Double>> jaccard = deserialize(file + "jaccard.ser");
-//		HashMap<Integer, ArrayList<Double>> jacDif = Jaccard.calcJaccardDifferences(jaccard);
-//		HashMap<Integer, ArrayList<Double>> jDiffClean = scrubJDiff(jacDif, jDiffThreshold);
+//		String file = args[0].toString() ;
+//		String out = args[1].toString();
+		String path = "/home/dock/Documents/IR/AmazonResults/";
+		String file = "jaccard";
+		String type = ".ser";
+		HashMap<Integer, HashMap<Integer,Double>> jaccard = deserialize(path + file + type);
 		
 		// get avg vol, std dev
 		
-		VolatilityAnalysis.avgVolatility(jaccard, out);
-//		VolatilityAnalysis.printAvgVol(avgVol, out);
+		VolatilityAnalysis.avgVolatility(jaccard, (path + file));
 	}
 
 	@SuppressWarnings("unchecked")

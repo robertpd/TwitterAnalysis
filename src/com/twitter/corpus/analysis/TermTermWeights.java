@@ -68,7 +68,7 @@ public class TermTermWeights implements java.io.Serializable{
 			HashSet<Long> docList = termIndex.get(i);							// doclist -> list of docs for a term
 			Integer termINum = termIndex.get(i).size();		// number of documents with term "i"
 
-			// Skip rare numbers altogether
+			// Skip rare numbers altogether; now dealt with at termIndex stage... terms in lt 15 docs are stripped and mt 5000
 			if(termINum < 15){
 				continue;
 			}

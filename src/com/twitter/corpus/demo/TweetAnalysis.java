@@ -115,34 +115,34 @@ public class TweetAnalysis{
 			// serialize term coset
 			CosetSerializer.cosetSerializer(blockCoSet, output, cnt+1);
 			
-			corpusCoSetArray.add(blockCoSet);			// add coset of particular day to array
-
-			if(corpusCoSetArray.size() == 2){	// only skipped once at the start
-				if(initJMap == null){			// one time initializer
-					initJMap = new Jaccard(termIndex.size() + (int)(0.1 * termIndex.size()));	// init size plus 10% for wiggle
-				}
-				// 3.0 do the deed
-				Jaccard.getJaccardEnhancedSimilarity(corpusCoSetArray);
-
-				// swap positions, makes our life easier
-				Collections.swap(corpusCoSetArray, 0, 1);
-				// remove the first coset array
-				corpusCoSetArray.remove(1);
-			}
-//						Thread.sleep(30000);
+//			corpusCoSetArray.add(blockCoSet);			// add coset of particular day to array
+//
+//			if(corpusCoSetArray.size() == 2){	// only skipped once at the start
+//				if(initJMap == null){			// one time initializer
+//					initJMap = new Jaccard(termIndex.size() + (int)(0.1 * termIndex.size()));	// init size plus 10% for wiggle
+//				}
+//				// 3.0 do the deed
+////				Jaccard.getJaccardEnhancedSimilarity(corpusCoSetArray);
+//				Jaccard.getJaccardSimilarity(corpusCoSetArray);
+//				// swap positions, makes our life easier
+//				Collections.swap(corpusCoSetArray, 0, 1);
+//				// remove the first coset array
+//				corpusCoSetArray.remove(1);
+//			}
+////						Thread.sleep(30000);
 			cnt++;
 		}
 		
 		// serialize termbimap
-
-		String path = output + "/termbimap.ser";
-		FileOutputStream fileOut = new FileOutputStream(path);
-		ObjectOutputStream objectOut = new ObjectOutputStream(fileOut);
-		objectOut.flush();
-		objectOut.writeObject(TermTermWeights.termBimap);
-		objectOut.close();
-				
-		Jaccard.serializeJaccards(output);
+//
+//		String path = output + "/termbimap.ser";
+//		FileOutputStream fileOut = new FileOutputStream(path);
+//		ObjectOutputStream objectOut = new ObjectOutputStream(fileOut);
+//		objectOut.flush();
+//		objectOut.writeObject(TermTermWeights.termBimap);
+//		objectOut.close();
+//				
+//		Jaccard.serializeJaccards(output);
 				
 //		HashMap<Integer, ArrayList<Double>> jDiffs = Jaccard.calcJaccardDifferences();
 //		Jaccard.serializeJDiff(jDiffs, jaccardOutput);
