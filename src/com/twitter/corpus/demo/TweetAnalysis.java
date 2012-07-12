@@ -35,9 +35,6 @@ public class TweetAnalysis{
 	private static final String INPUT_OPTION = "input";
 	private static final String OUTPUT_OPTION = "output";
 	private static final String TOOLS = "tools";
-	//	private static final String HTML_MODE = "html";
-	//	private static final String JSON_MODE = "json";
-
 
 	public static void main(String[] args) throws Exception {
 
@@ -76,8 +73,6 @@ public class TweetAnalysis{
 				root + "204", root + "204a", root + "205", root + "205a", root + "206", root + "206a", 
 				root + "207", root + "207a", root + "208"};
 
-
-		//		File indexLocation = new File(cmdline.getOptionValue(INDEX_OPTION));
 		//		String[] filePaths = {rootBase};
 		//		String[] filePaths = {root + "124"};
 
@@ -104,14 +99,14 @@ public class TweetAnalysis{
 			InvertedIndex ii = new InvertedIndex();
 			HashMap<Integer, HashSet<Long>> termIndex = ii.buildIndex(stream);			
 
-			// 2.0 calculate term-term weights
+			// 2.0 calculate term cosets
 			TermTermWeights ill = new TermTermWeights(termIndex);
 			blockCoSet = ill.termCosetBuilder();
 
-			// serialize term coset
+			// 2.1 serialize term cosets
 			CosetSerializer.cosetSerializer(blockCoSet, output, cnt+1);
 
-			//			corpusCoSetArray.add(blockCoSet);			// add coset of particular day to array
+			corpusCoSetArray.add(blockCoSet);			// add coset of particular day to array
 			//
 			if(corpusCoSetArray.size() == 2){	// only skipped once at the start
 				if(initJMap == null){			// one time initializer
