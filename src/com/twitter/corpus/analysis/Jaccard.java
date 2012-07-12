@@ -96,12 +96,12 @@ public class Jaccard {
 
 				HashSet<Integer> aMap = new HashSet<Integer>(a.size());
 				Iterator<CoWeight> aIter = a.iterator();
-				
+
 				while(aIter.hasNext()){
 					CoWeight acw = aIter.next();
 					aMap.add(acw.termId);
 				}
-				
+
 				HashSet<Integer> bMap = new HashSet<Integer>(b.size());
 				Iterator<CoWeight> bIter = b.iterator();
 				while(bIter.hasNext()){
@@ -110,21 +110,21 @@ public class Jaccard {
 				}
 
 				// get intersection
-				
+
 				HashSet<Integer> intersection = new HashSet<Integer>(aMap.size());				
 				Iterator<Integer> aMapIter = aMap.iterator();
-				
+
 				while(aMapIter.hasNext()){
 					Integer aTerm = aMapIter.next();
-										
+
 					if(bMap.contains(aTerm)){
 						intersection.add(aTerm);
 					}
 				}
-				
+
 				// get union
 				aMap.addAll(bMap);
-				
+
 				// get jaccard, dont bother if union is 0
 
 				if(a.size() != 0){
@@ -266,13 +266,13 @@ public class Jaccard {
 
 		Double jacc = 0.0;
 		HashSet<Integer> termsDone = new HashSet<Integer>();
-		
+
 		Iterator<Entry<Integer, Double>> aMapIter = aMap.entrySet().iterator();
 		while(aMapIter.hasNext()){
 			Entry<Integer, Double> entry = aMapIter.next();
 			Integer aTerm = entry.getKey();
 			Double aWeight = entry.getValue();
-			
+
 			if(bMap.containsKey(aTerm)){
 				// square the value
 				jacc += Math.pow( Math.abs(bMap.get(aTerm) - aWeight), 2);
@@ -288,82 +288,25 @@ public class Jaccard {
 
 		Iterator<Entry<Integer, Double>> bMapIter = bMap.entrySet().iterator();
 		while(bMapIter.hasNext()){
-			
+
 			Entry<Integer, Double> entry = bMapIter.next();
 			Integer bTerm = entry.getKey();
-			
+
 			if(!termsDone.contains(bTerm)){
 				Double bWeight = entry.getValue();
 				jacc += Math.pow(bWeight, 2);
 			}
 		}
-		
+
 		// sqrt the sum of squares
 		jacc = Math.sqrt(jacc);
-		
+
 		jacc = (double)Math.round((jacc ) * 1000) / 1000;
 
 		// et voila!
 
 		return jacc;
 	}
-	/***
-	 * Calculate jaccard differences across intervals.
-	 *  @return HashMap of term and jaccard differences for each interval
-	 */
-	public static HashMap<Integer, ArrayList<Double>> calcJaccardDifferences(HashMap<Integer, HashMap<Integer,Double>> jaccardList){	// previous prototype was empty and jaccardList below was the static object from Jaccard class..
-		LOG.info("Calc'ing jaccard differences");
-
-		// retVal hashmap is init to size of jaccard list, jaccardList is a hashmap
-
-		HashMap<Integer , ArrayList<Double>> retVal = new HashMap<Integer, ArrayList<Double>>(jaccardList.size());
-		Iterator<Entry<Integer, HashMap<Integer, Double>>> jaccardIter = jaccardList.entrySet().iterator();
-
-		while(jaccardIter.hasNext()){
-			Entry<Integer, HashMap<Integer, Double>> termJSet = jaccardIter.next();
-			HashMap<Integer, Double> termJIntervals = termJSet.getValue();
-			Integer outerTerm = termJSet.getKey();
-			Iterator<Entry<Integer, Double>> jaccardSetIter = termJIntervals.entrySet().iterator();
-			Double last = 0.0;
-			boolean firstIter = false;
-
-			while(jaccardSetIter.hasNext()){
-
-				Entry<Integer, Double> jVal = jaccardSetIter.next();
-				Double value = jVal.getValue();
-				Integer interval = jVal.getKey();
-				if(!firstIter){	// exec once to buffer 1st jaccard value
-					firstIter = true;
-					last = value;
-					continue;
-				}
-
-				Double jd = (double)Math.round(((double)(value - last)) * 1000) / 1000;
-				//				Double jd = 2.1;
-				if(!retVal.containsKey(termJSet.getKey())){
-					ArrayList<Double> intervalDiffs = new ArrayList<Double>();
-					int capacity = 31;
-					intervalDiffs.ensureCapacity(capacity);
-					for( int i =0; i<capacity ;i++){
-						intervalDiffs.add(i, 0.0);
-					}
-					// can we be sure that the intervalDiffs array will be filled from 0?? YES
-					intervalDiffs.set((interval - 1) , jd);
-					// add jaccard difference for a term
-					retVal.put(outerTerm, intervalDiffs);
-				}
-				else{
-					// get a terms jaccard difference set
-					retVal.get(outerTerm).set(jVal.getKey()-1, jd);
-				}
-
-				last = value;
-			}
-		}
-		LOG.info("Finished diffing jaccards");
-		return retVal;
-	} 
-
 	/***
 	 * Sort the coset hashmap of term and weights by weight. Return a Set of the top "cutoff" terms.
 	 * @param termCoset
@@ -407,19 +350,7 @@ public class Jaccard {
 
 		return retVal;
 	}
-	/***
-	 * Serialize the jaccard differences to avoid doing all that work again!
-	 * @param jDiffs
-	 * @throws IOException 
-	 */
-	public static void serializeJDiff(HashMap<Integer, ArrayList<Double>> jDiffs, String outputPath) throws IOException{
-		String path = outputPath + "/jDif.ser";
-		FileOutputStream fileOut = new FileOutputStream(path);
-		ObjectOutputStream objectOut = new ObjectOutputStream(fileOut);
-		objectOut.flush();
-		objectOut.writeObject(jDiffs);
-		objectOut.close();
-	}
+
 	public static void serializeJaccards(String outputPath) throws IOException{
 		LOG.info("Serializing Jaccards.");
 		String path = outputPath + "/jaccard.ser";

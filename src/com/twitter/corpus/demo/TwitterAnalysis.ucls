@@ -1,0 +1,260 @@
+<class-diagram version="1.0.9" icons="true" automaticImage="PNG" always-add-relationships="true" generalizations="true" 
+  realizations="true" associations="true" dependencies="true" nesting-relationships="true">  
+  <class id="1" corner="BOTTOM_RIGHT" language="java" name="com.twitter.corpus.demo.TweetAnalysis" 
+    project="lintool_lucene_35_a" file="/lintool_lucene_35_a/src/com/twitter/corpus/demo/TweetAnalysis.java" 
+    binary="false">    
+    <position height="-1" width="-1" x="716" y="-77"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="false"/>      
+      <operations public="true" package="true" protected="true" private="false"/>    
+    </display>  
+  </class>  
+  <class id="2" corner="BOTTOM_RIGHT" language="java" name="com.twitter.corpus.analysis.Jaccard" 
+    project="lintool_lucene_35_a" file="/lintool_lucene_35_a/src/com/twitter/corpus/analysis/Jaccard.java" 
+    binary="false">    
+    <position height="-1" width="-1" x="1668" y="188"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="false" protected="false" private="false"/>      
+      <operations public="true" package="true" protected="true" private="false"/>    
+    </display>  
+  </class>  
+  <class id="3" corner="BOTTOM_RIGHT" language="java" 
+    name="com.twitter.corpus.analysis.TermTermWeights.CoWeightComparator" project="lintool_lucene_35_a" 
+    file="/lintool_lucene_35_a/src/com/twitter/corpus/analysis/TermTermWeights.java" binary="false">    
+    <position height="-1" width="-1" x="600" y="669"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="4" corner="BOTTOM_RIGHT" language="java" name="com.twitter.corpus.analysis.TermTermWeights" 
+    project="lintool_lucene_35_a" file="/lintool_lucene_35_a/src/com/twitter/corpus/analysis/TermTermWeights.java" 
+    binary="false">    
+    <position height="-1" width="-1" x="666" y="421"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="false"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="5" corner="BOTTOM_RIGHT" language="java" name="com.twitter.corpus.analysis.TermTermWeights.CoSetComparator" 
+    project="lintool_lucene_35_a" file="/lintool_lucene_35_a/src/com/twitter/corpus/analysis/TermTermWeights.java" 
+    binary="false">    
+    <position height="-1" width="-1" x="912" y="836"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <interface id="6" corner="BOTTOM_RIGHT" language="java" name="java.io.Serializable" project="lintool_lucene_35_a" 
+    file="/usr/lib/jvm/java-6-openjdk-i386/jre/lib/rt.jar" binary="true">    
+    <position height="-1" width="-1" x="812" y="240"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </interface>  
+  <interface id="7" corner="BOTTOM_RIGHT" language="java" name="java.util.Comparator" project="lintool_lucene_35_a" 
+    file="/usr/lib/jvm/java-6-openjdk-i386/jre/lib/rt.jar" binary="true">    
+    <position height="-1" width="-1" x="181" y="805"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </interface>  
+  <class id="8" corner="BOTTOM_RIGHT" language="java" name="com.twitter.corpus.analysis.CosetDeser" 
+    project="lintool_lucene_35_a" file="/lintool_lucene_35_a/src/com/twitter/corpus/analysis/CosetDeser.java" 
+    binary="false">    
+    <position height="-1" width="-1" x="1225" y="359"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="false"/>      
+      <operations public="true" package="true" protected="true" private="false"/>    
+    </display>  
+  </class>  
+  <class id="9" corner="BOTTOM_RIGHT" language="java" name="com.twitter.corpus.analysis.CosetSerializer" 
+    project="lintool_lucene_35_a" file="/lintool_lucene_35_a/src/com/twitter/corpus/analysis/CosetSerializer.java" 
+    binary="false">    
+    <position height="-1" width="-1" x="1248" y="623"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="10" corner="BOTTOM_RIGHT" language="java" name="com.twitter.corpus.analysis.InvertedIndex" 
+    project="lintool_lucene_35_a" file="/lintool_lucene_35_a/src/com/twitter/corpus/analysis/InvertedIndex.java" 
+    binary="false">    
+    <position height="-1" width="-1" x="220" y="107"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="false"/>      
+      <operations public="true" package="true" protected="true" private="false"/>    
+    </display>  
+  </class>  
+  <class id="11" corner="BOTTOM_RIGHT" language="java" name="com.twitter.corpus.analysis.InvertedIndex.tfComparator" 
+    project="lintool_lucene_35_a" file="/lintool_lucene_35_a/src/com/twitter/corpus/analysis/InvertedIndex.java" 
+    binary="false">    
+    <position height="-1" width="-1" x="38" y="449"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="12" corner="BOTTOM_RIGHT" language="java" name="com.twitter.corpus.analysis.InvertedIndex.idfComparator" 
+    project="lintool_lucene_35_a" file="/lintool_lucene_35_a/src/com/twitter/corpus/analysis/InvertedIndex.java" 
+    binary="false">    
+    <position height="-1" width="-1" x="211" y="449"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="13" corner="BOTTOM_RIGHT" language="java" name="com.twitter.corpus.analysis.InvertedIndex.tfPair" 
+    project="lintool_lucene_35_a" file="/lintool_lucene_35_a/src/com/twitter/corpus/analysis/InvertedIndex.java" 
+    binary="false">    
+    <position height="-1" width="-1" x="421" y="286"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="14" corner="BOTTOM_RIGHT" language="java" name="com.twitter.corpus.analysis.InvertedIndex.tfComparator2" 
+    project="lintool_lucene_35_a" file="/lintool_lucene_35_a/src/com/twitter/corpus/analysis/InvertedIndex.java" 
+    binary="false">    
+    <position height="-1" width="-1" x="367" y="448"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="15" corner="BOTTOM_RIGHT" language="java" name="com.twitter.corpus.analysis.JaccardDeserializer" 
+    project="lintool_lucene_35_a" file="/lintool_lucene_35_a/src/com/twitter/corpus/analysis/JaccardDeserializer.java" 
+    binary="false">    
+    <position height="-1" width="-1" x="1674" y="438"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="false"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="16" corner="BOTTOM_RIGHT" language="java" name="com.twitter.corpus.analysis.VolatilityAnalysis" 
+    project="lintool_lucene_35_a" file="/lintool_lucene_35_a/src/com/twitter/corpus/analysis/VolatilityAnalysis.java" 
+    binary="false">    
+    <position height="-1" width="-1" x="1704" y="588"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="17" corner="BOTTOM_RIGHT" language="java" name="com.twitter.corpus.types.CoWeight" 
+    project="lintool_lucene_35_a" file="/lintool_lucene_35_a/src/com/twitter/corpus/types/CoWeight.java" binary="false">    
+    <position height="-1" width="-1" x="1065" y="210"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="false"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <realization id="18">    
+    <end type="SOURCE" refId="17"/>    
+    <end type="TARGET" refId="6"/>  
+  </realization>  
+  <nesting id="19">    
+    <end type="SOURCE" refId="10"/>    
+    <end type="TARGET" refId="14"/>  
+  </nesting>  
+  <dependency id="20">    
+    <end type="SOURCE" refId="8"/>    
+    <end type="TARGET" refId="2"/>  
+  </dependency>  
+  <dependency id="21">    
+    <end type="SOURCE" refId="14"/>    
+    <end type="TARGET" refId="13"/>  
+  </dependency>  
+  <realization id="22">    
+    <end type="SOURCE" refId="12"/>    
+    <end type="TARGET" refId="7"/>  
+  </realization>  
+  <dependency id="23">    
+    <end type="SOURCE" refId="1"/>    
+    <end type="TARGET" refId="2"/>  
+  </dependency>  
+  <realization id="24">    
+    <end type="SOURCE" refId="11"/>    
+    <end type="TARGET" refId="7"/>  
+  </realization>  
+  <dependency id="25">    
+    <end type="SOURCE" refId="1"/>    
+    <end type="TARGET" refId="10"/>  
+  </dependency>  
+  <dependency id="26">    
+    <end type="SOURCE" refId="1"/>    
+    <end type="TARGET" refId="17"/>  
+  </dependency>  
+  <nesting id="27">    
+    <end type="SOURCE" refId="10"/>    
+    <end type="TARGET" refId="12"/>  
+  </nesting>  
+  <dependency id="28">    
+    <end type="SOURCE" refId="1"/>    
+    <end type="TARGET" refId="4"/>  
+  </dependency>  
+  <realization id="29">    
+    <end type="SOURCE" refId="14"/>    
+    <end type="TARGET" refId="7"/>  
+  </realization>  
+  <dependency id="30">    
+    <end type="SOURCE" refId="2"/>    
+    <end type="TARGET" refId="17"/>  
+  </dependency>  
+  <realization id="31">    
+    <end type="SOURCE" refId="5"/>    
+    <end type="TARGET" refId="7"/>  
+  </realization>  
+  <nesting id="32">    
+    <end type="SOURCE" refId="4"/>    
+    <end type="TARGET" refId="3"/>  
+  </nesting>  
+  <realization id="33">    
+    <end type="SOURCE" refId="3"/>    
+    <end type="TARGET" refId="7"/>  
+  </realization>  
+  <dependency id="34">    
+    <end type="SOURCE" refId="5"/>    
+    <end type="TARGET" refId="17"/>  
+  </dependency>  
+  <realization id="35">    
+    <end type="SOURCE" refId="4"/>    
+    <end type="TARGET" refId="6"/>  
+  </realization>  
+  <dependency id="36">    
+    <end type="SOURCE" refId="8"/>    
+    <end type="TARGET" refId="17"/>  
+  </dependency>  
+  <nesting id="37">    
+    <end type="SOURCE" refId="4"/>    
+    <end type="TARGET" refId="5"/>  
+  </nesting>  
+  <dependency id="38">    
+    <bendpoint x="849" y="538"/>    
+    <end type="SOURCE" refId="3"/>    
+    <end type="TARGET" refId="17"/>  
+  </dependency>  
+  <dependency id="39">    
+    <end type="SOURCE" refId="9"/>    
+    <end type="TARGET" refId="17"/>  
+  </dependency>  
+  <dependency id="40">    
+    <end type="SOURCE" refId="4"/>    
+    <end type="TARGET" refId="17"/>  
+  </dependency>  
+  <nesting id="41">    
+    <end type="SOURCE" refId="10"/>    
+    <end type="TARGET" refId="11"/>  
+  </nesting>  
+  <nesting id="42">    
+    <end type="SOURCE" refId="10"/>    
+    <end type="TARGET" refId="13"/>  
+  </nesting>  
+  <classifier-display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+    visibility="true">    
+    <attributes public="true" package="true" protected="true" private="true"/>    
+    <operations public="true" package="true" protected="true" private="true"/>  
+  </classifier-display>  
+  <association-display labels="true" multiplicity="true"/>
+</class-diagram>
