@@ -32,7 +32,7 @@ public class TermTermWeights implements java.io.Serializable{
 	}
 
 	private HashMap<Integer, HashSet<Long>> termIndex = null;
-	
+
 	/**
 	 * <p>TermCosetBuilder:
 	 * 			return a map of coweights for terms.<br>
@@ -47,18 +47,18 @@ public class TermTermWeights implements java.io.Serializable{
 		LOG.info("Starting term coweighting...");		
 		int cnt=0;	// counter for LOG.info()
 		long lastTime2=System.currentTimeMillis();	// timing for LOG.info()
-		
+
 		// return object cosetMap, contains terms mapped to coweights
-//		HashMap<Integer, HashMap<Integer, Double>> cosetMap = new HashMap<Integer, HashMap<Integer, Double>>(termIndex.size());	
+		//		HashMap<Integer, HashMap<Integer, Double>> cosetMap = new HashMap<Integer, HashMap<Integer, Double>>(termIndex.size());	
 		HashMap<Integer, ArrayList<CoWeight>> cosetMap = new HashMap<Integer, ArrayList<CoWeight>>(termIndex.size());
-//		Set<Integer> termMatrixKeys = termIndex.keySet();
-		
+		//		Set<Integer> termMatrixKeys = termIndex.keySet();
+
 		// TODO BIGGEST 2ND: termIndex was null the second time around, how???
 		HashMap<Integer, ArrayList<CoWeight>> coset2 = Maps.newHashMapWithExpectedSize(termIndex.size());
 		for(Integer i : termIndex.keySet()){
 			coset2.put(i, null);
 		}
-		
+
 		// term, hashSet<Documents>
 		Iterator<Map.Entry<Integer, HashSet<Long>>> termMatrixIter = termIndex.entrySet().iterator();
 		// iterate keys on termMatrix
@@ -74,9 +74,9 @@ public class TermTermWeights implements java.io.Serializable{
 			}
 
 			docCount1000+=termINum;
-			
+
 			int termIJNum=0;
-			
+
 			HashSet<Integer> uniqueTerms = null;
 
 			// calc size of unique terms array..
@@ -102,8 +102,8 @@ public class TermTermWeights implements java.io.Serializable{
 			ArrayList<CoWeight> termCoSetArray = new ArrayList<CoWeight>(uniqueTerms.size());		// new coset array should have same dim as termMatrix...
 
 			// hashmap below will need to be sorted when getting top 5(say) coweight terms
-//			HashMap<Integer,Double> termCosetMap = new HashMap<Integer, Double>(uniqueTerms.size());
-			
+			//			HashMap<Integer,Double> termCosetMap = new HashMap<Integer, Double>(uniqueTerms.size());
+
 			for(Iterator<Integer> term = uniqueTerms.iterator(); term.hasNext();){
 				int termJ = term.next();
 				HashSet<Long> termDocList = termIndex.get(termJ);
@@ -137,24 +137,19 @@ public class TermTermWeights implements java.io.Serializable{
 				CoWeight cs = null;
 				m = (double)Math.round(m * 1000) / 1000;
 
-				// Skip low coweights, as well as the above low doc number
+				// Skip low coweights
 				if(m > 0.05){
 					cs = new CoWeight(termJ, m);	// old, replaced by below, and.. back by popular demand
-//					termCosetMap.put(termJ, m);
 					termCoSetArray.add(cs); // this was the first imp, used an ArrayList
 				}
-				// arraylist of coweights, to be added to hashmap of terms to coweights
-				
-//				cs = null;
 			}
-			
+
 			//TODO NEED TO SORT THIS as treeset has been reverted
-//			termCosetSet.removeAll(Collections.singleton(null));
+			//			termCosetSet.removeAll(Collections.singleton(null));
 			Collections.sort(termCoSetArray, new CoWeightComparator());
-			
+
 			cosetMap.put(i, termCoSetArray);
-//			cosetMap.put(i, termCosetMap);
-			
+
 			cnt++;
 			if(cnt % 1000 ==0){
 				Long currTime2 = System.currentTimeMillis();
