@@ -24,7 +24,7 @@ import com.google.common.collect.HashBiMap;
 import com.twitter.corpus.types.CoWeight;
 
 public class CosetDeserTermToString {
-public static final Logger LOG = Logger.getLogger(CosetDeserTermToString.class);
+	public static final Logger LOG = Logger.getLogger(CosetDeserTermToString.class);
 	public static void main(String[] args) throws IOException{
 		//		String input = "/home/dock/Documents/IR/AmazonResults/";
 		//		String output = "/home/dock/Documents/IR/AmazonResults/termIdTranslation";
@@ -38,7 +38,7 @@ public static final Logger LOG = Logger.getLogger(CosetDeserTermToString.class);
 		// input is text file
 
 		HashSet<Integer> terms = getTermIds(input + "termTranslation/" + "terms.txt");
-		HashMap<Integer, ArrayList<CoWeight>> termSet = new HashMap<Integer, ArrayList<CoWeight>>(terms.size());
+		HashMap<Integer, ArrayList<CoWeight>> termsToTranslate = new HashMap<Integer, ArrayList<CoWeight>>(terms.size());
 
 		// input is termBimap
 
@@ -46,57 +46,48 @@ public static final Logger LOG = Logger.getLogger(CosetDeserTermToString.class);
 		HashBiMap<String, Integer> termBimap = deserTermBiMap(input + "/termbimap.ser");
 		LOG.info("finished termbimap deserialization\n termBimap size is: " + termBimap.size());
 
+		// filepaths to term cosets
 		String[] filePaths = new String[33];
 
 		// input is termcosets
-
 		for(int i = 0; i < 33 ; i++){
 			filePaths[i] = input + "termTranslation/termcoset/" + root + (i+1) + base;
 		}
 
+		// filepaths to each term coset
+		ArrayList<HashMap<Integer, ArrayList<CoWeight>>> termCosetArraylist = new ArrayList<HashMap<Integer, ArrayList<CoWeight>>>();
+
 		for(String path : filePaths){
-
-			String cosetPath = path;
-			HashMap<Integer, ArrayList<CoWeight>> coset = deser(cosetPath);
-
-			Iterator<Integer> iter = terms.iterator();
-			while(iter.hasNext()){
-				Integer t = iter.next();
-
-				ArrayList<CoWeight> entry = null;
-				if(coset.get(t) != null){
-					entry = coset.get(t);
-					termSet.put(t, entry);
-				}
-			}
+			HashMap<Integer, ArrayList<CoWeight>> coset = deser(path);
+			termCosetArraylist.add(coset);
 		}
-		LOG.info("termSet size is : " + termSet.size());
+		LOG.info("termSet size is : " + termsToTranslate.size());
 
 		BufferedWriter bf =  new BufferedWriter(new FileWriter(output + "/termStrings.txt"));
 
-		Iterator<Entry<Integer, ArrayList<CoWeight>>> cwIter = termSet.entrySet().iterator();
-		while(cwIter.hasNext()){
-			Entry<Integer, ArrayList<CoWeight>> entry = cwIter.next();
-			Integer term = entry.getKey();
+		// iterate my list of terms to translate
+		Iterator<Integer> termsIter = terms.iterator();
+		while(termsIter.hasNext()){
+			// get the term
+			Integer t = termsIter.next();
 
-			if(termBimap.inverse().get(term) != null){
-				LOG.info(termBimap.inverse().get(term));
-				
-				
-				bf.append(termBimap.inverse().get(term) + ": ");
+			// iterate term cosets
+			Iterator<HashMap<Integer, ArrayList<CoWeight>>> cosetIter = termCosetArraylist.iterator();
+			while(cosetIter.hasNext()){
+				HashMap<Integer, ArrayList<CoWeight>> coset = cosetIter.next();
+				ArrayList<CoWeight> termSet = coset.get(t);
 
-				Iterator<CoWeight> setIter = entry.getValue().iterator();
-				while(setIter.hasNext()){
-					CoWeight cw = setIter.next();
-					bf.append(termBimap.inverse().get(cw.termId) + ", ");					
+				bf.append(termBimap.inverse().get(t) + ": ");
+
+				Iterator<CoWeight> cwIter = termSet.iterator();
+				while(cwIter.hasNext()){
+					CoWeight cw = cwIter.next();
+					bf.append(termBimap.inverse().get(cw.termId) + ", ");
 				}
 				bf.append("\n");
 			}
-			else{
-				LOG.info(term + " gives null pointer. set size is: " +termSet.size()+  "\n");
-			}
 		}
-	}
+		bf.close();	}
 
 	@SuppressWarnings("unchecked")
 	private static HashMap<Integer, ArrayList<CoWeight>> deser(String path){
