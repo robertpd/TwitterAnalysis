@@ -11,8 +11,7 @@ public class HtmlStatusExtractor {
   private final String TWEET_BEGIN_DELIMITER = "<span class=\"entry-content\">";
   private final String TWEET_END_DELIMITER = "<span class=\"meta entry-meta\"";
 
-  private final Pattern TIMESTAMP_PATTERN =
-      Pattern.compile("<span class=\"published timestamp\" data=\"\\{time:'([^']+)'\\}\">");
+  private final Pattern TIMESTAMP_PATTERN = Pattern.compile("<span class=\"published timestamp\" data=\"\\{time:'([^']+)'\\}\">");
 
   public HtmlStatusExtractor() {}
 

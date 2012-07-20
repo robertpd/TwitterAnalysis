@@ -11,13 +11,13 @@ import java.util.HashMap;
 import com.twitter.corpus.types.CoWeight;
 
 
-public class CosetDeser {
+public class CosetDeserForJaccard {
 	public static void main(String[] args) throws IOException{
 //		String input = args[0].toString() ;
 //		String output = args[1].toString();
 		
-		String input = "/home/dock/Documents/IR/AmazonResults/TermCoset/";
-		String output = "/home/dock/Documents/IR/AmazonResults/";
+		String input = "/home/dock/Documents/IR/AmazonResults/StemmedResults1/";
+		String output = "/home/dock/Documents/IR/AmazonResults/StemmedResults1";
 //		String head = "/home/dock/Documents/IR/AmazonResults/total/coset/";
 		
 		String root = "termCoset_";

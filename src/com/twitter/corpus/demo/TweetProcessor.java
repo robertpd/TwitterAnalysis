@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import com.twitter.corpus.analysis.Stemmer;
 import com.twitter.corpus.analysis.TermTermWeights;
 
 public class TweetProcessor {
@@ -86,6 +87,7 @@ public class TweetProcessor {
 		// split
 		// normalize characters
 		// tokenize
+		// stem
 		String[] normElements = normalize(tweet.toLowerCase().split(" "));
 		String[] retVal = new String[normElements.length];
 
@@ -112,6 +114,7 @@ public class TweetProcessor {
 			norm=norm.replaceAll("[áàâ]","a");
 			norm=norm.replaceAll("[ó]","o");
 			retVal[i]=norm;
+			retVal[i] = Stemmer.stemTerm(norm);
 		}
 		return retVal;
 	}

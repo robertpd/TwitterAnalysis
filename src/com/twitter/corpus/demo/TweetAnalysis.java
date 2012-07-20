@@ -80,6 +80,7 @@ public class TweetAnalysis{
 		HashMap<Integer, ArrayList<CoWeight>> blockCoSet = null;
 		Jaccard initJMap = null;
 		ArrayList<HashMap<Integer, ArrayList<CoWeight>>> corpusCoSetArray = new ArrayList<HashMap<Integer, ArrayList<CoWeight>>>(2);
+		HashMap<Integer, HashSet<Long>> termIndex = null;
 		for(String path : filePaths){
 			LOG.info("Stream number : " + (cnt+1) + "\t. Indexing " + path);
 			StatusStream stream = null;
@@ -97,7 +98,7 @@ public class TweetAnalysis{
 
 			// 1.0 build index
 			InvertedIndex ii = new InvertedIndex();
-			HashMap<Integer, HashSet<Long>> termIndex = ii.buildIndex(stream);			
+			termIndex = ii.buildIndex(stream);			
 
 			// 2.0 calculate term cosets
 			TermTermWeights ill = new TermTermWeights(termIndex);
@@ -114,8 +115,8 @@ public class TweetAnalysis{
 				}
 				//				// 3.0 do the deed
 				int topNTerms = 5;
-				Jaccard.getJaccardEnhancedSimilarity(corpusCoSetArray, topNTerms);
-				//				Jaccard.getJaccardSimilarity(corpusCoSetArray);
+				//				Jaccard.getJaccardEnhancedSimilarity(corpusCoSetArray, topNTerms);
+				Jaccard.getJaccardSimilarity(corpusCoSetArray, topNTerms);
 				//				// swap positions, makes our life easier
 				Collections.swap(corpusCoSetArray, 0, 1);
 				//				// remove the first coset array
@@ -124,17 +125,17 @@ public class TweetAnalysis{
 				////						Thread.sleep(30000);
 				cnt++;
 			}
-
-			// serialize termbimap
-			//
-			String bimapPath = output + "/termbimap.ser";
-			FileOutputStream fileOut = new FileOutputStream(bimapPath);
-			ObjectOutputStream objectOut = new ObjectOutputStream(fileOut);
-			objectOut.flush();
-			objectOut.writeObject(TermTermWeights.termBimap);
-			objectOut.close();
-
-			Jaccard.serializeJaccards(output);
 		}
+		// serialize termbimap
+
+		String bimapPath = output + "/termbimap.ser";
+		FileOutputStream fileOut = new FileOutputStream(bimapPath);
+		ObjectOutputStream objectOut = new ObjectOutputStream(fileOut);
+		objectOut.flush();
+		objectOut.writeObject(TermTermWeights.termBimap);
+		objectOut.close();
+
+		Jaccard.serializeJaccards(output);
+		InvertedIndex.indexSerialize(termIndex, output);
 	}
 }

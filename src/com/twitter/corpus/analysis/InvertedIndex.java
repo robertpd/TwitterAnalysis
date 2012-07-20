@@ -2,8 +2,11 @@ package com.twitter.corpus.analysis;
 
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -168,6 +171,18 @@ public class InvertedIndex {
 		tfCount++;
 		return thresholdIndex;
 	}
+	
+	public static void indexSerialize(HashMap<Integer, HashSet<Long>> termIndex, String outputPath) throws IOException{
+		LOG.info("Serializing Index.");
+		String path = outputPath + "/index.ser";
+		FileOutputStream fileOut = new FileOutputStream(path);
+		ObjectOutputStream objectOut = new ObjectOutputStream(fileOut);
+		objectOut.flush();
+		objectOut.writeObject(termIndex);
+		objectOut.close();
+		LOG.info("Finished serializing Index.");
+	}
+	
 	/**
 	 * Get the tfIdf for each term
 	 * @param index
