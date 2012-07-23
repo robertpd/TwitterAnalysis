@@ -66,8 +66,6 @@ public class TweetAnalysis{
 		String rootBase = cmdline.getOptionValue(INPUT_OPTION);
 
 		String root = rootBase + "/20110";
-		//				String root = "/home/dock/Documents/IR/DataSets/lintool-twitter-corpus-tools-d604184/html/20110";
-
 		String[] filePaths = {root + "123", root + "123a", root + "124", root + "124a", root + "125", root + "125a", 
 				root + "126", root + "126a", root + "127", root + "127a", root + "128", root + "128a",
 				root + "129", root + "129a", root + "130", root + "130a", root + "131", root + "131a",
@@ -75,12 +73,8 @@ public class TweetAnalysis{
 				root + "204", root + "204a", root + "205", root + "205a", root + "206", root + "206a", 
 				root + "207", root + "207a", root + "208"};
 
-		//		String[] filePaths = {rootBase};
-		//		String[] filePaths = {root + "124"};
-
 		//		int cnt=0;
-		
-		
+				
 		corpusIndex = new HashMap<Integer, HashSet<Long>>(10000);
 		
 		HashMap<Integer, ArrayList<CoWeight>> blockCoSet = null;
@@ -104,43 +98,40 @@ public class TweetAnalysis{
 
 			// 1.0 build index
 			InvertedIndex ii = new InvertedIndex();
-			int lowerCut = 30;
-			int upperCut = 3000;
+			int lowerCut = 15;
+			int upperCut = 196;
 			intervalTermIndex = ii.buildIndex(stream, lowerCut, upperCut);
 			int corpSize = corpusIndex.size();
 			corpusIndex.putAll(intervalTermIndex);
-			// following log output tells how many new terms are added, but how many documents have been added??
 			int docCount = InvertedIndex.getDocCount(corpusIndex);
-			LOG.info("Corpus index: " + corpusIndex.size() + " " + ( corpusIndex.size() - corpSize) + " terms added. " + (docCount - indexDocCount) + " Documents added.");
+			LOG.info("Corpus index: " + corpusIndex.size() + " " + ( corpusIndex.size() - corpSize) + " terms added. " + (docCount - indexDocCount) + " term-document occurences.");
 			indexDocCount = docCount;
-			
-			
+						
 			// 2.0 calculate term cosets
-//			TermTermWeights ill = new TermTermWeights(intervalTermIndex);
-//			double correlateCutoff = 0.05;
-//			blockCoSet = ill.termCosetBuilder(correlateCutoff);
+			TermTermWeights ill = new TermTermWeights(intervalTermIndex);
+			double correlateCutoff = 0.1;
+			blockCoSet = ill.termCosetBuilder(correlateCutoff);
 
 			// 2.1 serialize term cosets
-//			CosetSerializer.cosetSerializer(blockCoSet, output, cnt+1);
-
-//			corpusCoSetArray.add(blockCoSet);			// add coset of particular day to array
-			//
-//			if(corpusCoSetArray.size() == 2){	// only skipped once at the start
-//				if(initJMap == null){			// one time initializer
-//					initJMap = new Jaccard(intervalTermIndex.size() + (int)(0.1 * intervalTermIndex.size()));	// init size plus 10% for wiggle
-//				}
+			CosetSerializer.cosetSerializer(blockCoSet, output, cnt+1);
+			corpusCoSetArray.add(blockCoSet);			// add coset of particular day to array
+			
+			if(corpusCoSetArray.size() == 2){	// only skipped once at the start
+				if(initJMap == null){			// one time initializer
+					initJMap = new Jaccard(intervalTermIndex.size() + (int)(0.1 * intervalTermIndex.size()));	// init size plus 10% for wiggle
+				}
 				//				// 3.0 do the deed
-//				int topNTerms = 5;
+				int topNTerms = 10;
 				//				Jaccard.getJaccardEnhancedSimilarity(corpusCoSetArray, topNTerms);
-//				Jaccard.getJaccardSimilarity(corpusCoSetArray, topNTerms);
+				Jaccard.getJaccardSimilarity(corpusCoSetArray, topNTerms);
 				//				// swap positions, makes our life easier
-//				Collections.swap(corpusCoSetArray, 0, 1);
+				Collections.swap(corpusCoSetArray, 0, 1);
 				//				// remove the first coset array
-//				corpusCoSetArray.remove(1);
+				corpusCoSetArray.remove(1);
 				//			}
 				////						Thread.sleep(30000);
 				cnt++;
-//			}
+			}
 		}
 
 		// print frequency range
@@ -148,14 +139,14 @@ public class TweetAnalysis{
 		
 		// serialize termbimap
 
-//		String bimapPath = output + "/termbimap.ser";
-//		FileOutputStream fileOut = new FileOutputStream(bimapPath);
-//		ObjectOutputStream objectOut = new ObjectOutputStream(fileOut);
-//		objectOut.flush();
-//		objectOut.writeObject(TermTermWeights.termBimap);
-//		objectOut.close();
+		String bimapPath = output + "/termbimap.ser";
+		FileOutputStream fileOut = new FileOutputStream(bimapPath);
+		ObjectOutputStream objectOut = new ObjectOutputStream(fileOut);
+		objectOut.flush();
+		objectOut.writeObject(TermTermWeights.termBimap);
+		objectOut.close();
 //
-//		Jaccard.serializeJaccards(output);
-//		InvertedIndex.indexSerialize(corpusIndex, output);
+		Jaccard.serializeJaccards(output);
+		InvertedIndex.indexSerialize(corpusIndex, output);
 	}
 }

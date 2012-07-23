@@ -69,11 +69,11 @@ public class TermTermWeights implements java.io.Serializable{
 			Integer termINum = termIndex.get(i).size();		// number of documents with term "i"
 
 			// Skip rare numbers altogether; now dealt with at termIndex stage... terms in lt 15 docs are stripped and mt 5000
-			if(termINum < 15){
-				continue;
-			}
+//			if(termINum < 15){
+//				continue;
+//			}
 
-			docCount1000+=termINum;
+//			docCount1000+=termINum;
 
 			int termIJNum=0;
 
@@ -151,12 +151,15 @@ public class TermTermWeights implements java.io.Serializable{
 			cosetMap.put(i, termCoSetArray);
 
 			cnt++;
-			if(cnt % 1000 ==0){
-				Long currTime2 = System.currentTimeMillis();
-				LOG.info(cnt + " term coweights calculated in: " + Admin.getTime(lastTime2, currTime2));
-				lastTime2 = currTime2;
-				docCount1000=0;
-			}
+//			if(cnt % 1000 ==0){
+//				Long currTime2 = System.currentTimeMillis();
+//				LOG.info(cnt + " term coweights calculated in: " + Admin.getTime(lastTime2, currTime2));
+//				lastTime2 = currTime2;
+//				docCount1000=0;
+//			}
+			Long currTime2 = System.currentTimeMillis();
+			LOG.info(cnt + " term coweights calculated in: " + Admin.getTime(lastTime2, currTime2));
+			lastTime2 = currTime2;
 		}
 		return cosetMap;
 	}
