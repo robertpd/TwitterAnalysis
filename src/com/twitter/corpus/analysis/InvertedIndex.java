@@ -29,7 +29,7 @@ public class InvertedIndex {
 	}
 	private static final Logger LOG = Logger.getLogger(TermTermWeights.class);
 		public static int counter =1;
-		private static int tfCount =1;
+//		private static int tfCount =1;
 	/**
 	 * @param StatusStream stream
 	 * @return <del>HashMap<Integer, HashSet<Long>> InvertIndex</del> IndexAndDocCount
@@ -87,7 +87,7 @@ public class InvertedIndex {
 //					break;
 //				}
 			}
-			LOG.info(termIndex.size() + " total terms indexed. Doc count >= 0.");
+//			LOG.info(termIndex.size() + " total terms indexed. Doc count >= 0.");
 		}
 		finally
 		{
@@ -105,7 +105,7 @@ public class InvertedIndex {
 				thresholdIndex.put(termEntry.getKey(), termEntry.getValue());
 			}
 		}
-		LOG.info(thresholdIndex.size() + " term after trimming.");
+		LOG.info("Trimmed interval index size is: " + thresholdIndex.size());
 		
 		// add TF-IDF stopword removal by taking occurance of term over 1000 docs. In a day there are avg 730k docs
 		
@@ -126,6 +126,8 @@ public class InvertedIndex {
 		Integer cutPoint = 7300;
 		termArrayList.ensureCapacity(cutPoint);
 		
+		// HOLD THE TF-IDF'ing. IT IS NOT NEEDED, RAW FREQUENCY WILL DO
+		
 		// populate window
 		
 		int cutCounter = 0;
@@ -136,28 +138,28 @@ public class InvertedIndex {
 			termArrayList.add(term);
 			cutCounter++;
 		}
-		int arraySize = termArrayList.size();
+//		int arraySize = termArrayList.size();
 		
 		// init TFIDF mapping		
-		HashMap<Integer, Double> termTFIDF = new HashMap<Integer, Double>(termIndex.size());
+//		HashMap<Integer, Double> termTFIDF = new HashMap<Integer, Double>(termIndex.size());
 		
 		// calc TFIDF's
-		Iterator<Map.Entry<Integer, HashSet<Long>>> termIter2 = termIndex.entrySet().iterator();
-		while(termIter2.hasNext()){
-			Entry<Integer, HashSet<Long>> entry = termIter2.next();
-			Integer term = entry.getKey();
-			
-			int tf=0;
-			Iterator<Integer> arrayListIter = termArrayList.iterator();
-			while(arrayListIter.hasNext()){
-				if(arrayListIter.next() == term){
-					tf++;
-				}
-			}
-			Double tfidf = ((double)tf / (double)arraySize ) * (Math.log(termIndex.size() /termIndex.get(term).size()));
-			tfidf = (double)Math.round(tfidf * 10000000) / 10000000;
-			termTFIDF.put(term, tfidf);
-		}
+//		Iterator<Map.Entry<Integer, HashSet<Long>>> termIter2 = termIndex.entrySet().iterator();
+//		while(termIter2.hasNext()){
+//			Entry<Integer, HashSet<Long>> entry = termIter2.next();
+//			Integer term = entry.getKey();
+//			
+//			int tf=0;
+//			Iterator<Integer> arrayListIter = termArrayList.iterator();
+//			while(arrayListIter.hasNext()){
+//				if(arrayListIter.next() == term){
+//					tf++;
+//				}
+//			}
+//			Double tfidf = ((double)tf / (double)arraySize ) * (Math.log(termIndex.size() /termIndex.get(term).size()));
+//			tfidf = (double)Math.round(tfidf * 10000000) / 10000000;
+//			termTFIDF.put(term, tfidf);
+//		}
 
 		// tfidf term print
 		
@@ -168,7 +170,7 @@ public class InvertedIndex {
 //			bf.append(ent.getKey() + ", " + ent.getValue() + "\n");
 //		}
 //		bf.close();
-		tfCount++;
+//		tfCount++;
 		return thresholdIndex;
 	}
 	
@@ -181,6 +183,16 @@ public class InvertedIndex {
 		objectOut.writeObject(termIndex);
 		objectOut.close();
 		LOG.info("Finished serializing Index.");
+	}
+	
+	public static int getDocCount(HashMap<Integer, HashSet<Long>> corpusIndex){
+		int retVal = 0;
+		Iterator<Map.Entry<Integer, HashSet<Long>>> indexIter = corpusIndex.entrySet().iterator();
+		while(indexIter.hasNext()){
+			Entry<Integer, HashSet<Long>> entry = indexIter.next();
+			retVal += entry.getValue().size();
+		}
+		return retVal;
 	}
 	
 	/**
