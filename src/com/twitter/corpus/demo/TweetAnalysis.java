@@ -35,6 +35,7 @@ public class TweetAnalysis{
 	private static final String INPUT_OPTION = "input";
 	private static final String OUTPUT_OPTION = "output";
 	private static final String TOOLS = "tools";
+	private static HashMap<Integer, HashSet<Long>> corpusIndex;
 
 	public static void main(String[] args) throws Exception {
 
@@ -77,10 +78,16 @@ public class TweetAnalysis{
 		//		String[] filePaths = {root + "124"};
 
 		//		int cnt=0;
+		
+		
+		corpusIndex = new HashMap<Integer, HashSet<Long>>(10000);
+		
+		
+		
 		HashMap<Integer, ArrayList<CoWeight>> blockCoSet = null;
 		Jaccard initJMap = null;
 		ArrayList<HashMap<Integer, ArrayList<CoWeight>>> corpusCoSetArray = new ArrayList<HashMap<Integer, ArrayList<CoWeight>>>(2);
-		HashMap<Integer, HashSet<Long>> termIndex = null;
+		HashMap<Integer, HashSet<Long>> intervalTermIndex = null;
 		for(String path : filePaths){
 			LOG.info("Stream number : " + (cnt+1) + "\t. Indexing " + path);
 			StatusStream stream = null;
@@ -98,11 +105,16 @@ public class TweetAnalysis{
 
 			// 1.0 build index
 			InvertedIndex ii = new InvertedIndex();
-			termIndex = ii.buildIndex(stream);			
-
+			int lowerCut = 30;
+			int upperCut = 2000;
+			intervalTermIndex = ii.buildIndex(stream, lowerCut, upperCut);	
+			corpusIndex.putAll(intervalTermIndex);
+			LOG.info("Corpus index contains: " + corpusIndex.size() + "terms.");
+			
 			// 2.0 calculate term cosets
-			TermTermWeights ill = new TermTermWeights(termIndex);
-			blockCoSet = ill.termCosetBuilder();
+			TermTermWeights ill = new TermTermWeights(intervalTermIndex);
+			double correlateCutoff = 0.05;
+			blockCoSet = ill.termCosetBuilder(correlateCutoff);
 
 			// 2.1 serialize term cosets
 			CosetSerializer.cosetSerializer(blockCoSet, output, cnt+1);
@@ -111,7 +123,7 @@ public class TweetAnalysis{
 			//
 			if(corpusCoSetArray.size() == 2){	// only skipped once at the start
 				if(initJMap == null){			// one time initializer
-					initJMap = new Jaccard(termIndex.size() + (int)(0.1 * termIndex.size()));	// init size plus 10% for wiggle
+					initJMap = new Jaccard(intervalTermIndex.size() + (int)(0.1 * intervalTermIndex.size()));	// init size plus 10% for wiggle
 				}
 				//				// 3.0 do the deed
 				int topNTerms = 5;
@@ -126,6 +138,10 @@ public class TweetAnalysis{
 				cnt++;
 			}
 		}
+
+		// print frequency range
+		InvertedIndex.printFrequencies(corpusIndex, output + "freqs.txt");
+		
 		// serialize termbimap
 
 		String bimapPath = output + "/termbimap.ser";
@@ -136,6 +152,6 @@ public class TweetAnalysis{
 		objectOut.close();
 
 		Jaccard.serializeJaccards(output);
-		InvertedIndex.indexSerialize(termIndex, output);
+		InvertedIndex.indexSerialize(corpusIndex, output);
 	}
 }

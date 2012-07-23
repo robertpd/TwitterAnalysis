@@ -37,7 +37,7 @@ public class InvertedIndex {
 	 * Returns the index built from a directory
 	 * @throws IOException
 	 */
-	public HashMap<Integer, HashSet<Long>> buildIndex(StatusStream stream) throws IOException{
+	public HashMap<Integer, HashSet<Long>> buildIndex(StatusStream stream, int lowerCut, int upperCut) throws IOException{
 		if(TweetProcessor.stopwords == null){
 			TweetProcessor.callStops();
 		}
@@ -76,16 +76,16 @@ public class InvertedIndex {
 					}
 				}
 				docNum++;
-				if(docNum % 50000 == 0 ){
+				if(docNum % 200000 == 0 ){
 					Long currTime = System.currentTimeMillis();
 					LOG.info(docNum + " tweets indexed in " +  Admin.getTime(lastTime, currTime));
 					lastTime = currTime;
 				}
 				
-				if(docNum > 500000){
-					LOG.info(termIndex.size() + " total terms.");
-					break;
-				}
+//				if(docNum > 50000){
+//					LOG.info(termIndex.size() + " total terms.");
+//					break;
+//				}
 			}
 			LOG.info(termIndex.size() + " total terms indexed. Doc count >= 0.");
 		}
@@ -101,7 +101,7 @@ public class InvertedIndex {
 		while(indexIterator.hasNext()){
 			Map.Entry<Integer, HashSet<Long>> termEntry = indexIterator.next();
 			// frequency threshold
-			if(termEntry.getValue().size() > 15 && termEntry.getValue().size() < 5000){
+			if(termEntry.getValue().size() > lowerCut && termEntry.getValue().size() < upperCut){
 				thresholdIndex.put(termEntry.getKey(), termEntry.getValue());
 			}
 		}
@@ -248,7 +248,42 @@ public class InvertedIndex {
 		counter++;
 		return tfidfMap;
 	}
+	public static void printFrequencies(HashMap<Integer, HashSet<Long>> index, String path) throws IOException{
+		BufferedWriter bf = new BufferedWriter(new FileWriter(path));
+		
+		ArrayList<Map.Entry<Integer, HashSet<Long>>> freqArrayL = new ArrayList<Map.Entry<Integer,HashSet<Long>>>(index.size());
+		
+		Iterator<Map.Entry<Integer, HashSet<Long>>> indexIter = index.entrySet().iterator();
+		while(indexIter.hasNext()){
+			Entry<Integer, HashSet<Long>> entry = indexIter.next();
+			freqArrayL.add(entry);			
+		}
+		
+		Collections.sort(freqArrayL, new indexComparator());
+		
+		Iterator<Map.Entry<Integer, HashSet<Long>>> arrayIter = freqArrayL.iterator();
+		
+		while(arrayIter.hasNext()){
+			Map.Entry<Integer, HashSet<Long>> entry = arrayIter.next();
+			bf.append(entry.getValue().size() + "\n");
+		}
+		bf.close();
+	}
+	public static class indexComparator implements Comparator<Map.Entry<Integer, HashSet<Long>>> {
 
+		@Override
+		public int compare(Map.Entry<Integer, HashSet<Long>> f1, Map.Entry<Integer, HashSet<Long>> f2) {
+
+			if (f1.getValue().size() > f2.getValue().size()){
+				return -1;
+			}else if(f1.getValue().size() < f2.getValue().size()){
+				return 1;
+			}
+			else
+				return 0;
+		}	
+	}
+	
 	public class tfPair{
 		public tfPair(Integer term, Integer tf){
 			this.term = term;

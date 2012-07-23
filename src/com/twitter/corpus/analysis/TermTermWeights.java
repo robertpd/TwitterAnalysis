@@ -43,7 +43,7 @@ public class TermTermWeights implements java.io.Serializable{
 	 * 		@return Returns a HashMap of term and weighted correlates.
 	 * 		@throws IOException
 	 */
-	public HashMap<Integer, ArrayList<CoWeight>> termCosetBuilder() throws IOException{
+	public HashMap<Integer, ArrayList<CoWeight>> termCosetBuilder(double correlateCutoff) throws IOException{
 		LOG.info("Starting term coweighting...");		
 		int cnt=0;	// counter for LOG.info()
 		long lastTime2=System.currentTimeMillis();	// timing for LOG.info()
@@ -138,7 +138,7 @@ public class TermTermWeights implements java.io.Serializable{
 				m = (double)Math.round(m * 1000) / 1000;
 
 				// Skip low coweights
-				if(m > 0.05){
+				if(m > correlateCutoff){
 					cs = new CoWeight(termJ, m);	// old, replaced by below, and.. back by popular demand
 					termCoSetArray.add(cs); // this was the first imp, used an ArrayList
 				}
