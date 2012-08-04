@@ -92,16 +92,16 @@ public class TweetProcessor {
 		String[] retVal = new String[normElements.length];
 
 		// http link processing removed, 730k tweets contain 112k http links
-		//		if(tweet.contains("http")){
-		//			for(int i=0; i< normElements.length;i++){
-		//				retVal[i]=normElements[i].contains("http") ? normElements[i] :normElements[i].replaceAll("[^A-Za-z0-9@#]","");
-		//			} 
-		//		}
-		//		else{
-		for(int i=0; i< normElements.length;i++){
-			retVal[i]=normElements[i].replaceAll("[^A-Za-z0-9@#]","");
+		if(tweet.contains("http")){
+			for(int i=0; i< normElements.length;i++){
+				retVal[i] = normElements[i].contains("http") ? ""/*normElements[i]*/ : normElements[i].replaceAll("[^A-Za-z0-9@#]","");
+			} 
 		}
-		//		}
+		else{
+			for(int i=0; i< normElements.length;i++){
+				retVal[i] = normElements[i].replaceAll("[^A-Za-z0-9@#]","");
+			}
+		}
 		return retVal;
 	}
 	private static String[] normalize(String[] str){
@@ -114,7 +114,7 @@ public class TweetProcessor {
 			norm=norm.replaceAll("[áàâ]","a");
 			norm=norm.replaceAll("[ó]","o");
 			retVal[i]=norm;
-			retVal[i] = Stemmer.stemTerm(norm);
+//			retVal[i] = Stemmer.stemTerm(norm);
 		}
 		return retVal;
 	}

@@ -1,5 +1,6 @@
 package com.twitter.corpus.demo;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
@@ -35,7 +36,14 @@ public class TweetAnalysis{
 	private static final String INPUT_OPTION = "input";
 	private static final String OUTPUT_OPTION = "output";
 	private static final String TOOLS = "tools";
-	private static HashMap<Integer, HashSet<Long>> corpusIndex;
+	private static final String LOWER_DAILY_THRESH = "gt";
+	private static final String UPPER_DAILY_THRESH = "lt";
+	private static final String TERM_CORRELATION_THRESH = "m";
+	private static final String COSET_TERMS = "t";
+	
+	public static int lowCutoffGlobal = 2;
+	public static HashMap<Integer, HashSet<Long>> corpusIndex;
+	private static ArrayList<HashMap<Integer, HashSet<Long>>> intervalIndices;
 	private static int indexDocCount=0;
 
 	public static void main(String[] args) throws Exception {
@@ -44,6 +52,10 @@ public class TweetAnalysis{
 		options.addOption(OptionBuilder.withArgName("path").hasArg().withDescription("input directory or file").create(INPUT_OPTION));
 		options.addOption(OptionBuilder.withArgName("path").hasArg().withDescription("index location").create(OUTPUT_OPTION));
 		options.addOption(OptionBuilder.withArgName("path").hasArg().withDescription("stopwords").create(TOOLS));
+		options.addOption(OptionBuilder.withArgName("constant").hasArg().withDescription("lower daily term threshold").create(LOWER_DAILY_THRESH));
+		options.addOption(OptionBuilder.withArgName("constant").hasArg().withDescription("upper daily term threshold").create(UPPER_DAILY_THRESH));
+		options.addOption(OptionBuilder.withArgName("constant").hasArg().withDescription("term correlation minimum").create(TERM_CORRELATION_THRESH));
+		options.addOption(OptionBuilder.withArgName("constant").hasArg().withDescription("coset top terms").create(COSET_TERMS));
 
 		CommandLine cmdline = null;
 		CommandLineParser parser = new GnuParser();
@@ -61,9 +73,14 @@ public class TweetAnalysis{
 		}
 
 		int cnt=0;
+		int termCosetCounter=0;
 		output = cmdline.getOptionValue(OUTPUT_OPTION);
 		toolsDir = cmdline.getOptionValue(TOOLS);
 		String rootBase = cmdline.getOptionValue(INPUT_OPTION);
+		int lowerFreq = Integer.parseInt(cmdline.getOptionValue(LOWER_DAILY_THRESH));
+		int upperFreq = Integer.parseInt(cmdline.getOptionValue(UPPER_DAILY_THRESH));
+		double m = Double.parseDouble(cmdline.getOptionValue(TERM_CORRELATION_THRESH));
+		int cosetTopN = Integer.parseInt(cmdline.getOptionValue(COSET_TERMS));
 
 		String root = rootBase + "/20110";
 		String[] filePaths = {root + "123", root + "123a", root + "124", root + "124a", root + "125", root + "125a", 
@@ -73,80 +90,70 @@ public class TweetAnalysis{
 				root + "204", root + "204a", root + "205", root + "205a", root + "206", root + "206a", 
 				root + "207", root + "207a", root + "208"};
 
-		//		int cnt=0;
-				
 		corpusIndex = new HashMap<Integer, HashSet<Long>>(10000);
-		
+
 		HashMap<Integer, ArrayList<CoWeight>> blockCoSet = null;
 		Jaccard initJMap = null;
 		ArrayList<HashMap<Integer, ArrayList<CoWeight>>> corpusCoSetArray = new ArrayList<HashMap<Integer, ArrayList<CoWeight>>>(2);
-		HashMap<Integer, HashSet<Long>> intervalTermIndex = null;
+//		HashMap<Integer, HashSet<Long>> intervalTermIndex = null;
+
+		int corpSize=0;int docCount=0;
+		intervalIndices = new ArrayList<HashMap<Integer,HashSet<Long>>>(33);
+		
+		
 		for(String path : filePaths){
 			LOG.info("Stream number : " + (cnt+1) + "\t. Indexing " + path);
-			StatusStream stream = null;
-			FileSystem fs = FileSystem.get(new Configuration());
-
-			Path file = new Path(path);
-
-			if (!fs.exists(file)) {
-				System.err.println("Error: " + file + " does not exist!");
-				System.exit(-1);
-			}
-			if (fs.getFileStatus(file).isDir()) {
-				stream = new HtmlStatusCorpusReader(file, fs);
-			}
+			StatusStream stream = null;	FileSystem fs = FileSystem.get(new Configuration());Path file = new Path(path);
+			if (!fs.exists(file)) {	System.err.println("Error: " + file + " does not exist!"); System.exit(-1);}
+			if (fs.getFileStatus(file).isDir()) {stream = new HtmlStatusCorpusReader(file, fs);	}
 
 			// 1.0 build index
 			InvertedIndex ii = new InvertedIndex();
-			int lowerCut = 15;
-			int upperCut = 196;
-			intervalTermIndex = ii.buildIndex(stream, lowerCut, upperCut);
-			int corpSize = corpusIndex.size();
-			corpusIndex.putAll(intervalTermIndex);
-			int docCount = InvertedIndex.getDocCount(corpusIndex);
-			LOG.info("Corpus index: " + corpusIndex.size() + " " + ( corpusIndex.size() - corpSize) + " terms added. " + (docCount - indexDocCount) + " term-document occurences.");
-			indexDocCount = docCount;
-						
+			HashMap<Integer, HashSet<Long>> intervalTermIndex = ii.buildIndex(stream);
+			corpSize = corpusIndex.size();
+			
+			//add interval index (both old and new terms with their document sets) 
+			InvertedIndex.mergeLocalIndex(intervalTermIndex);
+			intervalIndices.add(intervalTermIndex);
+			
+			docCount = InvertedIndex.getDocCount(corpusIndex);
+			cnt++;
+		}
+		LOG.info("Corpus index terms: " + corpusIndex.size() + " " + ( corpusIndex.size() - corpSize) + " terms added. " + (docCount - indexDocCount) + " term-document occurences.");
+		
+		// trim all local indexes in the array
+		ArrayList<HashMap<Integer, HashSet<Long>>> trimmedLocalIndexArray = InvertedIndex.trimLocalIndices(intervalIndices, lowerFreq, upperFreq);		
+		
+		for(int i = 0; i < trimmedLocalIndexArray.size(); i++){
 			// 2.0 calculate term cosets
-			TermTermWeights ill = new TermTermWeights(intervalTermIndex);
-			double correlateCutoff = 0.1;
-			blockCoSet = ill.termCosetBuilder(correlateCutoff);
+			TermTermWeights ill = new TermTermWeights(trimmedLocalIndexArray.get(i) /*intervalTermIndex*/);
+			blockCoSet = ill.termCosetBuilder(m);
 
 			// 2.1 serialize term cosets
-			CosetSerializer.cosetSerializer(blockCoSet, output, cnt+1);
+			CosetSerializer.cosetSerializer(blockCoSet, output, (termCosetCounter + 1));
 			corpusCoSetArray.add(blockCoSet);			// add coset of particular day to array
-			
+
 			if(corpusCoSetArray.size() == 2){	// only skipped once at the start
 				if(initJMap == null){			// one time initializer
-					initJMap = new Jaccard(intervalTermIndex.size() + (int)(0.1 * intervalTermIndex.size()));	// init size plus 10% for wiggle
+					initJMap = new Jaccard(trimmedLocalIndexArray.get(i).size());	// init size plus 10% for wiggle
 				}
 				//				// 3.0 do the deed
-				int topNTerms = 10;
-				//				Jaccard.getJaccardEnhancedSimilarity(corpusCoSetArray, topNTerms);
-				Jaccard.getJaccardSimilarity(corpusCoSetArray, topNTerms);
+				Jaccard.getJaccardSimilarity(corpusCoSetArray, cosetTopN);
+				Jaccard.getJaccardEnhancedSimilarity(corpusCoSetArray, cosetTopN);
 				//				// swap positions, makes our life easier
 				Collections.swap(corpusCoSetArray, 0, 1);
 				//				// remove the first coset array
 				corpusCoSetArray.remove(1);
-				//			}
-				////						Thread.sleep(30000);
-				cnt++;
+				termCosetCounter++;
 			}
 		}
 
 		// print frequency range
-		InvertedIndex.printFrequencies(corpusIndex, output + "freqs.txt");
-		
-		// serialize termbimap
+		InvertedIndex.printFrequencies(TweetAnalysis.corpusIndex, output + "freqs.txt");
 
-		String bimapPath = output + "/termbimap.ser";
-		FileOutputStream fileOut = new FileOutputStream(bimapPath);
-		ObjectOutputStream objectOut = new ObjectOutputStream(fileOut);
-		objectOut.flush();
-		objectOut.writeObject(TermTermWeights.termBimap);
-		objectOut.close();
-//
+		TermTermWeights.serializeTermBimap(output + "/termbimap.ser");		
 		Jaccard.serializeJaccards(output);
-		InvertedIndex.indexSerialize(corpusIndex, output);
+		InvertedIndex.globalIndexSerialize(corpusIndex, output);
+		InvertedIndex.localIndexArraySerialize(intervalIndices, output);		
 	}
 }

@@ -23,13 +23,15 @@ import com.twitter.corpus.types.CoWeight;
 public class Jaccard {
 	private static final Logger LOG = Logger.getLogger(Jaccard.class);
 	public Jaccard(int size){
-		jaccardList = new HashMap<Integer, HashMap<Integer,Double>>(size);
+		jaccardListNonWeighted = new HashMap<Integer, HashMap<Integer,Double>>(size);
+		jaccardListWeighted = new HashMap<Integer, HashMap<Integer,Double>>(size);
 	}
 	// dayCounter is used for jaccard map, also printed out on entry to jaccard calculator
 	private static int dayCounter = 0;
 	private static int unionZero = 0;
 	private static int termError = 0;
-	public static HashMap<Integer, HashMap<Integer,Double>> jaccardList;
+	public static HashMap<Integer, HashMap<Integer,Double>> jaccardListNonWeighted;
+	public static HashMap<Integer, HashMap<Integer,Double>> jaccardListWeighted;
 
 	/***
 	 *
@@ -134,7 +136,7 @@ public class Jaccard {
 
 			// add jaccard value for the interval, if first time add term first
 
-			if(!jaccardList.containsKey(term)){
+			if(!jaccardListNonWeighted.containsKey(term)){
 
 				// init map of jaccard to interval and add j
 
@@ -150,14 +152,14 @@ public class Jaccard {
 				jEachDayMap.put(dayCounter, jac);
 
 				// add mapping for term
-				jaccardList.put(term, jEachDayMap);
+				jaccardListNonWeighted.put(term, jEachDayMap);
 			}
 			else{
-				jaccardList.get(term).put(dayCounter, jac);
+				jaccardListNonWeighted.get(term).put(dayCounter, jac);
 			}
 
 		}
-		LOG.info("Jacard size = " + jaccardList.size());
+		LOG.info("Jacard size = " + jaccardListNonWeighted.size());
 		// LOG.info("Term error occured " + termError + "times." );
 		dayCounter++; // must be incremented here to ensure continuity
 	}
@@ -222,7 +224,7 @@ public class Jaccard {
 
 			// add jaccard value for the interval, if first time add term first
 
-			if(!jaccardList.containsKey(term)){
+			if(!jaccardListWeighted.containsKey(term)){
 
 				// init map of jaccard to interval and add j
 				HashMap<Integer, Double> jEachDayMap = new HashMap<Integer, Double>(32);	// 17 + 16 = 33 days => 32 intervals
@@ -234,14 +236,14 @@ public class Jaccard {
 				jEachDayMap.put(dayCounter, jac);
 
 				// add mapping for term
-				jaccardList.put(term, jEachDayMap);
+				jaccardListWeighted.put(term, jEachDayMap);
 			}
 			else{
-				jaccardList.get(term).put(dayCounter, jac);
+				jaccardListWeighted.get(term).put(dayCounter, jac);
 			}
 
 		}
-		LOG.info("Jacard size = " + jaccardList.size());
+		LOG.info("Jacard size = " + jaccardListWeighted.size());
 		//		LOG.info("Term error occured " + termError + "times." );
 		dayCounter++; // must be incremented here to ensure continuity
 	}
@@ -352,18 +354,27 @@ public class Jaccard {
 	}
 
 	public static void serializeJaccards(String outputPath) throws IOException{
-		LOG.info("Serializing Jaccards.");
-		String path = outputPath + "/jaccard.ser";
+		LOG.info("Serializing Weighted Jaccards.");
+		String path = outputPath + "/jaccardWeighted.ser";
 		FileOutputStream fileOut = new FileOutputStream(path);
 		ObjectOutputStream objectOut = new ObjectOutputStream(fileOut);
 		objectOut.flush();
-		objectOut.writeObject(jaccardList);
+		objectOut.writeObject(jaccardListWeighted);
 		objectOut.close();
-		LOG.info("Finished serializing Jaccards.");
+		LOG.info("Finished serializing Weighted Jaccards.");
+		
+		LOG.info("Serializing Non-Weighted Jaccards.");
+		String path2 = outputPath + "/jaccardNon_Weighted.ser";
+		FileOutputStream fileOut2 = new FileOutputStream(path2);
+		ObjectOutputStream objectOut2 = new ObjectOutputStream(fileOut2);
+		objectOut2.flush();
+		objectOut2.writeObject(jaccardListNonWeighted);
+		objectOut2.close();
+		LOG.info("Finished serializing Weighted Jaccards.");
 	}
 	public static void printResults() throws IOException{
 		BufferedWriter out = new BufferedWriter(new FileWriter(TweetAnalysis.output));
-		Iterator<Entry<Integer, HashMap<Integer, Double>>> termIter = jaccardList.entrySet().iterator();
+		Iterator<Entry<Integer, HashMap<Integer, Double>>> termIter = jaccardListNonWeighted.entrySet().iterator();
 		while(termIter.hasNext()){
 			Entry<Integer, HashMap<Integer, Double>> termJacc = termIter.next();
 			StringBuffer sb = new StringBuffer();

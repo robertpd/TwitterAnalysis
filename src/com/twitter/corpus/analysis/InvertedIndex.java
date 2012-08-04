@@ -22,14 +22,16 @@ import com.twitter.corpus.data.Status;
 import com.twitter.corpus.data.StatusStream;
 import com.twitter.corpus.demo.Admin;
 import com.twitter.corpus.demo.ProcessedTweet;
+import com.twitter.corpus.demo.TweetAnalysis;
 import com.twitter.corpus.demo.TweetProcessor;
 
 public class InvertedIndex {
 	public InvertedIndex(){
 	}
-	private static final Logger LOG = Logger.getLogger(TermTermWeights.class);
-		public static int counter =1;
-//		private static int tfCount =1;
+	private static final Logger LOG = Logger.getLogger(InvertedIndex.class);
+	public static int counter =1;
+	//		private static int tfCount =1;
+
 	/**
 	 * @param StatusStream stream
 	 * @return <del>HashMap<Integer, HashSet<Long>> InvertIndex</del> IndexAndDocCount
@@ -37,7 +39,7 @@ public class InvertedIndex {
 	 * Returns the index built from a directory
 	 * @throws IOException
 	 */
-	public HashMap<Integer, HashSet<Long>> buildIndex(StatusStream stream, int lowerCut, int upperCut) throws IOException{
+	public HashMap<Integer, HashSet<Long>> buildIndex(StatusStream stream/*, int lowerCut, int upperCut*/) throws IOException{
 		if(TweetProcessor.stopwords == null){
 			TweetProcessor.callStops();
 		}
@@ -76,13 +78,13 @@ public class InvertedIndex {
 					}
 				}
 				docNum++;
-//				if(docNum % 200000 == 0 ){
-//					Long currTime = System.currentTimeMillis();
-//					LOG.info(docNum + " tweets indexed in " +  Admin.getTime(lastTime, currTime));
-//					lastTime = currTime;
-//				}
-				
-//				if(docNum > 50000){
+				if(docNum % 200000 == 0 ){
+					Long currTime = System.currentTimeMillis();
+					LOG.info(docNum + " tweets indexed in " +  Admin.getTime(lastTime, currTime));
+					lastTime = currTime;
+				}
+//
+//				if(docNum > 1000){
 //					LOG.info(termIndex.size() + " total terms.");
 //					break;
 //				}
@@ -94,99 +96,106 @@ public class InvertedIndex {
 		finally
 		{
 		}
-		
-		// remove index terms with df less than a certain amount and > a certain amount
-		// TODO Sort out tf upper threshold. Investigate weighting, currently looking at raw term frequencies over daily corpus, need refined weighting
 		HashMap<Integer, HashSet<Long>> thresholdIndex = new HashMap<Integer, HashSet<Long>>((int)termIndex.size()/2);
-//		
+
 		Iterator<Map.Entry<Integer, HashSet<Long>>> indexIterator = termIndex.entrySet().iterator();
 		while(indexIterator.hasNext()){
 			Map.Entry<Integer, HashSet<Long>> termEntry = indexIterator.next();
-			// frequency threshold
-			if(termEntry.getValue().size() > lowerCut && termEntry.getValue().size() < upperCut){
+
+			// frequency threshold. There is a global and local consideration. Thresholds are calculated with Global values
+			// However for the purpose of index sizes, an threshold of tf < 2 say will be applied
+			if(termEntry.getValue().size() > TweetAnalysis.lowCutoffGlobal /*lowerCut && termEntry.getValue().size() < upperCut*/){
 				thresholdIndex.put(termEntry.getKey(), termEntry.getValue());
 			}
 		}
-		LOG.info("Trimmed interval index size is: " + thresholdIndex.size());
-		
-		// add TF-IDF stopword removal by taking occurance of term over 1000 docs. In a day there are avg 730k docs
-		
-		// iterate and take a term
-		// iterate 1000 docs and count occurances
-		// [ occurances / docs * term count of each doc ] * log[ total Docs / docs ]
-		// store this in a map for inspection and to determine cut point
-		// remove terms that correspond to this cut point
-		
-		// the first time the term occurs take 1000 docs following that .
-		// first time 
-		
-		// take 7300 docs.
-		// add them to arraylist to calc total size termCount
-		// after building arraylist, use to create set for fast checking
-		
-		ArrayList<Integer> termArrayList = new ArrayList<Integer>();
-		Integer cutPoint = 7300;
-		termArrayList.ensureCapacity(cutPoint);
-		
-		// HOLD THE TF-IDF'ing. IT IS NOT NEEDED, RAW FREQUENCY WILL DO
-		
-		// populate window
-		
-		int cutCounter = 0;
-		Iterator<Map.Entry<Integer, HashSet<Long>>> indexIter = termIndex.entrySet().iterator();
-		while(indexIter.hasNext() && cutCounter < cutPoint){			
-			Map.Entry<Integer, HashSet<Long>> termEntry = indexIter.next();
-			Integer term = termEntry.getKey();
-			termArrayList.add(term);
-			cutCounter++;
-		}
-//		int arraySize = termArrayList.size();
-		
-		// init TFIDF mapping		
-//		HashMap<Integer, Double> termTFIDF = new HashMap<Integer, Double>(termIndex.size());
-		
-		// calc TFIDF's
-//		Iterator<Map.Entry<Integer, HashSet<Long>>> termIter2 = termIndex.entrySet().iterator();
-//		while(termIter2.hasNext()){
-//			Entry<Integer, HashSet<Long>> entry = termIter2.next();
-//			Integer term = entry.getKey();
-//			
-//			int tf=0;
-//			Iterator<Integer> arrayListIter = termArrayList.iterator();
-//			while(arrayListIter.hasNext()){
-//				if(arrayListIter.next() == term){
-//					tf++;
-//				}
-//			}
-//			Double tfidf = ((double)tf / (double)arraySize ) * (Math.log(termIndex.size() /termIndex.get(term).size()));
-//			tfidf = (double)Math.round(tfidf * 10000000) / 10000000;
-//			termTFIDF.put(term, tfidf);
-//		}
+		LOG.info("Trimmed interval index using tf <  " + TweetAnalysis.lowCutoffGlobal + " size is: " + thresholdIndex.size());
 
-		// tfidf term print
-		
-		//		BufferedWriter bf = new BufferedWriter(new FileWriter("/analysis/output/" + tfCount + "_tfidf.txt"));
-//		Iterator<Map.Entry<Integer, Double>> tfIter = termTFIDF.entrySet().iterator();
-//		while(tfIter.hasNext()){
-//			Entry<Integer, Double> ent = tfIter.next();
-//			bf.append(ent.getKey() + ", " + ent.getValue() + "\n");
-//		}
-//		bf.close();
-//		tfCount++;
+//		ArrayList<Integer> termArrayList = new ArrayList<Integer>();
+//		Integer cutPoint = 7300;
+//		termArrayList.ensureCapacity(cutPoint);
+//
+//		int cutCounter = 0;
+//		Iterator<Map.Entry<Integer, HashSet<Long>>> indexIter = termIndex.entrySet().iterator();
+//		while(indexIter.hasNext() && cutCounter < cutPoint){			
+//			Map.Entry<Integer, HashSet<Long>> termEntry = indexIter.next();
+//			Integer term = termEntry.getKey();
+//			termArrayList.add(term);
+//			cutCounter++;
+//		}		
 		return thresholdIndex;
 	}
-	
-	public static void indexSerialize(HashMap<Integer, HashSet<Long>> termIndex, String outputPath) throws IOException{
-		LOG.info("Serializing Index.");
-		String path = outputPath + "/index.ser";
+	/**
+	 * Trim tf terms from the local index using Global docCount values after local index is added to global corpus index.
+	 * I.E. tf should be greater than 33*cutpoint
+	 * @param intervalTermIndex
+	 * @param lower
+	 * @param upper
+	 * @return trimmed index
+	 */
+	public static ArrayList<HashMap<Integer, HashSet<Long>>> trimLocalIndices(ArrayList<HashMap<Integer, HashSet<Long>>> intervalTermIndex, int lower, int upper){
+		ArrayList<HashMap<Integer, HashSet<Long>>> retVal = new ArrayList<HashMap<Integer,HashSet<Long>>>(intervalTermIndex.size());
+		
+		Iterator<HashMap<Integer, HashSet<Long>>> indexIter = intervalTermIndex.iterator();
+		
+		while(indexIter.hasNext()){
+			HashMap<Integer, HashSet<Long>> localIndex = indexIter.next();
+			
+			Iterator<Map.Entry<Integer, HashSet<Long>>> localIndexIter = localIndex.entrySet().iterator();
+			HashMap<Integer, HashSet<Long>> trimmedIndex = new HashMap<Integer, HashSet<Long>>((int)localIndex.size()/2);
+			while(localIndexIter.hasNext()){
+				Map.Entry<Integer, HashSet<Long>> entry = localIndexIter.next();
+				Integer term = entry.getKey();
+				HashSet<Long> docSet = entry.getValue();
+
+				// check against GLOBAL values
+				if(!(TweetAnalysis.corpusIndex.get(term).size() < lower || TweetAnalysis.corpusIndex.get(term).size() > upper)){
+					trimmedIndex.put(term, docSet);
+				}
+			}
+			retVal.add(trimmedIndex);
+		}
+		return retVal;
+	}
+
+	/**
+	 * merge local index with global index, iterate local index and merge existing document sets for a particular term, or add new terms with document set
+	 * @param intervalTermIndex
+	 */
+	public static void mergeLocalIndex(HashMap<Integer, HashSet<Long>> intervalTermIndex){
+		Iterator<Map.Entry<Integer, HashSet<Long>>> intervalIndexIter = intervalTermIndex.entrySet().iterator();
+		while(intervalIndexIter.hasNext()){
+			Map.Entry<Integer, HashSet<Long>> entry = intervalIndexIter.next();
+			Integer term = entry.getKey();
+			HashSet<Long> docs = entry.getValue();
+
+			if(TweetAnalysis.corpusIndex.containsKey(term)){
+				TweetAnalysis.corpusIndex.get(term).addAll(docs);
+			}
+			else{
+				TweetAnalysis.corpusIndex.put(term, docs);
+			}
+		}
+	}
+	public static void globalIndexSerialize(HashMap<Integer, HashSet<Long>> globalTermIndex, String outputPath) throws IOException{
+		LOG.info("Serializing Global Index.");
+		String path = outputPath + "/globalIndex.ser";
 		FileOutputStream fileOut = new FileOutputStream(path);
 		ObjectOutputStream objectOut = new ObjectOutputStream(fileOut);
 		objectOut.flush();
-		objectOut.writeObject(termIndex);
+		objectOut.writeObject(globalTermIndex);
 		objectOut.close();
-		LOG.info("Finished serializing Index.");
+		LOG.info("Finished serializing global Index.");
 	}
-	
+	public static void localIndexArraySerialize(ArrayList<HashMap<Integer, HashSet<Long>>> localTermIndex, String outputPath) throws IOException{
+		LOG.info("Serializing local Index array.");
+		String path = outputPath + "/LocalIndexArray.ser";
+		FileOutputStream fileOut = new FileOutputStream(path);
+		ObjectOutputStream objectOut = new ObjectOutputStream(fileOut);
+		objectOut.flush();
+		objectOut.writeObject(localTermIndex);
+		objectOut.close();
+		LOG.info("Finished serializing local Index.");
+	}
 	public static int getDocCount(HashMap<Integer, HashSet<Long>> corpusIndex){
 		int retVal = 0;
 		Iterator<Map.Entry<Integer, HashSet<Long>>> indexIter = corpusIndex.entrySet().iterator();
@@ -196,7 +205,6 @@ public class InvertedIndex {
 		}
 		return retVal;
 	}
-	
 	/**
 	 * Get the tfIdf for each term
 	 * @param index
@@ -215,7 +223,7 @@ public class InvertedIndex {
 				http++;
 			}
 		}
-		
+
 		Iterator<Entry<Integer, HashSet<Long>>> indexTFIterator = index.entrySet().iterator();
 
 		// print out  list of the low freq terms ie tf=1,2,3,4...
@@ -236,7 +244,7 @@ public class InvertedIndex {
 					lowTfPtint.append("\n");
 				}
 			}
-			
+
 			// tf upper threshold
 			if(term.getValue().size() >500){
 				highTfPtint.append(TermTermWeights.termBimap.inverse().get(term.getKey()) + ": " + term.getValue().size() + ", ");
@@ -250,7 +258,7 @@ public class InvertedIndex {
 		}
 		lowTfPtint.close();
 		highTfPtint.close();
-		
+
 		// deal with full tf 
 		Collections.sort(tf, new tfComparator2());
 		Iterator<tfPair> tfIter = tf.iterator();
@@ -262,27 +270,32 @@ public class InvertedIndex {
 		counter++;
 		return tfidfMap;
 	}
+
 	public static void printFrequencies(HashMap<Integer, HashSet<Long>> index, String path) throws IOException{
 		BufferedWriter bf = new BufferedWriter(new FileWriter(path));
-		
+
 		ArrayList<Map.Entry<Integer, HashSet<Long>>> freqArrayL = new ArrayList<Map.Entry<Integer,HashSet<Long>>>(index.size());
-		
+
 		Iterator<Map.Entry<Integer, HashSet<Long>>> indexIter = index.entrySet().iterator();
 		while(indexIter.hasNext()){
 			Entry<Integer, HashSet<Long>> entry = indexIter.next();
-			freqArrayL.add(entry);			
+			if(entry.getValue().size() > 2){
+				freqArrayL.add(entry);
+			}
 		}
-		
+
 		Collections.sort(freqArrayL, new indexComparator());
-		
+
 		Iterator<Map.Entry<Integer, HashSet<Long>>> arrayIter = freqArrayL.iterator();
-		
+
 		while(arrayIter.hasNext()){
 			Map.Entry<Integer, HashSet<Long>> entry = arrayIter.next();
-			bf.append(entry.getValue().size() + "\n");
+			bf.append(String.valueOf(entry.getValue().size()));
+			bf.append("\n");
 		}
 		bf.close();
 	}
+
 	public static class indexComparator implements Comparator<Map.Entry<Integer, HashSet<Long>>> {
 
 		@Override
@@ -297,7 +310,7 @@ public class InvertedIndex {
 				return 0;
 		}	
 	}
-	
+
 	public class tfPair{
 		public tfPair(Integer term, Integer tf){
 			this.term = term;

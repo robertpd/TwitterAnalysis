@@ -1,6 +1,9 @@
 package com.twitter.corpus.analysis;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -15,6 +18,7 @@ import org.apache.log4j.Logger;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.Maps;
 import com.twitter.corpus.demo.Admin;
+import com.twitter.corpus.demo.TweetAnalysis;
 import com.twitter.corpus.types.CoWeight;
 
 public class TermTermWeights implements java.io.Serializable{
@@ -30,9 +34,9 @@ public class TermTermWeights implements java.io.Serializable{
 	public TermTermWeights(HashMap<Integer, HashSet<Long>> termIndex) throws IOException{
 		this.termIndex = termIndex;
 	}
-
 	private HashMap<Integer, HashSet<Long>> termIndex = null;
 
+	
 	/**
 	 * <p>TermCosetBuilder:
 	 * 			return a map of coweights for terms.<br>
@@ -49,31 +53,34 @@ public class TermTermWeights implements java.io.Serializable{
 		long lastTime2=System.currentTimeMillis();	// timing for LOG.info()
 
 		// return object cosetMap, contains terms mapped to coweights
-		//		HashMap<Integer, HashMap<Integer, Double>> cosetMap = new HashMap<Integer, HashMap<Integer, Double>>(termIndex.size());	
 		HashMap<Integer, ArrayList<CoWeight>> cosetMap = new HashMap<Integer, ArrayList<CoWeight>>(termIndex.size());
-		//		Set<Integer> termMatrixKeys = termIndex.keySet();
 
 		// TODO BIGGEST 2ND: termIndex was null the second time around, how???
-		HashMap<Integer, ArrayList<CoWeight>> coset2 = Maps.newHashMapWithExpectedSize(termIndex.size());
-		for(Integer i : termIndex.keySet()){
-			coset2.put(i, null);
-		}
+		//		HashMap<Integer, ArrayList<CoWeight>> coset2 = Maps.newHashMapWithExpectedSize(termIndex.size());
+		//		for(Integer i : termIndex.keySet()){
+		//			coset2.put(i, null);
+		//		}
 
-		// term, hashSet<Documents>
 		Iterator<Map.Entry<Integer, HashSet<Long>>> termMatrixIter = termIndex.entrySet().iterator();
-		// iterate keys on termMatrix
 		//		for(Integer i : termMatrixKeys){
 		while(termMatrixIter.hasNext()){
 			Integer i = termMatrixIter.next().getKey();
-			HashSet<Long> docList = termIndex.get(i);							// doclist -> list of docs for a term
-			Integer termINum = termIndex.get(i).size();		// number of documents with term "i"
-
-			// Skip rare numbers altogether; now dealt with at termIndex stage... terms in lt 15 docs are stripped and mt 5000
-//			if(termINum < 15){
+			
+			// the following will cause a significant blunder in the algorithm
+			// it will omit terms of certain tf as KEYS in the coset map 
+			// however
+			// these terms will still exist in local index and will influence coset weightings. see uniqueTerms below
+//			if(TweetAnalysis.corpusIndex.get(i).size() < low || TweetAnalysis.corpusIndex.get(i).size() > hi){
 //				continue;
 //			}
+			
+			
+			// local analysis; get docset from intervalIndex 
+			HashSet<Long> docList = termIndex.get(i);							// doclist -> list of docs for a term
+			// global weighting of terms comes from Global corpus index!!
+			Integer termINum = termIndex.get(i).size();		// number of documents with term "i"
 
-//			docCount1000+=termINum;
+			
 
 			int termIJNum=0;
 
@@ -101,13 +108,12 @@ public class TermTermWeights implements java.io.Serializable{
 			// coweight array for term "i"
 			ArrayList<CoWeight> termCoSetArray = new ArrayList<CoWeight>(uniqueTerms.size());		// new coset array should have same dim as termMatrix...
 
-			// hashmap below will need to be sorted when getting top 5(say) coweight terms
-			//			HashMap<Integer,Double> termCosetMap = new HashMap<Integer, Double>(uniqueTerms.size());
-
-			for(Iterator<Integer> term = uniqueTerms.iterator(); term.hasNext();){
-				int termJ = term.next();
+			Iterator<Integer> uniqueTermsIter = uniqueTerms.iterator();
+			while(uniqueTermsIter.hasNext()){
+				int termJ = uniqueTermsIter.next();
 				HashSet<Long> termDocList = termIndex.get(termJ);
-				// can get null here, we iterate uniqueTerms and get doc lists from termIndex. low/hi freq terms are removed from termIndex but may persist in uniqueTerms
+				// can get null here, we iterate uniqueTerms and get doc lists from termIndex. low/hi freq terms are removed from termIndex but may persist in uniqueTerms 
+				//TODO sort this shit out soldier
 				if(termDocList == null){
 					continue;
 				}
@@ -128,40 +134,37 @@ public class TermTermWeights implements java.io.Serializable{
 						}
 					}
 				}
-
-				// termINum => num docs with I, termJNum => w/ J, IJ => docs with both
-				int denom = termINum + termJNum - termIJNum;
-
-				double m = (double)termIJNum / (double)denom;
-				termIJNum = 0;
-				CoWeight cs = null;
+				double m = (double)termIJNum / (double)(termINum + termJNum - termIJNum);
 				m = (double)Math.round(m * 1000) / 1000;
 
-				// Skip low coweights
+				// ignore low coweights
 				if(m > correlateCutoff){
-					cs = new CoWeight(termJ, m);	// old, replaced by below, and.. back by popular demand
-					termCoSetArray.add(cs); // this was the first imp, used an ArrayList
+					CoWeight cs = new CoWeight(termJ, m);
+					termCoSetArray.add(cs);
 				}
 			}
-
-			//TODO NEED TO SORT THIS as treeset has been reverted
-			//			termCosetSet.removeAll(Collections.singleton(null));
 			Collections.sort(termCoSetArray, new CoWeightComparator());
-
 			cosetMap.put(i, termCoSetArray);
 
 			cnt++;
-//			if(cnt % 1000 ==0){
-//				Long currTime2 = System.currentTimeMillis();
-//				LOG.info(cnt + " term coweights calculated in: " + Admin.getTime(lastTime2, currTime2));
-//				lastTime2 = currTime2;
-//				docCount1000=0;
-//			}
-			Long currTime2 = System.currentTimeMillis();
-			LOG.info(cnt + " term coweights calculated in: " + Admin.getTime(lastTime2, currTime2));
-			lastTime2 = currTime2;
+			//			if(cnt % 1000 ==0){
+			//				Long currTime2 = System.currentTimeMillis();
+			//				LOG.info(cnt + " term coweights calculated in: " + Admin.getTime(lastTime2, currTime2));
+			//				lastTime2 = currTime2;
+			//				docCount1000=0;
+			//			}
 		}
+		Long currTime2 = System.currentTimeMillis();
+		LOG.info(cnt + " term coweights calculated in: " + Admin.getTime(lastTime2, currTime2));
+		lastTime2 = currTime2;
 		return cosetMap;
+	}
+	public static void serializeTermBimap(String path) throws IOException{
+		FileOutputStream fileOut = new FileOutputStream(path);
+		ObjectOutputStream objectOut = new ObjectOutputStream(fileOut);
+		objectOut.flush();
+		objectOut.writeObject(TermTermWeights.termBimap);
+		objectOut.close();
 	}
 	public class CoWeightComparator implements Comparator<CoWeight> {
 		@Override

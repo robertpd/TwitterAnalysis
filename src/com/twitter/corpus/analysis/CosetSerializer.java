@@ -10,7 +10,7 @@ import com.twitter.corpus.types.CoWeight;
 
 public class CosetSerializer {
 
-	public static void cosetSerializer(HashMap<Integer, ArrayList<CoWeight>> blockCoSet , String output, int count) throws IOException{
+	public static void cosetSerializer(HashMap<Integer, ArrayList<CoWeight>> blockCoSet, String output, int count) throws IOException{
 		
 		String path = output + "/termCoset_" + count + ".ser";
 		FileOutputStream fileOut = new FileOutputStream(path);
