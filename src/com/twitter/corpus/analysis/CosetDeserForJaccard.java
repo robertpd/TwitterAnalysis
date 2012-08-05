@@ -29,7 +29,7 @@ public class CosetDeserForJaccard {
 			filePaths[i] = input + root + (i+1) + base;
 		}
 		
-		Jaccard initJMap = null;
+		Jaccard jaccardSim = null;
 		ArrayList<HashMap<Integer, ArrayList<CoWeight>>> corpusCoSetArray = new ArrayList<HashMap<Integer, ArrayList<CoWeight>>>(2);
 		for(String path : filePaths){
 			//			String head = "/analysis/output/";
@@ -39,12 +39,12 @@ public class CosetDeserForJaccard {
 			corpusCoSetArray.add(coset);
 			
 			if(corpusCoSetArray.size() == 2){	// only skipped once at the start
-				if(initJMap == null){			// one time initializer
-					initJMap = new Jaccard(20000);	// init size plus 10% for wiggle
+				if(jaccardSim == null){			// one time initializer
+					jaccardSim = new Jaccard(20000);	// init size plus 10% for wiggle
 				}
 				// 3.0 do the deed
 				int cutoff = 5;
-				Jaccard.getJaccardSimilarity(corpusCoSetArray, cutoff);
+				jaccardSim.getJaccardSimilarity(corpusCoSetArray, cutoff);
 //				Jaccard.getJaccardEnhancedSimilarity(corpusCoSetArray, cutoff);
 
 				// swap positions, makes our life easier
