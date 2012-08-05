@@ -11,13 +11,11 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
 
-import com.twitter.corpus.demo.TweetAnalysis;
 import com.twitter.corpus.types.CoWeight;
 
 public class Jaccard {
@@ -28,6 +26,8 @@ public class Jaccard {
 	}
 	// dayCounter is used for jaccard map, also printed out on entry to jaccard calculator
 	private static int dayCounter = 0;
+	private static int dayCounterWeighted = 0;
+	private static int dayCounterNonWeighted = 0;
 	private static int unionZero = 0;
 	private static int termError = 0;
 	public static HashMap<Integer, HashMap<Integer,Double>> jaccardListNonWeighted;
@@ -39,8 +39,8 @@ public class Jaccard {
 	 * @return maintains a static hashMap of jaccards for each term over duration of corpus, access when finished traversing the corpus
 	 * @throws IOException
 	 */
-	public static void getJaccardSimilarity(ArrayList<HashMap<Integer, ArrayList<CoWeight>>> cosetArray, int cutoff) throws IOException{
-		LOG.info("Interval: " + (dayCounter+1));
+	public void getJaccardSimilarity(ArrayList<HashMap<Integer, ArrayList<CoWeight>>> cosetArray, int cutoff) throws IOException{
+		LOG.info("Interval: " + (dayCounterNonWeighted+1));
 
 		// Get the list of all terms
 
@@ -149,19 +149,19 @@ public class Jaccard {
 				for(int i =0 ; i < 32 ;i++){
 					jEachDayMap.put(i, 0.0);
 				}
-				jEachDayMap.put(dayCounter, jac);
+				jEachDayMap.put(dayCounterNonWeighted, jac);
 
 				// add mapping for term
 				jaccardListNonWeighted.put(term, jEachDayMap);
 			}
 			else{
-				jaccardListNonWeighted.get(term).put(dayCounter, jac);
+				jaccardListNonWeighted.get(term).put(dayCounterNonWeighted, jac);
 			}
 
 		}
 		LOG.info("Jacard size = " + jaccardListNonWeighted.size());
 		// LOG.info("Term error occured " + termError + "times." );
-		dayCounter++; // must be incremented here to ensure continuity
+		dayCounterNonWeighted++; // must be incremented here to ensure continuity
 	}
 
 	/*** 
@@ -170,8 +170,8 @@ public class Jaccard {
 	 * @return maintains a static hashMap of jaccards for each term over duration of corpus, access when finished traversing the corpus
 	 * @throws IOException 
 	 */
-	public static void getJaccardEnhancedSimilarity(ArrayList<HashMap<Integer, ArrayList<CoWeight>>> cosetArray, int cutoff) throws IOException{
-		LOG.info("Interval: " + (dayCounter+1));
+	public void getJaccardWeightedSimilarity(ArrayList<HashMap<Integer, ArrayList<CoWeight>>> cosetArray, int cutoff) throws IOException{
+		LOG.info("Interval: " + (dayCounterWeighted+1));
 
 		// Get the list of all terms 
 
@@ -233,19 +233,19 @@ public class Jaccard {
 					jEachDayMap.put(i, 0.0);
 				}
 
-				jEachDayMap.put(dayCounter, jac);
+				jEachDayMap.put(dayCounterWeighted, jac);
 
 				// add mapping for term
 				jaccardListWeighted.put(term, jEachDayMap);
 			}
 			else{
-				jaccardListWeighted.get(term).put(dayCounter, jac);
+				jaccardListWeighted.get(term).put(dayCounterWeighted, jac);
 			}
 
 		}
 		LOG.info("Jacard size = " + jaccardListWeighted.size());
 		//		LOG.info("Term error occured " + termError + "times." );
-		dayCounter++; // must be incremented here to ensure continuity
+		dayCounterWeighted++; // must be incremented here to ensure continuity
 	}
 	private static Double getEnhancedJaccardVal(ArrayList<CoWeight> a, ArrayList<CoWeight> b){
 

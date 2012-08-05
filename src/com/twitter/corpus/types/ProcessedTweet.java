@@ -1,4 +1,4 @@
-package com.twitter.corpus.demo;
+package com.twitter.corpus.types;
 
 import java.util.ArrayList;
 

@@ -1,8 +1,6 @@
 package com.twitter.corpus.analysis;
 
 import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -20,10 +18,7 @@ import org.apache.log4j.Logger;
 
 import com.twitter.corpus.data.Status;
 import com.twitter.corpus.data.StatusStream;
-import com.twitter.corpus.demo.Admin;
-import com.twitter.corpus.demo.ProcessedTweet;
-import com.twitter.corpus.demo.TweetAnalysis;
-import com.twitter.corpus.demo.TweetProcessor;
+import com.twitter.corpus.types.ProcessedTweet;
 
 public class InvertedIndex {
 	public InvertedIndex(){

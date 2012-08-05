@@ -1,7 +1,7 @@
 <class-diagram version="1.0.9" icons="true" automaticImage="PNG" always-add-relationships="true" generalizations="true" 
   realizations="true" associations="true" dependencies="true" nesting-relationships="true">  
-  <class id="1" corner="BOTTOM_RIGHT" language="java" name="com.twitter.corpus.demo.TweetAnalysis" 
-    project="lintool_lucene_35_a" file="/lintool_lucene_35_a/src/com/twitter/corpus/demo/TweetAnalysis.java" 
+  <class id="1" corner="BOTTOM_RIGHT" language="java" name="com.twitter.corpus.analysis.TweetAnalysis" 
+    project="lintool_lucene_35_a" file="/lintool_lucene_35_a/src/com/twitter/corpus/analysis/TweetAnalysis.java" 
     binary="false">    
     <position height="-1" width="-1" x="716" y="-77"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      

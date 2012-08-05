@@ -8,6 +8,8 @@ import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.index.TermDocs;
 
+import com.twitter.corpus.analysis.Admin;
+
 public class TermDayTrend {
 	private static final Logger LOG = Logger.getLogger(TermDayTrend.class);
 	public static int defaultNumTerms = 200;

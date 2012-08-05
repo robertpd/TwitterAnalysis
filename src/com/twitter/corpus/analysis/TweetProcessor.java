@@ -1,4 +1,4 @@
-package com.twitter.corpus.demo;
+package com.twitter.corpus.analysis;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -10,8 +10,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import com.twitter.corpus.analysis.Stemmer;
-import com.twitter.corpus.analysis.TermTermWeights;
+import com.twitter.corpus.types.ProcessedTweet;
 
 public class TweetProcessor {
 	public static Set<String> stopwords = null;

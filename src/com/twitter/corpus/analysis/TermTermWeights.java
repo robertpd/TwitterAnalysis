@@ -1,6 +1,5 @@
 package com.twitter.corpus.analysis;
 
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -16,9 +15,6 @@ import java.util.Map.Entry;
 import org.apache.log4j.Logger;
 
 import com.google.common.collect.HashBiMap;
-import com.google.common.collect.Maps;
-import com.twitter.corpus.demo.Admin;
-import com.twitter.corpus.demo.TweetAnalysis;
 import com.twitter.corpus.types.CoWeight;
 
 public class TermTermWeights implements java.io.Serializable{
