@@ -1,4 +1,6 @@
 *.class
 *.hprof
 *.log
-
+.gitignore_global~
+*.ucls
+bin/
