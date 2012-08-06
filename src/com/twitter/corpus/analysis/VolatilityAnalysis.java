@@ -10,7 +10,7 @@ import java.util.Map.Entry;
 
 public class VolatilityAnalysis {
 	
-	public static void avgVolatility(HashMap<Integer, HashMap<Integer,Double>> jaccard, String path) throws IOException{
+	public void avgVolatility(HashMap<Integer, HashMap<Integer,Double>> jaccard, String path) throws IOException{
 	
 		HashMap<Integer, Double> avgVolMap = new HashMap<Integer, Double>(jaccard.size());
 		HashMap<Integer, Double> stdDevMap = new HashMap<Integer, Double>(jaccard.size());

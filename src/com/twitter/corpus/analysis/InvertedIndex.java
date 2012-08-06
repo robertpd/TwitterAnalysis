@@ -55,7 +55,6 @@ public class InvertedIndex {
 				String tweet = status.getText();
 				if (tweet == null){	continue;}
 				ProcessedTweet pt = TweetProcessor.processTweet(status.getText(),status.getId());
-				// blacnked for termbimap
 				for(int i=0; i< pt.termIdList.size() ; i++){
 					if(!termIndex.containsKey(pt.termIdList.get(i)))
 					{// tdh - termDocHash

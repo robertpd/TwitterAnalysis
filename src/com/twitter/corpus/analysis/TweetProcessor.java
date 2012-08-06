@@ -50,15 +50,15 @@ public class TweetProcessor {
 		ProcessedTweet pt = new ProcessedTweet();
 		String[] prepTweet = preprocessTweet(s);
 		//	collect hash's and mentions
-		for(String token : prepTweet){
-			if(token.startsWith("#", 0)){
-				pt.hashList.add(token);
-			}
-			if(token.startsWith("@", 0)){
-				pt.mentionList.add(token);
-			}
-		}
-		// strip stopwords, get ngrams
+//		for(String token : prepTweet){
+//			if(token.startsWith("#", 0)){
+//				pt.hashList.add(token);
+//			}
+//			if(token.startsWith("@", 0)){
+//				pt.mentionList.add(token);
+//			}
+//		}
+		// strip stopwords
 		ArrayList<Integer> termsInDoc = new ArrayList<Integer>();
 		for (int i = 0; i < prepTweet.length; i++) {
 			if(!stopwords.contains(prepTweet[i])){
@@ -75,8 +75,7 @@ public class TweetProcessor {
 				}
 			}
 		}
-		// blanked for termbimap
-		if(termsInDoc.size() > 0){	// discarding non alphanumeric chars like asian chars => empty termsInDoc
+		if(termsInDoc.size() > 0){
 			TermTermWeights.docTermsMap.put(docId, termsInDoc);
 		}
 		return pt;
