@@ -1,6 +1,7 @@
 package com.twitter.corpus.analysis;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -81,7 +82,7 @@ public class TweetAnalysis{
 
 		HashMap<Integer, ArrayList<CoWeight>> blockCoSet = null;
 		Jaccard jaccardSim = null;
-		ArrayList<HashMap<Integer, ArrayList<CoWeight>>> corpusCoSetArray = new ArrayList<HashMap<Integer, ArrayList<CoWeight>>>(2);
+		ArrayList<HashMap<Integer, ArrayList<CoWeight>>> corpusCoSetArray = new ArrayList<HashMap<Integer, ArrayList<CoWeight>>>(33);
 		//		HashMap<Integer, HashSet<Long>> intervalTermIndex = null;
 
 		int corpSize=0;int docCount=0;
@@ -111,37 +112,36 @@ public class TweetAnalysis{
 
 		// trim all local indexes
 		ArrayList<HashMap<Integer, HashSet<Long>>> trimmedLocalIndexArray = InvertedIndex.trimLocalIndices(intervalIndices, lowerFreq, upperFreq);		
-		jaccardSim = new Jaccard(trimmedLocalIndexArray.get(0).size());
+
+		for(int i = 0; i < trimmedLocalIndexArray.size(); i++){
+
+			TermTermWeights ill = new TermTermWeights(trimmedLocalIndexArray.get(i));
+			blockCoSet = ill.termCosetBuilder(0.03 /* standard minimum*/);
+
+			CosetSerializer.cosetSerializer(blockCoSet, output, (termCosetCounter + 1));
+			corpusCoSetArray.add(blockCoSet);			// add coset of particular day to array
+			termCosetCounter++;
+		}
+		CosetSerializer.copusCosetSer(corpusCoSetArray, output);
 
 		double[] mvalues = {0.2,0.15,0.1,0.05,0.03};
+		jaccardSim = null;
+		
 		for(int index = 0; index < mvalues.length; index++){
-			// Do cosets
-			termCosetCounter = 0;
-			for(int i = 0; i < trimmedLocalIndexArray.size(); i++){
-				// 2.0 calculate term cosets
-				TermTermWeights ill = new TermTermWeights(trimmedLocalIndexArray.get(i) /*intervalTermIndex*/);
-				blockCoSet = ill.termCosetBuilder(mvalues[index]);
-
-				// 2.1 serialize term cosets
-				//			CosetSerializer.cosetSerializer(blockCoSet, output, (termCosetCounter + 1));
-				CosetSerializer.cosetSerializer(blockCoSet, output, (termCosetCounter + 1), index, mvalues[index]);
-				corpusCoSetArray.add(blockCoSet);			// add coset of particular day to array
-
-				// Do Jaccard similarity
-				if(corpusCoSetArray.size() == 2){
-					jaccardSim.getJaccardSimilarity(corpusCoSetArray, cosetTopN);
-					jaccardSim.getJaccardWeightedSimilarity(corpusCoSetArray, cosetTopN);
-
-					// swap positions, makes our life easier
-					Collections.swap(corpusCoSetArray, 0, 1);
-					corpusCoSetArray.remove(1);
-
-					termCosetCounter++;
-				}
+			jaccardSim = new Jaccard(trimmedLocalIndexArray.get(0).size());
+			
+			for(int i = 0 ; i < corpusCoSetArray.size()-1; i++){
+				ArrayList<HashMap<Integer, ArrayList<CoWeight>>> corp = new ArrayList<HashMap<Integer,ArrayList<CoWeight>>>(2);
+				
+				corp.add(corpusCoSetArray.get(i));
+				corp.add(corpusCoSetArray.get(i+1));
+				
+				jaccardSim.getJaccardSimilarityMCorrelate(corp, cosetTopN, mvalues[index]);
+				jaccardSim.getJaccardWeightedSimilarityMCorrelate(corpusCoSetArray, cosetTopN, mvalues[index]);
 			}
-//			Jaccard.serializeJaccards(output);
 			Jaccard.serializeJaccards(output, index, mvalues[index]);
 		}
+		
 		// print frequency range
 		InvertedIndex.printFrequencies(TweetAnalysis.corpusIndex, output + "freqs.txt");
 		TermTermWeights.serializeTermBimap(output + "/termbimap.ser");		

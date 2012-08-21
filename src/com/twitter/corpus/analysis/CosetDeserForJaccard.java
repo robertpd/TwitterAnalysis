@@ -16,11 +16,11 @@ public class CosetDeserForJaccard {
 //		String input = args[0].toString() ;
 //		String output = args[1].toString();
 		
-		String input = "/home/dock/Documents/IR/AmazonResults/StemmedResults1/";
-		String output = "/home/dock/Documents/IR/AmazonResults/StemmedResults1";
+		String input = "/home/dock/Documents/IR/AmazonResults/TCRange/TC/0.2/";
+		String output = "/home/dock/Documents/IR/AmazonResults/TCRange/TC/0.2/";
 //		String head = "/home/dock/Documents/IR/AmazonResults/total/coset/";
 		
-		String root = "termCoset_";
+		String root = "0_0.2_termCoset_";
 		String base = ".ser";
 
 		String[] filePaths = new String[33];
@@ -45,7 +45,7 @@ public class CosetDeserForJaccard {
 				// 3.0 do the deed
 				int cutoff = 5;
 				jaccardSim.getJaccardSimilarity(corpusCoSetArray, cutoff);
-//				Jaccard.getJaccardEnhancedSimilarity(corpusCoSetArray, cutoff);
+				jaccardSim.getJaccardWeightedSimilarity(corpusCoSetArray, cutoff);
 
 				// swap positions, makes our life easier
 				Collections.swap(corpusCoSetArray, 0, 1);

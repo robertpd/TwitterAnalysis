@@ -51,26 +51,10 @@ public class TermTermWeights implements java.io.Serializable{
 		// return object cosetMap, contains terms mapped to coweights
 		HashMap<Integer, ArrayList<CoWeight>> cosetMap = new HashMap<Integer, ArrayList<CoWeight>>(termIndex.size());
 
-		// TODO BIGGEST 2ND: termIndex was null the second time around, how???
-		//		HashMap<Integer, ArrayList<CoWeight>> coset2 = Maps.newHashMapWithExpectedSize(termIndex.size());
-		//		for(Integer i : termIndex.keySet()){
-		//			coset2.put(i, null);
-		//		}
-
 		Iterator<Map.Entry<Integer, HashSet<Long>>> termMatrixIter = termIndex.entrySet().iterator();
 		//		for(Integer i : termMatrixKeys){
 		while(termMatrixIter.hasNext()){
 			Integer i = termMatrixIter.next().getKey();
-			
-			// the following will cause a significant blunder in the algorithm
-			// it will omit terms of certain tf as KEYS in the coset map 
-			// however
-			// these terms will still exist in local index and will influence coset weightings. see uniqueTerms below
-//			if(TweetAnalysis.corpusIndex.get(i).size() < low || TweetAnalysis.corpusIndex.get(i).size() > hi){
-//				continue;
-//			}
-			
-			
 			// local analysis; get docset from intervalIndex 
 			HashSet<Long> docList = termIndex.get(i);							// doclist -> list of docs for a term
 			// global weighting of terms comes from Global corpus index!!
@@ -143,12 +127,6 @@ public class TermTermWeights implements java.io.Serializable{
 			cosetMap.put(i, termCoSetArray);
 
 			cnt++;
-			//			if(cnt % 1000 ==0){
-			//				Long currTime2 = System.currentTimeMillis();
-			//				LOG.info(cnt + " term coweights calculated in: " + Admin.getTime(lastTime2, currTime2));
-			//				lastTime2 = currTime2;
-			//				docCount1000=0;
-			//			}
 		}
 		Long currTime2 = System.currentTimeMillis();
 		LOG.info(cnt + " term coweights calculated in: " + Admin.getTime(lastTime2, currTime2));

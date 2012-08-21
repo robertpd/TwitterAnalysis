@@ -1,5 +1,6 @@
 package com.twitter.corpus.analysis;
 
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -26,6 +27,14 @@ public class CosetSerializer {
 		ObjectOutputStream objectOut = new ObjectOutputStream(fileOut);
 		objectOut.flush();
 		objectOut.writeObject(blockCoSet);
+		objectOut.close();
+	}
+	public static void copusCosetSer(ArrayList<HashMap<Integer, ArrayList<CoWeight>>> corpusCoSetArray, String output) throws IOException{
+		String path = output + "/termCoset.ser";
+		FileOutputStream fileOut = new FileOutputStream(path);
+		ObjectOutputStream objectOut = new ObjectOutputStream(fileOut);
+		objectOut.flush();
+		objectOut.writeObject(corpusCoSetArray);
 		objectOut.close();
 	}
 }

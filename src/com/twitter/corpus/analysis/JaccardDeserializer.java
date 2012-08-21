@@ -16,9 +16,9 @@ public class JaccardDeserializer {
 	public static void main(String[] args) throws IOException{
 //		String file = args[0].toString() ;
 //		String out = args[1].toString();
-		String path = "/home/dock/Documents/IR/AmazonResults/Globals2/";
+		String path = "/home/dock/Documents/IR/AmazonResults/TCRange/TC/0.1/";
 //		String path = "analysis/output/globallocal";
-		String file = "jaccardNon_Weighted";
+		String file = "jaccardWeighted";
 		String type = ".ser";
 		HashMap<Integer, HashMap<Integer,Double>> jaccard = deserialize(path + file + type);
 		
