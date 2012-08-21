@@ -77,8 +77,7 @@ public class InvertedIndex {
 					LOG.info(docNum + " tweets indexed in " +  Admin.getTime(lastTime, currTime));
 					lastTime = currTime;
 				}
-//
-//				if(docNum > 1000){
+//				if(docNum > 10000){
 //					LOG.info(termIndex.size() + " total terms.");
 //					break;
 //				}
