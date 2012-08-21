@@ -33,7 +33,7 @@ public class TweetAnalysis{
 	private static final String UPPER_DAILY_THRESH = "lt";
 	private static final String TERM_CORRELATION_THRESH = "m";
 	private static final String COSET_TERMS = "t";
-	
+
 	public static int lowCutoffGlobal = 2;
 	public static HashMap<Integer, HashSet<Long>> corpusIndex;
 	private static ArrayList<HashMap<Integer, HashSet<Long>>> intervalIndices;
@@ -61,7 +61,7 @@ public class TweetAnalysis{
 
 		int cnt=0;
 		int termCosetCounter=0;
-		
+
 		// command line options
 		output = cmdline.getOptionValue(OUTPUT_OPTION);
 		toolsDir = cmdline.getOptionValue(TOOLS);
@@ -82,12 +82,12 @@ public class TweetAnalysis{
 		HashMap<Integer, ArrayList<CoWeight>> blockCoSet = null;
 		Jaccard jaccardSim = null;
 		ArrayList<HashMap<Integer, ArrayList<CoWeight>>> corpusCoSetArray = new ArrayList<HashMap<Integer, ArrayList<CoWeight>>>(2);
-//		HashMap<Integer, HashSet<Long>> intervalTermIndex = null;
+		//		HashMap<Integer, HashSet<Long>> intervalTermIndex = null;
 
 		int corpSize=0;int docCount=0;
 		intervalIndices = new ArrayList<HashMap<Integer,HashSet<Long>>>(33);		
-		
-		
+
+
 		// Do the indexing
 		for(String path : filePaths){
 			LOG.info("Stream number : " + (cnt+1) + "\t. Indexing " + path);
@@ -99,47 +99,52 @@ public class TweetAnalysis{
 			InvertedIndex ii = new InvertedIndex();
 			HashMap<Integer, HashSet<Long>> intervalTermIndex = ii.buildIndex(stream);
 			corpSize = corpusIndex.size();
-			
+
 			//add interval index (both old and new terms with their document sets) 
 			InvertedIndex.mergeLocalIndex(intervalTermIndex);
 			intervalIndices.add(intervalTermIndex);
-			
+
 			docCount = InvertedIndex.getDocCount(corpusIndex);
 			cnt++;
 		}
 		LOG.info("Global corpus index terms: " + corpusIndex.size() + " " + ( corpusIndex.size() - corpSize) + " terms added. " + (docCount - indexDocCount) + " term-document occurences.");
-		
+
 		// trim all local indexes
 		ArrayList<HashMap<Integer, HashSet<Long>>> trimmedLocalIndexArray = InvertedIndex.trimLocalIndices(intervalIndices, lowerFreq, upperFreq);		
 		jaccardSim = new Jaccard(trimmedLocalIndexArray.get(0).size());
-		
-		// Do cosets
-		for(int i = 0; i < trimmedLocalIndexArray.size(); i++){
-			// 2.0 calculate term cosets
-			TermTermWeights ill = new TermTermWeights(trimmedLocalIndexArray.get(i) /*intervalTermIndex*/);
-			blockCoSet = ill.termCosetBuilder(m);
 
-			// 2.1 serialize term cosets
-			CosetSerializer.cosetSerializer(blockCoSet, output, (termCosetCounter + 1));
-			corpusCoSetArray.add(blockCoSet);			// add coset of particular day to array
-			
-			// Do Jaccard similarity
-			if(corpusCoSetArray.size() == 2){
-				jaccardSim.getJaccardSimilarity(corpusCoSetArray, cosetTopN);
-				jaccardSim.getJaccardWeightedSimilarity(corpusCoSetArray, cosetTopN);
-				
-				// swap positions, makes our life easier
-				Collections.swap(corpusCoSetArray, 0, 1);
-				corpusCoSetArray.remove(1);
-				
-				termCosetCounter++;
+		double[] mvalues = {0.2,0.15,0.1,0.05,0.03};
+		for(int index = 0; index < mvalues.length; index++){
+			// Do cosets
+			termCosetCounter = 0;
+			for(int i = 0; i < trimmedLocalIndexArray.size(); i++){
+				// 2.0 calculate term cosets
+				TermTermWeights ill = new TermTermWeights(trimmedLocalIndexArray.get(i) /*intervalTermIndex*/);
+				blockCoSet = ill.termCosetBuilder(mvalues[index]);
+
+				// 2.1 serialize term cosets
+				//			CosetSerializer.cosetSerializer(blockCoSet, output, (termCosetCounter + 1));
+				CosetSerializer.cosetSerializer(blockCoSet, output, (termCosetCounter + 1), index, mvalues[index]);
+				corpusCoSetArray.add(blockCoSet);			// add coset of particular day to array
+
+				// Do Jaccard similarity
+				if(corpusCoSetArray.size() == 2){
+					jaccardSim.getJaccardSimilarity(corpusCoSetArray, cosetTopN);
+					jaccardSim.getJaccardWeightedSimilarity(corpusCoSetArray, cosetTopN);
+
+					// swap positions, makes our life easier
+					Collections.swap(corpusCoSetArray, 0, 1);
+					corpusCoSetArray.remove(1);
+
+					termCosetCounter++;
+				}
 			}
+//			Jaccard.serializeJaccards(output);
+			Jaccard.serializeJaccards(output, index, mvalues[index]);
 		}
-
 		// print frequency range
 		InvertedIndex.printFrequencies(TweetAnalysis.corpusIndex, output + "freqs.txt");
 		TermTermWeights.serializeTermBimap(output + "/termbimap.ser");		
-		Jaccard.serializeJaccards(output);
 		InvertedIndex.globalIndexSerialize(corpusIndex, output);
 		InvertedIndex.localIndexArraySerialize(intervalIndices, output);		
 	}

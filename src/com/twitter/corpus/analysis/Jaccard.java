@@ -353,6 +353,25 @@ public class Jaccard {
 		return retVal;
 	}
 
+	public static void serializeJaccards(String outputPath, int index, double m) throws IOException{
+		LOG.info("Serializing Weighted Jaccards.");
+		String path = outputPath + "/" + String.valueOf(index) + "_" + String.valueOf(m) + "_jaccardWeighted.ser";
+		FileOutputStream fileOut = new FileOutputStream(path);
+		ObjectOutputStream objectOut = new ObjectOutputStream(fileOut);
+		objectOut.flush();
+		objectOut.writeObject(jaccardListWeighted);
+		objectOut.close();
+		LOG.info("Finished serializing Weighted Jaccards.");
+		
+		LOG.info("Serializing Non-Weighted Jaccards.");
+		String path2 = outputPath + "/" + String.valueOf(index) + "_" + String.valueOf(m) + "_jaccardNon_Weighted.ser";
+		FileOutputStream fileOut2 = new FileOutputStream(path2);
+		ObjectOutputStream objectOut2 = new ObjectOutputStream(fileOut2);
+		objectOut2.flush();
+		objectOut2.writeObject(jaccardListNonWeighted);
+		objectOut2.close();
+		LOG.info("Finished serializing Weighted Jaccards.");
+	}
 	public static void serializeJaccards(String outputPath) throws IOException{
 		LOG.info("Serializing Weighted Jaccards.");
 		String path = outputPath + "/jaccardWeighted.ser";
