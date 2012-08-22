@@ -23,11 +23,13 @@ public class Jaccard {
 	public Jaccard(int size){
 		jaccardListNonWeighted = new HashMap<Integer, HashMap<Integer,Double>>(size);
 		jaccardListWeighted = new HashMap<Integer, HashMap<Integer,Double>>(size);
+		dayCounterNonWeighted = 0;
+		dayCounterWeighted = 0;
 	}
 	// dayCounter is used for jaccard map, also printed out on entry to jaccard calculator
 	private static int dayCounter = 0;
-	private static int dayCounterWeighted = 0;
-	private static int dayCounterNonWeighted = 0;
+	private static int dayCounterWeighted;
+	private static int dayCounterNonWeighted;
 	private static int unionZero = 0;
 	private static int termError = 0;
 	public static HashMap<Integer, HashMap<Integer,Double>> jaccardListNonWeighted;
