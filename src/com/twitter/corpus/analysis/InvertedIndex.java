@@ -141,7 +141,7 @@ public class InvertedIndex {
 				HashSet<Long> docSet = entry.getValue();
 
 				// check against GLOBAL values
-				if(!(TweetAnalysis.corpusIndex.get(term).size() < lower || TweetAnalysis.corpusIndex.get(term).size() > upper)){
+				if(TweetAnalysis.corpusIndex.get(term).size() >= lower && TweetAnalysis.corpusIndex.get(term).size() <= upper){
 					trimmedIndex.put(term, docSet);
 				}
 			}

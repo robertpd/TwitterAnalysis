@@ -26,12 +26,9 @@ public class Jaccard {
 		dayCounterNonWeighted = 0;
 		dayCounterWeighted = 0;
 	}
-	// dayCounter is used for jaccard map, also printed out on entry to jaccard calculator
-	private static int dayCounter = 0;
+
 	private static int dayCounterWeighted;
 	private static int dayCounterNonWeighted;
-	private static int unionZero = 0;
-	private static int termError = 0;
 	public static HashMap<Integer, HashMap<Integer,Double>> jaccardListNonWeighted;
 	public static HashMap<Integer, HashMap<Integer,Double>> jaccardListWeighted;
 
@@ -144,8 +141,6 @@ public class Jaccard {
 
 				HashMap<Integer, Double> jEachDayMap = new HashMap<Integer, Double>(32);	// 17 + 16 = 33 days => 32 intervals
 
-				// scratch that - pre init this map with 9.9 so we have an entry for every interval and we can distinguish the 9.9 as interval in which term was missing on a particular day!
-
 				// pre init this map with 0.0
 
 				for(int i =0 ; i < 32 ;i++){
@@ -161,7 +156,7 @@ public class Jaccard {
 			}
 		}
 		LOG.info("Jacard size = " + jaccardListNonWeighted.size());
-		// LOG.info("Term error occured " + termError + "times." );
+
 		dayCounterNonWeighted++; // must be incremented here to ensure continuity
 	}
 
@@ -174,10 +169,8 @@ public class Jaccard {
 	public void getJaccardWeightedSimilarity(ArrayList<HashMap<Integer, ArrayList<CoWeight>>> cosetArray, int cutoff) throws IOException{
 		LOG.info("Interval: " + (dayCounterWeighted+1));
 
-		// Get the list of all terms 
-
 		ArrayList<HashMap<Integer, ArrayList<CoWeight>>> copyMap = new ArrayList<HashMap<Integer, ArrayList<CoWeight>>>(cosetArray);
-		// TODO coset array contained somewhere 4370, think all entries are null and so size is zero... . why??
+
 		Set<Integer> allTerms = new HashSet<Integer>(copyMap.get(0).keySet());
 		allTerms.addAll(copyMap.get(1).keySet());
 		copyMap = null;
@@ -189,10 +182,8 @@ public class Jaccard {
 			Integer term = termIterator.next();
 
 			// HOW MANY TERMS IN COSET?
-
 			ArrayList<CoWeight> a = null;
 			ArrayList<CoWeight> b = null;
-
 
 			try{
 				if(cosetArray.get(0).get(term).size() >= cutoff){
@@ -217,10 +208,10 @@ public class Jaccard {
 				//  gulp!
 			}
 
-			// if either a or b is null, then jaccard is just z. 0 is kept in the loop to provide continuity			
+			// if either a or b is null, then jaccard is just 0. 0 is kept in the loop to provide continuity
 			Double jac = 0.0;
 			if(a != null && b != null){	// if either are null jac == 0.0 will be added
-				jac = getEnhancedJaccardVal(a,b);
+				jac = getWeightedJaccardVal(a,b);
 			}
 
 			// add jaccard value for the interval, if first time add term first
@@ -245,15 +236,10 @@ public class Jaccard {
 
 		}
 		LOG.info("Jacard size = " + jaccardListWeighted.size());
-		//		LOG.info("Term error occured " + termError + "times." );
 		dayCounterWeighted++; // must be incremented here to ensure continuity
 	}
-	private static Double getEnhancedJaccardVal(ArrayList<CoWeight> a, ArrayList<CoWeight> b){
-		// stub 
-		// m value has been added to params of this method, stub prevents error and allows to keep jaccard method without m
-		return null;
-	}
-	private static Double getEnhancedJaccardVal(ArrayList<CoWeight> a, ArrayList<CoWeight> b, double m){
+
+	private static Double getWeightedJaccardVal(ArrayList<CoWeight> a, ArrayList<CoWeight> b/*, double m*/){
 
 		// convert arraylist to hashmap to make coweight access easy
 
@@ -261,17 +247,13 @@ public class Jaccard {
 		Iterator<CoWeight> aIter = a.iterator();
 		while(aIter.hasNext()){
 			CoWeight acw = aIter.next();
-			if(acw.correlate > m){
-				aMap.put(acw.termId, acw.correlate);
-			}
+			aMap.put(acw.termId, acw.correlate);
 		}
 		HashMap<Integer, Double> bMap = new HashMap<Integer, Double>(b.size());
 		Iterator<CoWeight> bIter = b.iterator();
 		while(bIter.hasNext()){
 			CoWeight bcw = bIter.next();
-			if(bcw.correlate > m){
-				bMap.put(bcw.termId, bcw.correlate);
-			}
+			bMap.put(bcw.termId, bcw.correlate);
 		}
 
 		// iterate aMap and crosscheck
@@ -291,7 +273,6 @@ public class Jaccard {
 				termsDone.add(aTerm);
 			}
 			else{
-				// dont add term from here to termsDone as, from the b persepective we check if a has terms we know b has, and thus they are already done
 				jacc += Math.pow( aWeight, 2 );
 			}	
 		}
@@ -309,290 +290,13 @@ public class Jaccard {
 				jacc += Math.pow(bWeight, 2);
 			}
 		}
-
 		// sqrt the sum of squares
 		jacc = Math.sqrt(jacc);
-
 		jacc = (double)Math.round((jacc ) * 1000) / 1000;
-
-		// et voila!
-
+		
 		return jacc;
 	}
-	public void getJaccardSimilarityMCorrelate(ArrayList<HashMap<Integer, ArrayList<CoWeight>>> cosetArray, int cutoff, double m) throws IOException{
-		LOG.info("Interval: " + (dayCounterNonWeighted+1));
-
-		// Get the list of all terms
-
-		ArrayList<HashMap<Integer, ArrayList<CoWeight>>> copyMap = new ArrayList<HashMap<Integer,ArrayList<CoWeight>>>(cosetArray);
-		// TODO coset array contained somewhere 4370, think all entries are null and so size is zero... . why??
-		Set<Integer> allTerms = new HashSet<Integer>(copyMap.get(0).keySet());
-		allTerms.addAll(copyMap.get(1).keySet());
-		copyMap = null;
-
-		// iterate all terms
-
-		Iterator<Integer> termIterator = allTerms.iterator();
-		while(termIterator.hasNext()){
-			Integer term = termIterator.next();
-
-			// cutoff is init size for the trimmed
-
-			ArrayList<CoWeight> a = null;
-			ArrayList<CoWeight> b = null;
-
-			// try get coweight set for term from both days
-
-			try{
-				if(cosetArray.get(0).get(term).size() >= cutoff){
-					a = new ArrayList<CoWeight>(cosetArray.get(0).get(term).subList(0, cutoff - 1));
-				}
-				else{
-					a = new ArrayList<CoWeight>(cosetArray.get(0).get(term));
-				}
-			}
-			catch (NullPointerException e) {
-				// gulp!
-			}
-			try{
-				if(cosetArray.get(1).get(term).size() >= cutoff){
-					b = new ArrayList<CoWeight>(cosetArray.get(1).get(term).subList(0, cutoff - 1));
-				}
-				else{
-					b = new ArrayList<CoWeight>(cosetArray.get(1).get(term));
-				}
-			}
-			catch (NullPointerException e) {
-				//  gulp!
-			}
-
-			// set default jaccard to 0.0
-
-			Double jac = 0.0;
-
-			// if either a or b is null, then jaccard is just z. 0 is kept in the loop to provide continuity
-
-			if(a != null && b != null){	// if either are null jac == 0.0 will be added
-
-				// convert arraylist to hashmap to make coweight access easy
-
-				HashSet<CoWeight> aMap = new HashSet<CoWeight>(a.size());
-				Iterator<CoWeight> aIter = a.iterator();
-
-				while(aIter.hasNext()){
-					CoWeight acw = aIter.next();
-					aMap.add(acw);
-				}
-
-				HashSet<CoWeight> bMap = new HashSet<CoWeight>(b.size());
-				Iterator<CoWeight> bIter = b.iterator();
-				while(bIter.hasNext()){
-					CoWeight bcw = bIter.next();
-					bMap.add(bcw);
-				}
-
-				// get intersection
-
-				HashSet<Integer> intersection = new HashSet<Integer>(aMap.size());
-				Iterator<CoWeight> aMapIter = aMap.iterator();
-
-				while(aMapIter.hasNext()){
-					CoWeight aTerm = aMapIter.next();
-
-					if(bMap.contains(aTerm) && aTerm.correlate > m){
-						intersection.add(aTerm.termId);
-					}
-				}
-
-				// get union
-				//				aMap.addAll(bMap);
-				HashSet<Integer> uni = new HashSet<Integer>();
-				for(CoWeight c : aMap){
-					if(!uni.contains(c.termId)){
-						uni.add(c.termId);
-					}
-				}
-				for(CoWeight c: bMap){
-					if(!uni.contains(c.termId)){
-						uni.add(c.termId);
-					}
-				}
-
-				// get jaccard, dont bother if union is 0
-
-				if(!(uni.size() == 0 || intersection.size() == 0)){
-					jac = (double)Math.round(((double)intersection.size() / (double)uni.size()) * 1000) / 1000;
-				}
-			}
-
-			// add jaccard value for the interval, if first time add term first
-
-			if(!jaccardListNonWeighted.containsKey(term)){
-
-				// init map of jaccard to interval and add j
-
-				HashMap<Integer, Double> jEachDayMap = new HashMap<Integer, Double>(32);	// 17 + 16 = 33 days => 32 intervals
-
-				// scratch that - pre init this map with 9.9 so we have an entry for every interval and we can distinguish the 9.9 as interval in which term was missing on a particular day!
-
-				// pre init this map with 0.0
-
-				for(int i =0 ; i < 32 ;i++){
-					jEachDayMap.put(i, 0.0);
-				}
-				jEachDayMap.put(dayCounterNonWeighted, jac);
-
-				// add mapping for term
-				jaccardListNonWeighted.put(term, jEachDayMap);
-			}
-			else{
-				jaccardListNonWeighted.get(term).put(dayCounterNonWeighted, jac);
-			}
-		}
-		LOG.info("Jacard size = " + jaccardListNonWeighted.size());
-		// LOG.info("Term error occured " + termError + "times." );
-		dayCounterNonWeighted++; // must be incremented here to ensure continuity
-	}
-	public void getJaccardWeightedSimilarityMCorrelate(ArrayList<HashMap<Integer, ArrayList<CoWeight>>> cosetArray, int cutoff, double m) throws IOException{
-		LOG.info("Interval: " + (dayCounterWeighted+1));
-
-		// Get the list of all terms 
-
-		ArrayList<HashMap<Integer, ArrayList<CoWeight>>> copyMap = new ArrayList<HashMap<Integer, ArrayList<CoWeight>>>(cosetArray);
-		// TODO coset array contained somewhere 4370, think all entries are null and so size is zero... . why??
-		Set<Integer> allTerms = new HashSet<Integer>(copyMap.get(0).keySet());
-		allTerms.addAll(copyMap.get(1).keySet());
-		copyMap = null;
-
-		// iterate all terms
-
-		Iterator<Integer> termIterator = allTerms.iterator();
-		while(termIterator.hasNext()){
-			Integer term = termIterator.next();
-
-			// HOW MANY TERMS IN COSET?
-
-			ArrayList<CoWeight> a = null;
-			ArrayList<CoWeight> b = null;
-
-
-			try{
-				if(cosetArray.get(0).get(term).size() >= cutoff){
-					a = new ArrayList<CoWeight>(cosetArray.get(0).get(term).subList(0, cutoff - 1));
-				}
-				else{
-					a = new ArrayList<CoWeight>(cosetArray.get(0).get(term));
-				}
-			}
-			catch (NullPointerException e) {
-				// gulp!
-			}
-			try{
-				if(cosetArray.get(1).get(term).size() >= cutoff){
-					b = new ArrayList<CoWeight>(cosetArray.get(1).get(term).subList(0, cutoff - 1));
-				}
-				else{
-					b = new ArrayList<CoWeight>(cosetArray.get(1).get(term));
-				}
-			}
-			catch (NullPointerException e) {
-				//  gulp!
-			}
-
-			// if either a or b is null, then jaccard is just z. 0 is kept in the loop to provide continuity			
-			Double jac = 0.0;
-			if(a != null && b != null){	// if either are null jac == 0.0 will be added
-				jac = getEnhancedJaccardVal(a,b,m);
-			}
-
-			// add jaccard value for the interval, if first time add term first
-
-			if(!jaccardListWeighted.containsKey(term)){
-
-				// init map of jaccard to interval and add j
-				HashMap<Integer, Double> jEachDayMap = new HashMap<Integer, Double>(32);	// 17 + 16 = 33 days => 32 intervals
-				// pre init this map with 0.0
-				for(int i =0 ; i < 32 ;i++){
-					jEachDayMap.put(i, 0.0);
-				}
-
-				jEachDayMap.put(dayCounterWeighted, jac);
-
-				// add mapping for term
-				jaccardListWeighted.put(term, jEachDayMap);
-			}
-			else{
-				jaccardListWeighted.get(term).put(dayCounterWeighted, jac);
-			}
-
-		}
-		LOG.info("Jacard size = " + jaccardListWeighted.size());
-		//		LOG.info("Term error occured " + termError + "times." );
-		dayCounterWeighted++; // must be incremented here to ensure continuity
-	}
-	/***
-	 * Sort the coset hashmap of term and weights by weight. Return a Set of the top "cutoff" terms.
-	 * @param termCoset
-	 * @param cutoff
-	 * @return
-	 */
-	public static HashSet<Integer> sortList(HashMap<Integer, Double> termCoset, int cutoff){
-
-		ArrayList<Entry<Integer, Double>> top5Aranked = new ArrayList<Entry<Integer, Double>>(termCoset.size());
-
-		// add all from hashmap to arraylist so they can be sorted
-		Iterator<Entry<Integer, Double>> coweightAIter = termCoset.entrySet().iterator();
-		while(coweightAIter.hasNext()){
-			top5Aranked.add(coweightAIter.next());
-		}
-
-		// sort by weight
-		Collections.sort(top5Aranked, new top5Comp());
-
-		// for new jaccard method need term and weight returned so ...
-		//	return top5Aranked;
-
-		// old jaccard used a return hashSet - no sacrifice in efficiency with new return type
-
-		// init sorted top 5 list
-		ArrayList<Integer> sortedTop5A = new ArrayList<Integer>(cutoff);
-		//		
-		//		// get and add top 5 from already sorted list
-		//		
-		Iterator<Entry<Integer, Double>> liter = top5Aranked.iterator();		
-		int breakCounter = 0;		
-		while(liter.hasNext() && breakCounter < cutoff){
-			// i can imagine that future enhancements will require the coweight type to keep term and weight together
-			sortedTop5A.add(liter.next().getKey());
-			breakCounter++;
-		}
-		//		
-		//		// convert to hashset
-		//		
-		HashSet<Integer> retVal = new HashSet<Integer>(sortedTop5A);
-
-		return retVal;
-	}
-
-	public static void serializeJaccards(String outputPath, int index, double m) throws IOException{
-		LOG.info("Serializing Weighted Jaccards.");
-		String path = outputPath + "/" + String.valueOf(index) + "_" + String.valueOf(m) + "_jaccardWeighted.ser";
-		FileOutputStream fileOut = new FileOutputStream(path);
-		ObjectOutputStream objectOut = new ObjectOutputStream(fileOut);
-		objectOut.flush();
-		objectOut.writeObject(jaccardListWeighted);
-		objectOut.close();
-		LOG.info("Finished serializing Weighted Jaccards.");
-
-		LOG.info("Serializing Non-Weighted Jaccards.");
-		String path2 = outputPath + "/" + String.valueOf(index) + "_" + String.valueOf(m) + "_jaccardNon_Weighted.ser";
-		FileOutputStream fileOut2 = new FileOutputStream(path2);
-		ObjectOutputStream objectOut2 = new ObjectOutputStream(fileOut2);
-		objectOut2.flush();
-		objectOut2.writeObject(jaccardListNonWeighted);
-		objectOut2.close();
-		LOG.info("Finished serializing Weighted Jaccards.");
-	}
+	
 	public static void serializeJaccards(String outputPath) throws IOException{
 		LOG.info("Serializing Weighted Jaccards.");
 		String path = outputPath + "/jaccardWeighted.ser";

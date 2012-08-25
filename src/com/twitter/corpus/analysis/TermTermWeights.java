@@ -58,9 +58,7 @@ public class TermTermWeights implements java.io.Serializable{
 			// local analysis; get docset from intervalIndex 
 			HashSet<Long> docList = termIndex.get(i);							// doclist -> list of docs for a term
 			// global weighting of terms comes from Global corpus index!!
-			Integer termINum = termIndex.get(i).size();		// number of documents with term "i"
-
-			
+			Integer termINum = termIndex.get(i).size();		// number of documents with term "i"			
 
 			int termIJNum=0;
 
@@ -93,7 +91,7 @@ public class TermTermWeights implements java.io.Serializable{
 				int termJ = uniqueTermsIter.next();
 				HashSet<Long> termDocList = termIndex.get(termJ);
 				// can get null here, we iterate uniqueTerms and get doc lists from termIndex. low/hi freq terms are removed from termIndex but may persist in uniqueTerms 
-				//TODO sort this shit out soldier
+
 				if(termDocList == null){
 					continue;
 				}
@@ -118,7 +116,7 @@ public class TermTermWeights implements java.io.Serializable{
 				m = (double)Math.round(m * 1000) / 1000;
 
 				// ignore low coweights
-				if(m > correlateCutoff){
+				if(m >= correlateCutoff){
 					CoWeight cs = new CoWeight(termJ, m);
 					termCoSetArray.add(cs);
 				}

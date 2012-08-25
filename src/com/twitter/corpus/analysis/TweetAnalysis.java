@@ -1,8 +1,6 @@
 package com.twitter.corpus.analysis;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 
@@ -113,10 +111,10 @@ public class TweetAnalysis{
 		// trim all local indexes
 		ArrayList<HashMap<Integer, HashSet<Long>>> trimmedLocalIndexArray = InvertedIndex.trimLocalIndices(intervalIndices, lowerFreq, upperFreq);		
 
+		// get Term Coset
 		for(int i = 0; i < trimmedLocalIndexArray.size(); i++){
-
 			TermTermWeights ill = new TermTermWeights(trimmedLocalIndexArray.get(i));
-			blockCoSet = ill.termCosetBuilder(0.03 /* standard minimum*/);
+			blockCoSet = ill.termCosetBuilder(m);
 
 			CosetSerializer.cosetSerializer(blockCoSet, output, (termCosetCounter + 1));
 			corpusCoSetArray.add(blockCoSet);			// add coset of particular day to array
@@ -124,24 +122,21 @@ public class TweetAnalysis{
 		}
 		CosetSerializer.copusCosetSer(corpusCoSetArray, output);
 
-		double[] mvalues = {0.2,0.15,0.1,0.05,0.03};
+		// Get Jaccard based on the TC calculated above using m = Argv]
 		jaccardSim = null;
-		
-		for(int index = 0; index < mvalues.length; index++){
-			jaccardSim = new Jaccard(trimmedLocalIndexArray.get(0).size());
-			
-			for(int i = 0 ; i < corpusCoSetArray.size()-1; i++){
-				ArrayList<HashMap<Integer, ArrayList<CoWeight>>> corp = new ArrayList<HashMap<Integer,ArrayList<CoWeight>>>(2);
-				
-				corp.add(corpusCoSetArray.get(i));
-				corp.add(corpusCoSetArray.get(i+1));
-				
-				jaccardSim.getJaccardSimilarityMCorrelate(corp, cosetTopN, mvalues[index]);
-				jaccardSim.getJaccardWeightedSimilarityMCorrelate(corpusCoSetArray, cosetTopN, mvalues[index]);
-			}
-			Jaccard.serializeJaccards(output, index, mvalues[index]);
+		jaccardSim = new Jaccard(trimmedLocalIndexArray.get(0).size());
+
+		for(int i = 0 ; i < corpusCoSetArray.size()-1; i++){
+			ArrayList<HashMap<Integer, ArrayList<CoWeight>>> corp = new ArrayList<HashMap<Integer,ArrayList<CoWeight>>>(2);
+
+			corp.add(corpusCoSetArray.get(i));
+			corp.add(corpusCoSetArray.get(i+1));
+
+			jaccardSim.getJaccardSimilarity(corp, cosetTopN);
+			jaccardSim.getJaccardWeightedSimilarity(corp, cosetTopN);
 		}
-		
+		Jaccard.serializeJaccards(output);
+
 		// print frequency range
 		InvertedIndex.printFrequencies(TweetAnalysis.corpusIndex, output + "freqs.txt");
 		TermTermWeights.serializeTermBimap(output + "/termbimap.ser");		
