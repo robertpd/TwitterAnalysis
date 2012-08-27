@@ -15,10 +15,10 @@ public class AdjustCosetByWeights {
 	private static final Logger LOG = Logger.getLogger(AdjustCosetByWeights.class);
 	public static void main(String[] args) throws IOException{
 
-		Double m = 0.17;
+		Double m = 0.05;
 
 		String input = "/home/dock/Documents/IR/AmazonResults/mRange3/tc/";
-		String output = "/home/dock/Documents/IR/AmazonResults/mRange3/tc_0.17/";
+		String output = "/home/dock/Documents/IR/AmazonResults/mRange3/2_tc_0.05/";
 		String root = "termCoset_";
 		String base = ".ser";
 
