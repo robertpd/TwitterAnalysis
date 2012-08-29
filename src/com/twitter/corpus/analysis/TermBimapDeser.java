@@ -12,18 +12,22 @@ import java.nio.charset.Charset;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import org.apache.log4j.Logger;
 
 import com.google.common.collect.HashBiMap;
 
 public class TermBimapDeser {
+	private static final Logger LOG = Logger.getLogger(TermBimapDeser.class);
 
 	public static void main(String[] args) throws IOException{
+		LOG.info("Doing termbimap deser.");
 		String path = "/home/dock/Documents/IR/AmazonResults/mRange3/termbimap.ser";
-		String termPath = "/home/dock/Documents/IR/AmazonResults/mRange3/tc_0.05/node568TermInts.csv";
-		String output = "/home/dock/Documents/IR/AmazonResults/mRange3/tc_0.05/termString.csv";
+		String termPath = "/home/dock/Documents/IR/AmazonResults/mRange3/tc_0.05/350.csv";
+		String output = "/home/dock/Documents/IR/AmazonResults/mRange3/tc_0.05/350Strings.csv";
 		
 		Set<Integer> termDecode = readFile(termPath);
 		HashBiMap<String, Integer> termBimap = deserTermBiMap(path);
+		LOG.info("finished deserializing termBimap");
 		
 		BufferedWriter bw = new BufferedWriter(new FileWriter(output));
 		
@@ -50,7 +54,7 @@ public class TermBimapDeser {
 		return retVal;
 	}
 
-	private static Set<Integer> readFile(String path) throws IOException {
+	public static Set<Integer> readFile(String path) throws IOException {
 		Set<Integer> terms = new HashSet<Integer>();
 
 		FileInputStream stream = new FileInputStream(new File(path));
