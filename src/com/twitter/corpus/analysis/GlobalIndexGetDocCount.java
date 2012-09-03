@@ -17,13 +17,23 @@ import com.twitter.corpus.types.Serialization2;
 public class GlobalIndexGetDocCount {
 	private static final Logger LOG = Logger.getLogger(GlobalIndexGetDocCount.class); 
 
+	//
+	//
+	//
+	//
+	//		No longer necessary as tfMap has been created that is 150kb!!
+	//
+	//
+	//
+	//
+	
 	public static void main(String[] args) throws IOException{
 		String path = "/trec/output/mRange3/nonIZeroGCorpDocCount.csv";
 		String corpPath = "/trec/output/mRange3/trimGlobalIndex.ser";
 		String output = "/trec/output/mRange3/docCounts.csv";
 		
 		HashSet<Integer> termSet =  (HashSet<Integer>) Serialization2.readFile(path);
-		HashMap<Integer, HashSet<Long>> gCorp = gCorpDeser(corpPath);
+		HashMap<Integer, HashSet<Long>> gCorp = Serialization2.deserialize(corpPath);
 		
 		ArrayList<Integer> docCounts = new ArrayList<Integer>();
 		for(Integer term : termSet){
@@ -36,21 +46,5 @@ public class GlobalIndexGetDocCount {
 		}
 		bw.close();
 		LOG.info("file written");
-	}
-	private static HashMap<Integer, HashSet<Long>> gCorpDeser(String path){
-		LOG.info("deser global corp");
-		File cosetFile = new File(path);
-
-		HashMap<Integer, HashSet<Long>> retVal = null;
-		try{			
-			ObjectInputStream in = new ObjectInputStream(new FileInputStream(path));
-			retVal = (HashMap<Integer, HashSet<Long>>) in.readObject();
-			in.close();
-		}
-		catch(Exception ex){
-			// gulp
-		}
-		LOG.info("global corp deserialized.");
-		return retVal;
 	}
 }

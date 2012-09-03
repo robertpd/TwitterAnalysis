@@ -40,7 +40,7 @@ public class JaccardNodesFromCoset {
 
 		for(String path : filePaths){
 			String cosetPath = path;
-			HashMap<Integer, ArrayList<CoWeight>> coset = deserialize(cosetPath);
+			HashMap<Integer, ArrayList<CoWeight>> coset = Serialization2.deserialize(cosetPath);
 			corpusCoSetArray.add(coset);
 		}
 
@@ -359,21 +359,7 @@ public class JaccardNodesFromCoset {
 		}
 		return count;
 	}
-	@SuppressWarnings("unchecked")
-	public static HashMap<Integer, ArrayList<CoWeight>> deserialize(String path){
-		File cosetFile = new File(path);
-
-		HashMap<Integer, ArrayList<CoWeight>> retVal = null;
-		try{			
-			ObjectInputStream in = new ObjectInputStream(new FileInputStream(cosetFile));
-			retVal = (HashMap<Integer, ArrayList<CoWeight>>) in.readObject();
-			in.close();
-		}
-		catch(Exception ex){
-			// gulp
-		}
-		return retVal;
-	}
+	
 	public static class JSizeComparator implements Comparator<Entry<Integer, HashMap<Integer, HashMap<Integer, Double>>>>{
 		@Override
 		public int compare(Entry<Integer, HashMap<Integer, HashMap<Integer, Double>>> o1, Entry<Integer, HashMap<Integer, HashMap<Integer, Double>>> o2) {

@@ -16,6 +16,7 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 
 import com.twitter.corpus.types.CoWeight;
+import com.twitter.corpus.types.Serialization2;
 
 public class Jaccard {
 	private static final Logger LOG = Logger.getLogger(Jaccard.class);
@@ -402,21 +403,28 @@ public class Jaccard {
 
 	public static void serializeJaccards(String outputPath) throws IOException{
 		LOG.info("Serializing Weighted Jaccards.");
+				
 		String path = outputPath + "/jaccardWeighted.ser";
-		FileOutputStream fileOut = new FileOutputStream(path);
-		ObjectOutputStream objectOut = new ObjectOutputStream(fileOut);
-		objectOut.flush();
-		objectOut.writeObject(jaccardListWeighted);
-		objectOut.close();
-		LOG.info("Finished serializing Weighted Jaccards.");
-
-		LOG.info("Serializing Non-Weighted Jaccards.");
+		Serialization2.serialize(jaccardListWeighted, path);
+		
 		String path2 = outputPath + "/jaccardNon_Weighted.ser";
-		FileOutputStream fileOut2 = new FileOutputStream(path2);
-		ObjectOutputStream objectOut2 = new ObjectOutputStream(fileOut2);
-		objectOut2.flush();
-		objectOut2.writeObject(jaccardListNonWeighted);
-		objectOut2.close();
+		Serialization2.serialize(jaccardListNonWeighted, path2);
+		
+//		String path = outputPath + "/jaccardWeighted.ser";
+//		FileOutputStream fileOut = new FileOutputStream(path);
+//		ObjectOutputStream objectOut = new ObjectOutputStream(fileOut);
+//		objectOut.flush();
+//		objectOut.writeObject(jaccardListWeighted);
+//		objectOut.close();
+//		LOG.info("Finished serializing Weighted Jaccards.");
+//
+//		LOG.info("Serializing Non-Weighted Jaccards.");
+//		String path2 = outputPath + "/jaccardNon_Weighted.ser";
+//		FileOutputStream fileOut2 = new FileOutputStream(path2);
+//		ObjectOutputStream objectOut2 = new ObjectOutputStream(fileOut2);
+//		objectOut2.flush();
+//		objectOut2.writeObject(jaccardListNonWeighted);
+//		objectOut2.close();
 		LOG.info("Finished serializing Weighted Jaccards.");
 	}
 	public static void printResults() throws IOException{

@@ -10,9 +10,20 @@ import java.util.Map.Entry;
 import org.apache.log4j.Logger;
 
 import com.twitter.corpus.types.CoWeight;
+import com.twitter.corpus.types.Serialization2;
 
 public class AdjustCosetByWeights {
 	private static final Logger LOG = Logger.getLogger(AdjustCosetByWeights.class);
+	
+	//
+	//
+	//
+	//	takes raw unfiltered tc and created new tc set for specified m value
+	//
+	//
+	//
+	//
+	
 	public static void main(String[] args) throws IOException{
 
 		Double m = 0.05;
@@ -31,7 +42,7 @@ public class AdjustCosetByWeights {
 
 		for(String path : filePaths){
 			String cosetPath = path;
-			HashMap<Integer, ArrayList<CoWeight>> coset = CosetDeserForJaccard.deserialize(cosetPath);
+			HashMap<Integer, ArrayList<CoWeight>> coset = Serialization2.deserialize(cosetPath);
 			HashMap<Integer, ArrayList<CoWeight>> newCosetMap = new HashMap<Integer, ArrayList<CoWeight>>(coset.size());
 
 			Iterator<Map.Entry<Integer, ArrayList<CoWeight>>> iterOldCoset = coset.entrySet().iterator();

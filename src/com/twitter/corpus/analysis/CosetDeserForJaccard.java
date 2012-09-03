@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.HashMap;
 
 import com.twitter.corpus.types.CoWeight;
+import com.twitter.corpus.types.Serialization2;
 
 
 public class CosetDeserForJaccard {
@@ -30,7 +31,7 @@ public class CosetDeserForJaccard {
 		
 		for(String path : filePaths){
 			String cosetPath = path;
-			HashMap<Integer, ArrayList<CoWeight>> coset = deserialize(cosetPath);
+			HashMap<Integer, ArrayList<CoWeight>> coset = Serialization2.deserialize(cosetPath);
 			corpusCoSetArray.add(coset);
 			
 			if(corpusCoSetArray.size() == 2){
@@ -49,21 +50,5 @@ public class CosetDeserForJaccard {
 			}
 		}
 		Jaccard.serializeJaccards(output);
-	}
-
-	@SuppressWarnings("unchecked")
-	public static HashMap<Integer, ArrayList<CoWeight>> deserialize(String path){
-		File cosetFile = new File(path);
-		
-		HashMap<Integer, ArrayList<CoWeight>> retVal = null;
-		try{			
-			ObjectInputStream in = new ObjectInputStream(new FileInputStream(cosetFile));
-			retVal = (HashMap<Integer, ArrayList<CoWeight>>) in.readObject();
-			in.close();
-		}
-		catch(Exception ex){
-			// gulp
-		}
-		return retVal;
 	}
 }

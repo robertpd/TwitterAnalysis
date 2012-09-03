@@ -19,6 +19,7 @@ import org.apache.log4j.Logger;
 import com.twitter.corpus.data.HtmlStatusCorpusReader;
 import com.twitter.corpus.data.StatusStream;
 import com.twitter.corpus.types.CoWeight;
+import com.twitter.corpus.types.Serialization2;
 
 public class TweetAnalysis{
 	private static final Logger LOG = Logger.getLogger(TweetAnalysis.class);
@@ -139,8 +140,11 @@ public class TweetAnalysis{
 
 		// print frequency range
 		InvertedIndex.printFrequencies(TweetAnalysis.corpusIndex, output + "freqs.txt");
-		TermTermWeights.serializeTermBimap(output + "/termbimap.ser");		
-		InvertedIndex.globalIndexSerialize(corpusIndex, output);
-		InvertedIndex.localIndexArraySerialize(intervalIndices, output);		
+		Serialization2.serialize(TermTermWeights.termBimap, output + "/termbimap.ser");
+//		TermTermWeights.serializeTermBimap(output + "/termbimap.ser");
+		Serialization2.serialize(corpusIndex, output);
+		Serialization2.serialize(intervalIndices, output);
+//		InvertedIndex.globalIndexSerialize(corpusIndex, output);
+//		InvertedIndex.localIndexArraySerialize(intervalIndices, output);		
 	}
 }

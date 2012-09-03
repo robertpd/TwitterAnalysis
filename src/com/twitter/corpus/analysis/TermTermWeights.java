@@ -131,13 +131,6 @@ public class TermTermWeights implements java.io.Serializable{
 		lastTime2 = currTime2;
 		return cosetMap;
 	}
-	public static void serializeTermBimap(String path) throws IOException{
-		FileOutputStream fileOut = new FileOutputStream(path);
-		ObjectOutputStream objectOut = new ObjectOutputStream(fileOut);
-		objectOut.flush();
-		objectOut.writeObject(TermTermWeights.termBimap);
-		objectOut.close();
-	}
 	public class CoWeightComparator implements Comparator<CoWeight> {
 		@Override
 		public int compare(CoWeight c1, CoWeight c2) {
