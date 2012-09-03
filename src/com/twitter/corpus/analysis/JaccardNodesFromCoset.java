@@ -14,15 +14,18 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
+
 import org.apache.log4j.Logger;
 
 import com.twitter.corpus.types.CoWeight;
+import com.twitter.corpus.types.Serialization2;
 
 public class JaccardNodesFromCoset {
 	private static final Logger LOG = Logger.getLogger(JaccardNodesFromCoset.class);
 	public static void main(String[] args) throws IOException{
 
-		String input = "/home/dock/Documents/IR/AmazonResults/mRange3/tc_0.05/";
+		String input = "/home/dock/Documents/IR/AmazonResults/mRange3/tc_0.05/tc/";
 		String output = "/home/dock/Documents/IR/AmazonResults/mRange3/tc_0.05/";
 		String root = "termCoset_";
 		String base = ".ser";
@@ -54,34 +57,75 @@ public class JaccardNodesFromCoset {
 				jaccardNodes.getJaccardSimilarityAllNodes(corpusCoSetArray, cutoff, i , j);
 			}
 		}
+
 		
 		
+		
+		// get 350 set of term jaccards
+//		HashMap<Integer, HashMap<Integer, HashMap<Integer, Double>>> jaccardNodeThresholdTerms = new HashMap<Integer, HashMap<Integer,HashMap<Integer,Double>>>(20);
+//		HashSet<Integer> terms = (HashSet<Integer>) TermBimapDeser.readFile("/home/dock/Documents/IR/AmazonResults/mRange3/tc_0.05/528/528.csv");
+//		Iterator<Integer> termI = terms.iterator();
+//		while(termI.hasNext()){
+//			Integer term = termI.next();
+//			jaccardNodeThresholdTerms.put(term, jaccardNodes.jaccardAllNodes.get(term));
+//		}
+
+		for(Double i = 0.4; i <= 0.4 ; i+=0.1){
+			HashMap<Integer, Integer> thresh = new HashMap<Integer, Integer>();
+			Iterator<Map.Entry<Integer, HashMap<Integer, HashMap<Integer, Double>>>> threshTermsIter = jaccardNodes.jaccardAllNodes.entrySet().iterator();//jaccardNodeThresholdTerms.entrySet().iterator();
+			while(threshTermsIter.hasNext()){
+				Entry<Integer, HashMap<Integer, HashMap<Integer, Double>>> entry = threshTermsIter.next();
+				Integer t = entry.getKey();
+				HashMap<Integer, HashMap<Integer, Double>> val = entry.getValue();
+				thresh.put(t, thresholdCounterDiscountIZero(val, i));
+			}
+			BufferedWriter bw = new BufferedWriter(new FileWriter("/home/dock/Documents/IR/AmazonResults/mRange3/tc_0.05/all/" + i + "thresh.csv"));
+			Iterator<Entry<Integer, Integer>> threshI = thresh.entrySet().iterator();
+			while(threshI.hasNext()){
+				Entry<Integer, Integer> entry = threshI.next();
+				bw.append(entry.getKey() + "," + entry.getValue() + "\n");
+			}
+			bw.close();
+		}
+//
+//		Set<Integer> termSet = jaccardNodeThresholdTerms.keySet();
+//		Iterator<Integer> keyI = termSet.iterator();
+//		while(keyI.hasNext()){
+//			Integer entry = keyI.next();
+//			printForTerm(jaccardNodeThresholdTerms, entry, "/home/dock/Documents/IR/AmazonResults/mRange3/tc_0.05/528Nodes" );
+//		}
+
+
+
 		Jaccard JaccardNodesTrimmed = new Jaccard(jaccardNodes.jaccardAllNodes.size());
+
+		// remove terms with an absence at any interval
 		ArrayList<Entry<Integer, HashMap<Integer, HashMap<Integer, Double>>>> trimmedTerms = trimIZeros(jaccardNodes.jaccardAllNodes);
-// rank the trimmed terms and then print a graph
+
+		// rank the trimmed terms and then print a graph
 		ArrayList<Map.Entry<Integer, Integer>> nonZeroMap = getNonZeros(trimmedTerms);
-		
+
 		// count non zeroz for each term
-//		ArrayList<Map.Entry<Integer, Integer>> nonZeroNodeMap = getNonZeros(jaccardNodes.jaccardAllNodes);
+		//		ArrayList<Map.Entry<Integer, Integer>> nonZeroNodeMap = getNonZeros(jaccardNodes.jaccardAllNodes);
 		// print it out
 		printNodeNonZeroRank(nonZeroMap, "/home/dock/Documents/IR/AmazonResults/mRange3/tc_0.05/nodeSizesNoIZero.csv");
-		
-		// get a set of terms to decode
-		HashSet<Integer> termsToDecode = (HashSet<Integer>) TermBimapDeser.readFile("/home/dock/Documents/IR/AmazonResults/mRange3/tc_0.05/20nonZeroNodes.csv");
 
-		// print out jaccard all nodes for each term in set
+		// get a set of terms to decode
+		HashSet<Integer> termsToDecode = (HashSet<Integer>) Serialization2.readFile("/home/dock/Documents/IR/AmazonResults/mRange3/tc_0.05/20nonZeroNodes.csv");
+
+		// print triangle
+		// print out jaccard all nodes for each term in set		
 		for(Integer term : termsToDecode){
 			printForTerm(jaccardNodes.jaccardAllNodes, term,"/home/dock/Documents/IR/AmazonResults/mRange3/tc_0.05/termNodeJ" );
 		}
-		
 
-		Double threshold = 0.3;
+		Double threshold2 = 0.3;
 		HashMap<Integer, Integer> keeptrack = new HashMap<Integer, Integer>();
 		for(Integer term : termsToDecode){
-			Integer count = thresholdCounter(jaccardNodes.jaccardAllNodes.get(term), threshold);
+			Integer count = thresholdCounter(jaccardNodes.jaccardAllNodes.get(term), threshold2);
 			keeptrack.put(term, count);
 		}
-		
+
 		System.console();
 		// iterate all nodes and rank by number that are above a certain threshold
 		// threshold = 0.3
@@ -89,9 +133,10 @@ public class JaccardNodesFromCoset {
 		// sort jaccard pairs by number of non-zero pairs
 		//		ArrayList<Map.Entry<Integer, HashMap<Integer, HashMap<Integer, Double>>>> sortedJNodes = sortNodesByZeroCount(jaccardNodes.jaccardAllNodes);
 		// Print sorted jaccard nodes
-		//		printNodeNonZeroCount(sortedJNodes,"/home/dock/Documents/IR/AmazonResults/mRange3/tc_0.05/nodeSizes2.csv");
+//				printNodeNonZeroCount(sortedJNodes,"/home/dock/Documents/IR/AmazonResults/mRange3/tc_0.05/nodeSizes2.csv");
 
 	}
+
 	/**
 	 * create a new jaccardAllNodes array by removing any term that is absent at any interval
 	 * 
@@ -100,7 +145,7 @@ public class JaccardNodesFromCoset {
 	private static ArrayList<Entry<Integer, HashMap<Integer, HashMap<Integer, Double>>>> trimIZeros(HashMap<Integer, HashMap<Integer, HashMap<Integer, Double>>> jaccardAllNodes){
 		LOG.info("Old JaccardAllNodes size; " + jaccardAllNodes.size());
 		ArrayList<Entry<Integer, HashMap<Integer, HashMap<Integer, Double>>>> retVal = new ArrayList<Map.Entry<Integer,HashMap<Integer,HashMap<Integer,Double>>>>(jaccardAllNodes.size());
-		
+
 		Iterator<Entry<Integer, HashMap<Integer, HashMap<Integer, Double>>>> jNodesIter = jaccardAllNodes.entrySet().iterator();
 		while (jNodesIter.hasNext()) {
 			Entry<Integer, HashMap<Integer, HashMap<Integer, Double>>> entry = jNodesIter.next();
@@ -122,17 +167,45 @@ public class JaccardNodesFromCoset {
 		LOG.info("New jaccardAllNodes size: " + retVal.size());
 		return retVal;
 	}
+
+	private static Integer thresholdCounterDiscountIZero(HashMap<Integer, HashMap<Integer, Double>> termNode, Double threshold){
+		Integer retVal = 0;
+		Iterator<Map.Entry<Integer, HashMap<Integer, Double>>> termNodeIter = termNode.entrySet().iterator();
+		while(termNodeIter.hasNext()){
+			Entry<Integer, HashMap<Integer, Double>> entry = termNodeIter.next();
+			Integer i = entry.getKey();
+			HashMap<Integer, Double> asd = entry.getValue();
+			Iterator<Map.Entry<Integer, Double>> asdIter = asd.entrySet().iterator();
+			while(asdIter.hasNext()){
+				Entry<Integer, Double> entryJ = asdIter.next();
+				Integer j = entryJ.getKey(); 
+				Double jac = entryJ.getValue();
+				if( j == i && jac == 0.0){	// catch case where i jac is zero
+//					retVal -= (i-1);	//reverse the effect
+					retVal -= 32;
+					break;
+				}
+				else{
+					if( jac < threshold ){
+						retVal++;
+					}
+				}
+			}
+		}
+		return retVal;
+	}
+
 	private static Integer thresholdCounter(HashMap<Integer, HashMap<Integer, Double>> termNode, Double threshold){
 		Integer retVal = 0;
 		Iterator<Map.Entry<Integer, HashMap<Integer, Double>>> termNodeIter = termNode.entrySet().iterator();
 		while(termNodeIter.hasNext()){
 			Entry<Integer, HashMap<Integer, Double>> entry = termNodeIter.next();
 			HashMap<Integer, Double> asd = entry.getValue();
-			
+
 			Iterator<Map.Entry<Integer, Double>> asdIter = asd.entrySet().iterator();
 			while(asdIter.hasNext()){
 				Double jac = asdIter.next().getValue();
-				if( jac < threshold && jac != 0.0){
+				if( jac < threshold /*&& jac != 0.0*/){
 					retVal++;
 				}
 			}
@@ -158,24 +231,13 @@ public class JaccardNodesFromCoset {
 					bw.append("-.-,");
 				}
 				else{
-				bw.append(asd.get(j).toString() + ",");
+					bw.append(asd.get(j).toString() + ",");
 				}
 			}
 			bw.newLine();
 			bw.flush();
 		}
 		bw.close();
-		
-//		Iterator<Entry<Integer, HashMap<Integer, Double>>> termSetIter = TermSet.entrySet().iterator();
-//		while(termSetIter.hasNext()){
-//			Entry<Integer, HashMap<Integer, Double>> jEntry = termSetIter.next();
-//			Iterator<Entry<Integer, Double>> jSet = jEntry.getValue().entrySet().iterator();
-//			while(jSet.hasNext()){
-//				Double j = jSet.next().getValue();
-//				bw.append(j + ",");
-//			}
-//			bw.append("\n");
-//		}
 	}
 	private static void printNodeNonZeroRank(ArrayList<Entry<Integer, Integer>> nonZeroNodeMap, String path) throws IOException{
 		BufferedWriter bf =  new BufferedWriter(new FileWriter(path));
@@ -186,10 +248,15 @@ public class JaccardNodesFromCoset {
 		}
 		bf.close();
 	}
-		
+
+	/**
+	 * return map of terms and count of non-zero jac pairs
+	 * @param nodes
+	 * @return
+	 */
 	private static ArrayList<Entry<Integer, Integer>> getNonZeros(ArrayList<Entry<Integer, HashMap<Integer, HashMap<Integer, Double>>>> nodes){
 		HashMap<Integer, Integer> nodesMap = new HashMap<Integer, Integer>();
-		
+
 		Iterator<Entry<Integer, HashMap<Integer, HashMap<Integer, Double>>>> nodeIter = nodes.iterator();
 		while(nodeIter.hasNext()){
 			Entry<Integer, HashMap<Integer, HashMap<Integer, Double>>> entry = nodeIter.next();
@@ -206,7 +273,7 @@ public class JaccardNodesFromCoset {
 		Collections.sort(sortedMap, new nonZeroComaparator());
 		return sortedMap;
 	}
-	
+
 	/**
 	 * Get map of term to non-zero node count
 	 * @param nodes
