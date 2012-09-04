@@ -142,8 +142,8 @@ public class TweetAnalysis{
 		InvertedIndex.printFrequencies(TweetAnalysis.corpusIndex, output + "freqs.txt");
 		Serialization2.serialize(TermTermWeights.termBimap, output + "/termbimap.ser");
 //		TermTermWeights.serializeTermBimap(output + "/termbimap.ser");
-		Serialization2.serialize(corpusIndex, output);
-		Serialization2.serialize(intervalIndices, output);
+		Serialization2.serialize(corpusIndex, output + "globalIndex.ser");
+		Serialization2.serialize(intervalIndices, output + "LocalIndexArray.ser");
 //		InvertedIndex.globalIndexSerialize(corpusIndex, output);
 //		InvertedIndex.localIndexArraySerialize(intervalIndices, output);		
 	}

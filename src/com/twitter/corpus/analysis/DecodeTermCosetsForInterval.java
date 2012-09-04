@@ -25,7 +25,7 @@ public class DecodeTermCosetsForInterval {
 		String root = "termCoset_";
 		String base = ".ser";
 		
-		String fileOut = "/home/dock/Documents/IR/AmazonResults/mRange3/tc_0.05/528/termCosetsStrings.txt";
+		String fileOut = "/home/dock/Documents/IR/AmazonResults/mRange3/tc_0.05/528/termCosetsStrings2.txt";
 		String intputTerms = "/home/dock/Documents/IR/AmazonResults/mRange3/tc_0.05/528/0.3 terms.csv";
 		
 		String termBimapPath = "/home/dock/Documents/IR/AmazonResults/mRange3/ds/trimTermBimapm0.05.ser";
@@ -50,6 +50,8 @@ public class DecodeTermCosetsForInterval {
 		HashBiMap<String, Integer> termBimap = Serialization2.deserialize(termBimapPath);
 		HashMap<Integer, Integer> tfMap = Serialization2.deserialize(tfMapPath);
 		
+		ArrayList<HashMap<Integer, Integer>> tfMapArray = Serialization2.deserialize("/home/dock/Documents/IR/AmazonResults/mRange3/ds/tfMapArray.ser");
+		
 		BufferedWriter bw = new BufferedWriter(new FileWriter(fileOut));
 		
 		LOG.info("Output translations for cosets");
@@ -60,7 +62,7 @@ public class DecodeTermCosetsForInterval {
 			for(int i =0; i < cosetArray.size(); i++){
 				HashMap<Integer, ArrayList<CoWeight>> cosetEntry = cosetArray.get(i);
 				if(cosetEntry.containsKey(entry)){
-					bw.append(i + " " + termBimap.inverse().get(entry).toString() + " (" + tfMap.get(entry) + ") : ");
+					bw.append(i + " " + termBimap.inverse().get(entry).toString() + " (" + /*tfMap.get(entry)*/ tfMapArray.get(i).get(entry) + ") : ");
 					
 					Iterator<CoWeight> coweightIter = cosetEntry.get(entry).iterator();
 					while(coweightIter.hasNext()){
