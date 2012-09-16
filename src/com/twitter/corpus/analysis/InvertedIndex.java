@@ -72,11 +72,11 @@ public class InvertedIndex {
 					}
 				}
 				docNum++;
-				if(docNum % 200000 == 0 ){
-					Long currTime = System.currentTimeMillis();
-					LOG.info(docNum + " tweets indexed in " +  Admin.getTime(lastTime, currTime));
-					lastTime = currTime;
-				}
+//				if(docNum % 200000 == 0 ){
+//					Long currTime = System.currentTimeMillis();
+//					LOG.info(docNum + " tweets indexed in " +  Admin.getTime(lastTime, currTime));
+//					lastTime = currTime;
+//				}
 //				if(docNum > 10000){
 //					LOG.info(termIndex.size() + " total terms.");
 //					break;
@@ -140,7 +140,7 @@ public class InvertedIndex {
 				Integer term = entry.getKey();
 				HashSet<Long> docSet = entry.getValue();
 
-				// check against GLOBAL values
+				// check against GLOBAL values to avoid losing any values that are just starting a trend
 				if(TweetAnalysis.corpusIndex.get(term).size() >= lower && TweetAnalysis.corpusIndex.get(term).size() <= upper){
 					trimmedIndex.put(term, docSet);
 				}

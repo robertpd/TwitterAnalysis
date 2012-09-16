@@ -26,7 +26,7 @@ public class JaccardNodesFromCoset {
 	public static void main(String[] args) throws IOException{
 
 		String input = "/home/dock/Documents/IR/AmazonResults/mRange3/tc_0.05/tc/";
-		String output = "/home/dock/Documents/IR/AmazonResults/mRange3/tc_0.05/";
+		String output = "/home/dock/Documents/IR/AmazonResults/mRange3/tc_0.05/jnodes/";
 		String root = "termCoset_";
 		String base = ".ser";
 
@@ -54,12 +54,10 @@ public class JaccardNodesFromCoset {
 
 				corp.add(corpusCoSetArray.get(j));
 				corp.add(corpusCoSetArray.get(j+1));
+				
 				jaccardNodes.getJaccardSimilarityAllNodes(corpusCoSetArray, cutoff, i , j);
 			}
 		}
-
-		
-		
 		
 		// get 350 set of term jaccards
 //		HashMap<Integer, HashMap<Integer, HashMap<Integer, Double>>> jaccardNodeThresholdTerms = new HashMap<Integer, HashMap<Integer,HashMap<Integer,Double>>>(20);
@@ -69,8 +67,9 @@ public class JaccardNodesFromCoset {
 //			Integer term = termI.next();
 //			jaccardNodeThresholdTerms.put(term, jaccardNodes.jaccardAllNodes.get(term));
 //		}
-
-		for(Double i = 0.4; i <= 0.4 ; i+=0.1){
+		String ppath = "/home/dock/Documents/IR/AmazonResults/mRange3/tc_0.05/all/threshMap";
+		
+		for(Double i = 0.3; i <= 0.3 ; i+=0.1){
 			HashMap<Integer, Integer> thresh = new HashMap<Integer, Integer>();
 			Iterator<Map.Entry<Integer, HashMap<Integer, HashMap<Integer, Double>>>> threshTermsIter = jaccardNodes.jaccardAllNodes.entrySet().iterator();//jaccardNodeThresholdTerms.entrySet().iterator();
 			while(threshTermsIter.hasNext()){
@@ -79,6 +78,7 @@ public class JaccardNodesFromCoset {
 				HashMap<Integer, HashMap<Integer, Double>> val = entry.getValue();
 				thresh.put(t, thresholdCounterDiscountIZero(val, i));
 			}
+			Serialization2.serialize(thresh, ppath + i + ".ser");
 			BufferedWriter bw = new BufferedWriter(new FileWriter("/home/dock/Documents/IR/AmazonResults/mRange3/tc_0.05/all/" + i + "thresh.csv"));
 			Iterator<Entry<Integer, Integer>> threshI = thresh.entrySet().iterator();
 			while(threshI.hasNext()){
@@ -182,7 +182,8 @@ public class JaccardNodesFromCoset {
 				Double jac = entryJ.getValue();
 				if( j == i && jac == 0.0){	// catch case where i jac is zero
 //					retVal -= (i-1);	//reverse the effect
-					retVal -= 32;
+					retVal -= (32-j);
+//					retVal -= 32;
 					break;
 				}
 				else{
