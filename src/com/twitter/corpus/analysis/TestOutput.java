@@ -29,4 +29,7 @@ public class TestOutput {
 		}
 		bw.close();
 	}
+	public static void inspectTermIntervalCluster(){
+		
+	}
 }

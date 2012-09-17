@@ -25,15 +25,13 @@ public class DecodeTermCosetsForInterval {
 		String root = "termCoset_";
 		String base = ".ser";
 		
-		String fileOut = "/home/dock/Documents/IR/AmazonResults/mRange3/tc_0.05/all/termCosetsStrings.txt";
-		String intputTerms = "/home/dock/Documents/IR/AmazonResults/mRange3/tc_0.05/all/0.3thresh 0 passed threshold.csv";
+		String fileOut = "/home/dock/Documents/IR/AmazonResults/mRange3/tc_0.05/jnodes/termCosetsStrings.txt";
+		String intputTerms = "/home/dock/Documents/IR/AmazonResults/mRange3/tc_0.05/jnodes/Avg stableMap (copy).csv";
 		
 		String termBimapPath = "/home/dock/Documents/IR/AmazonResults/mRange3/ds/trimTermBimapm0.05.ser";
-		
 		String tfMapPath = "/home/dock/Documents/IR/AmazonResults/mRange3/ds/tfMap.ser";
 		
 		String[] filePaths = new String[33];
-
 		for(int i = 0; i < 33 ; i++){
 			filePaths[i] = input + root + (i+1) + base;
 		}
@@ -46,12 +44,8 @@ public class DecodeTermCosetsForInterval {
 			cosetArray.add(coset);
 		}
 		LOG.info("Deser termBimap");
-//		HashBiMap<String, Integer> termBimap = deserTermBiMap(termBimapPath);
 		HashBiMap<String, Integer> termBimap = Serialization2.deserialize(termBimapPath);
-		int egypt = termBimap.get("egypt");
 		HashMap<Integer, Integer> tfMap = Serialization2.deserialize(tfMapPath);
-		
-		ArrayList<HashMap<Integer, Integer>> tfMapArray = Serialization2.deserialize("/home/dock/Documents/IR/AmazonResults/mRange3/ds/tfMapArray.ser");
 		
 		BufferedWriter bw = new BufferedWriter(new FileWriter(fileOut));
 		
@@ -60,20 +54,12 @@ public class DecodeTermCosetsForInterval {
 		Iterator<Integer> termSetI = termSet.iterator();
 		while(termSetI.hasNext()){
 			Integer entry = termSetI.next();
-			bw.append("\nTerm: " + termBimap.inverse().get(entry).toString() + " (t_id:" + entry + ", tf:" + (tfMap.get(entry)/33) + ")\n");
+			bw.append("\nTerm: " + termBimap.inverse().get(entry).toString() + " (t_id:" + entry + ", daily tf:" + (tfMap.get(entry)/33) + ")\n");
 			for(int i =0; i < cosetArray.size(); i++){
 				HashMap<Integer, ArrayList<CoWeight>> cosetEntry = cosetArray.get(i);
 				if(cosetEntry.containsKey(entry)){
 					bw.append(i + " ");
-//					bw.append(termBimap.inverse().get(entry).toString());
-//					bw.append(" (t_id:");
-//					bw.append(entry +"");
-//					bw.append(", tf:");
-//					bw.append(tfMapArray.get(i).get(entry) + "");
-//					bw.append(") : ");
-					
-//					bw.append(i + " " + termBimap.inverse().get(entry).toString() + " (" + /*tfMap.get(entry)*/ tfMapArray.get(i).get(entry) + ") : ");
-					
+
 					Iterator<CoWeight> coweightIter = cosetEntry.get(entry).iterator();
 					while(coweightIter.hasNext()){
 						CoWeight termEntry = coweightIter.next();
@@ -84,9 +70,7 @@ public class DecodeTermCosetsForInterval {
 					}
 					bw.append("\n");bw.flush();
 				}
-				else{
-					bw.append(i + "\n");
-				}
+				else{ bw.append(i + "\n");}
 			}
 		}
 		bw.close();

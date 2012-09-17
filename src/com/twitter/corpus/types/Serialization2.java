@@ -52,7 +52,7 @@ public class Serialization2 {
 		catch(Exception ex){
 			// gulp
 		}
-		LOG.info("Finished deserializing");
+		LOG.info("Finished deserializing " + retVal.getClass().getName());
 		return retVal;
 	}
 	public static ArrayList<Integer> readFiletoArray(String path) throws IOException {
