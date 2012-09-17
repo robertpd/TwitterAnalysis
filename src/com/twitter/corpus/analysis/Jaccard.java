@@ -34,7 +34,7 @@ public class Jaccard {
 	private static int dayCounterNonWeighted;
 	public static HashMap<Integer, HashMap<Integer,Double>> jaccardListNonWeighted;
 	public static HashMap<Integer, HashMap<Integer,Double>> jaccardListWeighted;
-	public static HashMap<Integer, ArrayList<Double>> jaccardNodes;
+//	public static HashMap<Integer, ArrayList<Double>> jaccardNodes;
 	// key=>term, key=>i key=>j
 	public static HashMap<Integer, HashMap<Integer, HashMap<Integer, Double>>> jaccardAllNodes;
 
