@@ -3,9 +3,11 @@ package com.twitter.corpus.analysis;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -46,11 +48,21 @@ public class JaccardNodesFromCoset {
 				jaccardNodes.getJaccardSimilarityAllNodes(corpusCoSetArray, cutoff, i , j);
 			}
 		}
-		Serialization2.serialize(jaccardNodes.jaccardAllNodes, output+"jaccardAllNodes.ser");
+//		Serialization2.serialize(jaccardNodes.jaccardAllNodes, output+"jaccardAllNodes.ser");
 		
 		Jaccard jaccardIntervals = new Jaccard(corpusCoSetArray.get(1).size());
 		jaccardIntervals.getJaccardSimilarity(corpusCoSetArray, cutoff);
-		Serialization2.serialize(jaccardIntervals.jaccardListNonWeighted, output+"jaccardIntervals.ser");
+//		Serialization2.serialize(jaccardIntervals.jaccardListNonWeighted, output+"jaccardIntervals.ser");
+		
+		String p = output+"jaccardIntervals.ser";
+		
+		LOG.info("Serializing...");
+		FileOutputStream fileOut = new FileOutputStream(p);
+		ObjectOutputStream objectOut = new ObjectOutputStream(fileOut);
+		objectOut.flush();
+		objectOut.writeObject(jaccardIntervals.jaccardListNonWeighted);
+		objectOut.close();
+		LOG.info("Finished serializing");
 		
 		
 		// get 350 set of term jaccards

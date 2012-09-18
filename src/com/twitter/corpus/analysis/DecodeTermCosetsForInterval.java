@@ -26,7 +26,7 @@ public class DecodeTermCosetsForInterval {
 		String base = ".ser";
 		
 		String fileOut = "/home/dock/Documents/IR/AmazonResults/mRange3/tc_0.05/jnodes/termCosetsStrings.txt";
-		String intputTerms = "/home/dock/Documents/IR/AmazonResults/mRange3/tc_0.05/jnodes/Avg stableMap (copy).csv";
+		String intputTerms = "/home/dock/Documents/IR/AmazonResults/mRange3/tc_0.05/jnodes/Test Stable/Round 2 added avg cluster size/0.7 Avg stableMap (copy).csv";
 		
 		String termBimapPath = "/home/dock/Documents/IR/AmazonResults/mRange3/ds/trimTermBimapm0.05.ser";
 		String tfMapPath = "/home/dock/Documents/IR/AmazonResults/mRange3/ds/tfMap.ser";

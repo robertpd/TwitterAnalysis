@@ -2,6 +2,7 @@ package com.twitter.corpus.analysis;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map.Entry;
 
@@ -13,54 +14,93 @@ import com.twitter.corpus.types.Serialization2;
 public class Test2_Trend {
 	public static final Logger LOG = Logger.getLogger(Test2_Trend.class);
 	public static void main(String args[]) throws IOException{
-
-		String input = "/home/dock/Documents/IR/AmazonResults/mRange3/";
-		String output = "/home/dock/Documents/IR/AmazonResults/mRange3/tc_0.05/jnodes/";
-		double outerTrend = 0.4;
+		testTrend();
 		
-		double stableLevel = 0.95;
+		String input = "/home/dock/Documents/IR/AmazonResults/mRange3/tc_0.05/Test Trend/Round 2/list of terms.csv";
+		String output = "/home/dock/Documents/IR/AmazonResults/mRange3/tc_0.05/Test Trend/Round 2/results.csv";
+		TestOutput.printLinearTrend(input, output);
+		
+	}
+	public static void testTrend() throws IOException{
+		String input = "/home/dock/Documents/IR/AmazonResults/mRange3/";
+		String output = "/home/dock/Documents/IR/AmazonResults/mRange3/tc_0.05/jnodes/Test Trend/Round 2/";
 
 		HashMap<String, Integer> stableTermsFreqs = new HashMap<String, Integer>();
 		HashMap<Integer, Integer> tfMap = Serialization2.deserialize(input+"ds/tfMap.ser");
 		HashBiMap<String, Integer> tbm = Serialization2.deserialize(input+"ds/trimTermBimapm0.05.ser");
 		HashMap<Integer, HashMap<Integer, HashMap<Integer, Double>>> jaccardNodes = Serialization2.deserialize(input+"tc_0.05/jnodes/jaccardAllNodes.ser");
-		
-		Iterator<Entry<Integer, HashMap<Integer, HashMap<Integer, Double>>>> jNodesIter = jaccardNodes.entrySet().iterator();
-		// iterate terms
-		while(jNodesIter.hasNext()){
-			boolean pass = true;
-			double avgStability = 0.0;
-			int countInnerStability = 0;
-			Entry<Integer, HashMap<Integer, HashMap<Integer, Double>>> jNodesEntry = jNodesIter.next();
-			int term = jNodesEntry.getKey();
-			HashMap<Integer, HashMap<Integer, Double>> termJNodes = jNodesEntry.getValue();
+		HashMap<Integer, HashMap<Integer, Double>>  jaccardLinear = Serialization2.deserialize(input + "jaccardNon_Weighted.ser");
+		HashMap<Integer, Double> intervalTermCosetAvgSize = Serialization2.deserialize(input + "ds/IntervalCosetAvgSize.ser");
 
-			Iterator<Entry<Integer, HashMap<Integer, Double>>> termJnodesIter = termJNodes.entrySet().iterator();
-			//iterate i level for term
-			while(termJnodesIter.hasNext()){
-				Entry<Integer, HashMap<Integer, Double>> iLevelEntry = termJnodesIter.next();						
-				int i = iLevelEntry.getKey();
-				HashMap<Integer, Double> iValue = iLevelEntry.getValue();
-				Iterator<Entry<Integer, Double>> iValueIter = iValue.entrySet().iterator();
-				// iterate each jaccard value
-				while(iValueIter.hasNext()){
-					double jac = iValueIter.next().getValue();
-					avgStability += jac;
-					if(jac >= stableLevel ){
-						countInnerStability++;
-					}
-					if(jac < outerTrend || countInnerStability > 230){ // 528/3 = 176. 528/5 = 105
-						pass = false;
-						break;
-					}
-					
+		double adjDiff = 0.3;
+
+		double nodeTop = 0.7;
+		double nodeBottom = 0.2;
+
+		HashSet<Integer> closeTerms = new HashSet<Integer>(200);
+
+		// iterate adjacent jaccard set first
+
+		Iterator<Entry<Integer, HashMap<Integer, Double>>> jaccLinIter = jaccardLinear.entrySet().iterator();
+		while(jaccLinIter.hasNext()){
+			double linearCount = 0.0;
+			Entry<Integer, HashMap<Integer, Double>> termEntry = jaccLinIter.next();
+
+			Integer term = termEntry.getKey();
+
+			HashMap<Integer, Double> termJaccLin = termEntry.getValue();
+
+			Iterator<Entry<Integer, Double>> termJaccIter = termJaccLin.entrySet().iterator();
+
+			double oldJ = 0.0;
+			while(termJaccIter.hasNext()){
+				Entry<Integer, Double> jacc = termJaccIter.next();
+				double nextJ = jacc.getValue();
+
+				if(Math.abs(nextJ - oldJ) > adjDiff){
+					linearCount++;
 				}
+				oldJ = nextJ;
 			}
-			if(pass){
-				stableTermsFreqs.put(term + " " + tbm.inverse().get(term) + " " + avgStability/528, tfMap.get(term));
+			if(linearCount < 5){
+				closeTerms.add(term);
 			}
 		}
-		TestOutput.printMap(stableTermsFreqs, output + "Avg stableMap.csv");
-		LOG.info("Finished Test: Gradual Trend: " + stableTermsFreqs);
+
+		HashMap<String, Integer> outputList = new HashMap<String, Integer>(closeTerms.size());
+		
+		Iterator<Integer> termsIter = closeTerms.iterator();
+		while(termsIter.hasNext()){
+			int nodeCount = 0;
+			double avgStability = 0.0;
+			Integer t = termsIter.next();
+			// outer i level, inner j level => iterate all
+			if(jaccardNodes.get(t) != null){
+				HashMap<Integer, HashMap<Integer, Double>> termJaccNodes = jaccardNodes.get(t);
+				Iterator<Entry<Integer, HashMap<Integer, Double>>> iLevelIter = termJaccNodes.entrySet().iterator();
+				while(iLevelIter.hasNext()){
+					Entry<Integer, HashMap<Integer, Double>> entry = iLevelIter.next();
+					Iterator<Entry<Integer, Double>> jLevelIter = entry.getValue().entrySet().iterator();
+					while(jLevelIter.hasNext()){
+						Entry<Integer, Double> jEntry = jLevelIter.next();
+
+						double jacc = jEntry.getValue();
+						avgStability += jacc;
+						if(jacc < nodeTop && jacc > nodeBottom){
+							nodeCount++;
+						}
+					}
+				}
+				if(nodeCount < 130){
+					avgStability =  (double)Math.round(((double)avgStability/528) * 1000) / 1000;
+					
+					outputList.put(t + " " + tbm.inverse().get(t) + " "+ avgStability +" "+ intervalTermCosetAvgSize.get(t),tfMap.get(t));
+				}
+			}
+		}
+
+		TestOutput.printMap(outputList, output + " test 2.csv");
+
+		//		TestOutput.printMap(stableTermsFreqs, output + "Avg stableMap.csv");
 	}
 }
