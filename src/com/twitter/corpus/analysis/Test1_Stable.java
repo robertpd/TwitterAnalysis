@@ -17,7 +17,7 @@ public class Test1_Stable {
 	public static final Logger LOG = Logger.getLogger(Test1_Stable.class);
 	public static void main(String args[]) throws IOException{
 //		primaryAnalysis();
-		String file = "/home/dock/Documents/IR/AmazonResults/mRange3/tc_0.05/jnodes/Test Trend/Round 2/list of terms.csv";
+		String file = "/home/dock/Documents/IR/AmazonResults/mRange3/tc_0.05/jnodes/Test Stable/Round 2 added avg cluster size/(100)0.7 Avg stableMap terms.csv";
 		printLinearTrend(file);
 	}
 	public static void primaryAnalysis() throws IOException{
@@ -75,12 +75,14 @@ public class Test1_Stable {
 //		String inputTerms = base + "/Test Stable/Round 2 added avg cluster size/10 miss terms.csv";
 		String jaccardLinear = "/home/dock/Documents/IR/AmazonResults/mRange3/jaccardNon_Weighted.ser";
 //		String outputCsv = base + "/Test Stable/Round 2 added avg cluster size/linearJaccardListForTerms.csv";
-		String outputCsv = base + "/Test Trend/Round 2/linearJaccardListForTerms.csv";
+		String outputCsv = base + "/Test Trend/Round 2/linearJaccardListForTerms 0.7 100 misses.csv";
 		String termBimap = "/home/dock/Documents/IR/AmazonResults/mRange3/ds/trimTermBimapm0.05.ser";
+		String tfmapp = "/home/dock/Documents/IR/AmazonResults/mRange3/ds/tfMap.ser";
 		
 		HashSet<Integer> termSet =  (HashSet<Integer>) Serialization2.readFile(inputTerms);
 		HashMap<Integer, HashMap<Integer, Double>> jlin = Serialization2.deserialize(jaccardLinear);
 		HashBiMap<String, Integer> bimap = Serialization2.deserialize(termBimap);
+		HashMap<Integer, Integer> tfmap = Serialization2.deserialize(tfmapp);
 		HashMap<Integer, Double> intervalCosetAvgTermSetSize = Serialization2.deserialize("/home/dock/Documents/IR/AmazonResults/mRange3/ds/IntervalCosetAvgSize.ser");
 		
 		BufferedWriter bw = new BufferedWriter(new FileWriter(outputCsv));
@@ -89,6 +91,7 @@ public class Test1_Stable {
 		while(termSetIter.hasNext()){
 			Integer term = termSetIter.next();
 			bw.append(bimap.inverse().get(term));
+			bw.append("," + tfmap.get(term));
 			bw.append(",CS= " + intervalCosetAvgTermSetSize.get(term)+",");
 			HashMap<Integer, Double> jaccLin = jlin.get(term);
 			
