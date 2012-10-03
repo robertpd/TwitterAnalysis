@@ -64,15 +64,7 @@ public class JaccardNodesFromCoset {
 		objectOut.close();
 		LOG.info("Finished serializing");
 		
-		
-		// get 350 set of term jaccards
-//		HashMap<Integer, HashMap<Integer, HashMap<Integer, Double>>> jaccardNodeThresholdTerms = new HashMap<Integer, HashMap<Integer,HashMap<Integer,Double>>>(20);
-//		HashSet<Integer> terms = (HashSet<Integer>) TermBimapDeser.readFile("/home/dock/Documents/IR/AmazonResults/mRange3/tc_0.05/528/528.csv");
-//		Iterator<Integer> termI = terms.iterator();
-//		while(termI.hasNext()){
-//			Integer term = termI.next();
-//			jaccardNodeThresholdTerms.put(term, jaccardNodes.jaccardAllNodes.get(term));
-//		}
+
 		String ppath = "/home/dock/Documents/IR/AmazonResults/mRange3/tc_0.05/all/threshMap";
 		
 		for(Double i = 0.3; i <= 0.3 ; i+=0.1){

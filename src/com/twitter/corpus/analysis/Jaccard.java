@@ -409,22 +409,7 @@ public class Jaccard {
 		
 		String path2 = outputPath + "/jaccardNon_Weighted.ser";
 		Serialization2.serialize(jaccardListNonWeighted, path2);
-		
-//		String path = outputPath + "/jaccardWeighted.ser";
-//		FileOutputStream fileOut = new FileOutputStream(path);
-//		ObjectOutputStream objectOut = new ObjectOutputStream(fileOut);
-//		objectOut.flush();
-//		objectOut.writeObject(jaccardListWeighted);
-//		objectOut.close();
-//		LOG.info("Finished serializing Weighted Jaccards.");
-//
-//		LOG.info("Serializing Non-Weighted Jaccards.");
-//		String path2 = outputPath + "/jaccardNon_Weighted.ser";
-//		FileOutputStream fileOut2 = new FileOutputStream(path2);
-//		ObjectOutputStream objectOut2 = new ObjectOutputStream(fileOut2);
-//		objectOut2.flush();
-//		objectOut2.writeObject(jaccardListNonWeighted);
-//		objectOut2.close();
+
 		LOG.info("Finished serializing Weighted Jaccards.");
 	}
 	public static void printResults() throws IOException{

@@ -103,18 +103,6 @@ public class InvertedIndex {
 		}
 		LOG.info("Trimmed interval index using tf <  " + TweetAnalysis.lowCutoffGlobal + " size is: " + thresholdIndex.size());
 
-//		ArrayList<Integer> termArrayList = new ArrayList<Integer>();
-//		Integer cutPoint = 7300;
-//		termArrayList.ensureCapacity(cutPoint);
-//
-//		int cutCounter = 0;
-//		Iterator<Map.Entry<Integer, HashSet<Long>>> indexIter = termIndex.entrySet().iterator();
-//		while(indexIter.hasNext() && cutCounter < cutPoint){			
-//			Map.Entry<Integer, HashSet<Long>> termEntry = indexIter.next();
-//			Integer term = termEntry.getKey();
-//			termArrayList.add(term);
-//			cutCounter++;
-//		}		
 		return thresholdIndex;
 	}
 	/**
@@ -169,26 +157,6 @@ public class InvertedIndex {
 			}
 		}
 	}
-//	public static void globalIndexSerialize(HashMap<Integer, HashSet<Long>> globalTermIndex, String outputPath) throws IOException{
-//		LOG.info("Serializing Global Index.");
-//		String path = outputPath + "/globalIndex.ser";
-//		FileOutputStream fileOut = new FileOutputStream(path);
-//		ObjectOutputStream objectOut = new ObjectOutputStream(fileOut);
-//		objectOut.flush();
-//		objectOut.writeObject(globalTermIndex);
-//		objectOut.close();
-//		LOG.info("Finished serializing global Index.");
-//	}
-//	public static void localIndexArraySerialize(ArrayList<HashMap<Integer, HashSet<Long>>> localTermIndex, String outputPath) throws IOException{
-//		LOG.info("Serializing local Index array.");
-//		String path = outputPath + "/LocalIndexArray.ser";
-//		FileOutputStream fileOut = new FileOutputStream(path);
-//		ObjectOutputStream objectOut = new ObjectOutputStream(fileOut);
-//		objectOut.flush();
-//		objectOut.writeObject(localTermIndex);
-//		objectOut.close();
-//		LOG.info("Finished serializing local Index.");
-//	}
 	public static int getDocCount(HashMap<Integer, HashSet<Long>> corpusIndex){
 		int retVal = 0;
 		Iterator<Map.Entry<Integer, HashSet<Long>>> indexIter = corpusIndex.entrySet().iterator();

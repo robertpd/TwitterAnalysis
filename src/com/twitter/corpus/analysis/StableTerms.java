@@ -13,8 +13,8 @@ import org.apache.log4j.Logger;
 import com.google.common.collect.HashBiMap;
 import com.twitter.corpus.types.Serialization2;
 
-public class Test1_Stable {
-	public static final Logger LOG = Logger.getLogger(Test1_Stable.class);
+public class StableTerms {
+	public static final Logger LOG = Logger.getLogger(StableTerms.class);
 	public static void main(String args[]) throws IOException{
 //		primaryAnalysis();
 		String file = "/home/dock/Documents/IR/AmazonResults/mRange3/tc_0.05/jnodes/Test Stable/Round 2 added avg cluster size/(100)0.7 Avg stableMap terms.csv";

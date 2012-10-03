@@ -11,8 +11,8 @@ import org.apache.log4j.Logger;
 import com.google.common.collect.HashBiMap;
 import com.twitter.corpus.types.Serialization2;
 
-public class Test2_Trend {
-	public static final Logger LOG = Logger.getLogger(Test2_Trend.class);
+public class GradualTrend {
+	public static final Logger LOG = Logger.getLogger(GradualTrend.class);
 	static HashMap<Integer, Double> intervalTermCosetAvgSize;
 	static HashBiMap<String, Integer> tbm;
 	static HashMap<Integer, Integer> tfMap;

@@ -1,5 +1,7 @@
 package com.twitter.corpus.analysis;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -58,14 +60,23 @@ public class AvgTermClusterSize {
 				}
 			}
 		}
+		
 		HashMap<Integer, Double> retVal2 = new HashMap<Integer, Double>((int)(retVal.size()*1.2));
 		Iterator<Entry<Integer, Integer>> retValIter = retVal.entrySet().iterator();
 		while(retValIter.hasNext()){
 			Entry<Integer, Integer> entry = retValIter.next();
-			;
 			retVal2.put(entry.getKey(), (double)Math.round(((double)entry.getValue()/33) * 10) / 10);
 		}
 		
-		Serialization2.serialize(retVal2, fileOut);
+//		Serialization2.serialize(retVal2, fileOut);
+		
+		BufferedWriter bw = new BufferedWriter(new FileWriter("/home/dock/Documents/IR/AmazonResults/mRange3/ds/avgClusterSize.csv"));
+		Iterator<Entry<Integer, Double>> avgSizeIter = retVal2.entrySet().iterator();
+		
+		while(avgSizeIter.hasNext()){
+			Entry<Integer, Double> entryx = avgSizeIter.next();
+			bw.append(entryx.getKey() + ","  + entryx.getValue()+"\n");
+		}
+		bw.close();
 	}
 }

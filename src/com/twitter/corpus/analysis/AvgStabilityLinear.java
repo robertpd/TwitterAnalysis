@@ -1,5 +1,7 @@
 package com.twitter.corpus.analysis;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.annotation.Retention;
 import java.util.ArrayList;
@@ -68,34 +70,27 @@ public class AvgStabilityLinear {
 		
 		HashMap<Integer, Double> trend = new HashMap<Integer, Double>();
 		
+		BufferedWriter bwa = new BufferedWriter(new FileWriter("/home/dock/Documents/IR/AmazonResults/mRange3/tc_0.05/jnodes/avgStab.csv"));
 		Iterator<Entry<Integer, Double>> avgIter = avgStabMap.entrySet().iterator();
 		while(avgIter.hasNext()){
-			Entry<Integer, Double> asd = avgIter.next();
-			if(asd.getValue() >= 0.3 && asd.getValue() <= 0.7){
-				trend.put(asd.getKey(), asd.getValue());
-			}
+			Entry<Integer, Double> as = avgIter.next();
+			bwa.append(as.getKey() + "," + as.getValue() + "\n");
 		}
-		ArrayList<Entry<Integer, Double>> ranked = new ArrayList<Map.Entry<Integer,Double>>();
-		Iterator<Entry<Integer, Double>> asd = trend.entrySet().iterator();
-		while(asd.hasNext()){
-			Entry<Integer, Double> entry = asd.next();
-			ranked.add(entry);
+		bwa.close();
+		
+		BufferedWriter bws = new BufferedWriter(new FileWriter("/home/dock/Documents/IR/AmazonResults/mRange3/tc_0.05/jnodes/stdStab.csv"));
+		Iterator<Entry<Integer, Double>> stdIter = stdDevMap.entrySet().iterator();
+		while(stdIter.hasNext()){
+			Entry<Integer, Double> as = stdIter.next();
+			bws.append(as.getKey() + "," + as.getValue() + "\n");
 		}
-		Collections.sort(ranked, new rankedComparator());
+		bws.close();
+		
+		
 	}
 	public static class rankedComparator implements Comparator<Map.Entry<Integer, Double>> {
 
-//		@Override
-//		public int compare(Map.Entry<Integer, HashSet<Long>> f1, Map.Entry<Integer, HashSet<Long>> f2) {
-//
-//			if (f1.getValue().size() > f2.getValue().size()){
-//				return -1;
-//			}else if(f1.getValue().size() < f2.getValue().size()){
-//				return 1;
-//			}
-//			else
-//				return 0;
-//		}
+
 
 		@Override
 		public int compare(Entry<Integer, Double> arg0,Entry<Integer, Double> arg1) {

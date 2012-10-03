@@ -25,13 +25,6 @@ public class CosetSerializer {
 	}
 	public static void copusCosetSer(ArrayList<HashMap<Integer, ArrayList<CoWeight>>> corpusCoSetArray, String output) throws IOException{
 		Serialization2.serialize(corpusCoSetArray, output + "/corpusTermCoset.ser");
-//		LOG.info("Serializing corpus coset.");
-//		String path = output + "/corpusTermCoset.ser";
-//		FileOutputStream fileOut = new FileOutputStream(path);
-//		ObjectOutputStream objectOut = new ObjectOutputStream(fileOut);
-//		objectOut.flush();
-//		objectOut.writeObject(corpusCoSetArray);
-//		objectOut.close();
-//		LOG.info("Finished.");
+
 	}
 }
