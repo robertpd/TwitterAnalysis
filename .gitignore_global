@@ -6,3 +6,4 @@
 bin/
 *.prefs
 *.project
+.*
