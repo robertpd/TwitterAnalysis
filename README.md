@@ -1,8 +1,6 @@
 #TwitterAnalysis
-=============================================================================
 
 Not under active development since September 2012.
------------------------------------------------------------------------------
 
 TwitterAnalysis is a text analysis program I developed during research for my Masters.
 It provides an analysis of the trending topics within a 12GB body of Tweets (16 million tweets) 
@@ -17,7 +15,7 @@ Three particular trends are assessed by this tool:
 2. Gradually trending term clusters - clusters possessing significant divergence in topic over time, (but retain an overall theme).
 3. Sudden significant change - clusters that contain significant localized departure from the baseline term set.
 
------------------------------------------------------------------------------
+</hr>
 
 Development and testing were initially conducted on my laptop and later moved to Amazon EC2 to meet memory requirement.
 Some issues faced during development:
@@ -28,7 +26,7 @@ to the removal of stop words and other removable terms according to the distribu
 retained terms shrank to below 20% of original volume, improving completion times for subsequent stages. Tweaks to the JVM yielded 
 positive results while developing on a latop(2GB ram) but became insignificant when testing was moved to a larger machine
 
------------------------------------------------------------------------------
+</hr>
 
 Twitter data used during this research is available at [trec.nist.gov/data/tweets/] (http://trec.nist.gov/data/tweets/)
 
