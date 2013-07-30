@@ -12,8 +12,14 @@ import java.util.Map.Entry;
 import org.apache.log4j.Logger;
 
 import com.twitter.corpus.types.CoWeight;
-import com.twitter.corpus.types.Serialization2;
+import com.twitter.corpus.types.SerializationHelper;
 
+/** 
+ * Provide a printout of average term cluster size for graphing in Excel
+ * Output: csv
+ * @author dock
+ *
+ */
 public class AvgTermClusterSize {
 	private static final Logger LOG = Logger.getLogger(AvgTermClusterSize.class);
 	public static void main(String args[]) throws IOException{
@@ -32,7 +38,7 @@ public class AvgTermClusterSize {
 		LOG.info("getting cosets");
 		ArrayList<HashMap<Integer, ArrayList<CoWeight>>> cosetArray = new ArrayList<HashMap<Integer,ArrayList<CoWeight>>>(33);
 		for(String path : filePaths){
-			HashMap<Integer, ArrayList<CoWeight>> coset = Serialization2.deserialize(path);
+			HashMap<Integer, ArrayList<CoWeight>> coset = SerializationHelper.deserialize(path);
 			cosetArray.add(coset);
 		}
 		

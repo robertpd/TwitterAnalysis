@@ -7,7 +7,7 @@ import java.util.HashSet;
 
 import com.google.common.collect.HashBiMap;
 import com.twitter.corpus.types.CoWeight;
-import com.twitter.corpus.types.Serialization2;
+import com.twitter.corpus.types.SerializationHelper;
 
 public class ShrinkTermBimap {
 
@@ -27,15 +27,15 @@ public class ShrinkTermBimap {
 
 		HashSet<Integer> terms = new HashSet<Integer>(2000);
 		for(String path : filePaths){
-			HashMap<Integer, ArrayList<CoWeight>> coset = Serialization2.deserialize(path);
+			HashMap<Integer, ArrayList<CoWeight>> coset = SerializationHelper.deserialize(path);
 			terms.addAll(coset.keySet());
 		}
 		
-		HashBiMap<String, Integer> termBimap = Serialization2.deserialize(termBimapPath);
+		HashBiMap<String, Integer> termBimap = SerializationHelper.deserialize(termBimapPath);
 		HashBiMap<String, Integer> newTermBimap = HashBiMap.create(termBimap.size());
 		for(Integer term : terms){
 			newTermBimap.put(termBimap.inverse().get(term), term);
 		}
-		Serialization2.serialize(newTermBimap, newTermBimapPath);		
+		SerializationHelper.serialize(newTermBimap, newTermBimapPath);		
 	}
 }

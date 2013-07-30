@@ -4,3 +4,5 @@
 .gitignore_global~
 *.ucls
 bin/
+*.prefs
+*.project

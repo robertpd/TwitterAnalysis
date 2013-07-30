@@ -12,7 +12,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import org.apache.log4j.Logger;
 
-import com.twitter.corpus.types.Serialization2;
+import com.twitter.corpus.types.SerializationHelper;
 
 public class GlobalIndexGetDocCount {
 	private static final Logger LOG = Logger.getLogger(GlobalIndexGetDocCount.class); 
@@ -32,8 +32,8 @@ public class GlobalIndexGetDocCount {
 		String corpPath = "/trec/output/mRange3/trimGlobalIndex.ser";
 		String output = "/trec/output/mRange3/docCounts.csv";
 		
-		HashSet<Integer> termSet =  (HashSet<Integer>) Serialization2.readFile(path);
-		HashMap<Integer, HashSet<Long>> gCorp = Serialization2.deserialize(corpPath);
+		HashSet<Integer> termSet =  (HashSet<Integer>) SerializationHelper.readFile(path);
+		HashMap<Integer, HashSet<Long>> gCorp = SerializationHelper.deserialize(corpPath);
 		
 		ArrayList<Integer> docCounts = new ArrayList<Integer>();
 		for(Integer term : termSet){

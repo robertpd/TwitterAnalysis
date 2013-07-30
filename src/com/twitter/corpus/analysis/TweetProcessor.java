@@ -15,16 +15,6 @@ import com.twitter.corpus.types.ProcessedTweet;
 public class TweetProcessor {
 	public static Set<String> stopwords = null;
 	public static int uniqueTermCounter=0;
-	//	private static String stopsFile[] = {"/home/dock/Documents/IR/DataSets/stopwords/english",
-	//		"/home/dock/Documents/IR/DataSets/stopwords/misc",
-	//		"/home/dock/Documents/IR/DataSets/stopwords/french",
-	//		"/home/dock/Documents/IR/DataSets/stopwords/english",
-	//		"/home/dock/Documents/IR/DataSets/stopwords/portuguese",
-	//		"/home/dock/Documents/IR/DataSets/stopwords/non_eng_stops",
-	//		"/home/dock/Documents/IR/DataSets/stopwords/portu_stops",
-	//		"/home/dock/Documents/IR/DataSets/stopwords/spanish_stops",
-	//		"/home/dock/Documents/IR/DataSets/stopwords/analysis",
-	//	};
 	private static String stopDir = "stopwords";
 
 	private static String stopsFile[] = {
@@ -80,12 +70,17 @@ public class TweetProcessor {
 		}
 		return pt;
 	}
+	
+	/**
+	 * Preprocess tweet: tokenize,lowercase, normalise chars
+	 * @param tweet
+	 * @return string array of tokens
+	 */
 	public static String[] preprocessTweet(String tweet){
 		// lowercase
 		// split
 		// normalize characters
 		// tokenize
-		// stem
 		String[] normElements = normalize(tweet.toLowerCase().split(" "));
 		String[] retVal = new String[normElements.length];
 
@@ -102,6 +97,12 @@ public class TweetProcessor {
 		}
 		return retVal;
 	}
+	
+	/**
+	 * Normalise a string array, remove all character accents
+	 * @param str tweet string array
+	 * @return normalised tweet string array
+	 */
 	private static String[] normalize(String[] str){
 		String[] retVal = new String[str.length];
 		for(int i=0;i<str.length;i++){
@@ -116,6 +117,13 @@ public class TweetProcessor {
 		}
 		return retVal;
 	}
+	
+	/**
+	 * Read in stopwords file
+	 * @param paths
+	 * @return
+	 * @throws IOException
+	 */
 	private static Set<String> readFile(String[] paths) throws IOException {
 		Set<String> stopWords = new LinkedHashSet<String>();
 		for(String path : paths){

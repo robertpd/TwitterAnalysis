@@ -20,7 +20,7 @@ import org.mortbay.log.Log;
 import com.twitter.corpus.data.HtmlStatusCorpusReader;
 import com.twitter.corpus.data.StatusStream;
 import com.twitter.corpus.types.CoWeight;
-import com.twitter.corpus.types.Serialization2;
+import com.twitter.corpus.types.SerializationHelper;
 
 public class TweetAnalysis{
 	private static final Logger LOG = Logger.getLogger(TweetAnalysis.class);
@@ -72,7 +72,6 @@ public class TweetAnalysis{
 		int upperFreq = Integer.parseInt(cmdline.getOptionValue(UPPER_DAILY_THRESH));
 		double m = Double.parseDouble(cmdline.getOptionValue(TERM_CORRELATION_THRESH));
 		int cosetTopN = Integer.parseInt(cmdline.getOptionValue(COSET_TERMS));
-
 		
 		
 		String root = rootBase + "/20110";
@@ -80,7 +79,7 @@ public class TweetAnalysis{
 				root + "127", root + "127a", root + "128", root + "128a", root + "129", root + "129a", root + "130", root + "130a", root + "131", 
 				root + "131a", root + "201", root + "201a", root + "202", root + "202a", root + "203", root + "203a", root + "204", root + "204a", 
 				root + "205", root + "205a", root + "206", root + "206a", root + "207", root + "207a", root + "208"};
-
+		
 		corpusIndex = new HashMap<Integer, HashSet<Long>>(10000);
 
 		HashMap<Integer, ArrayList<CoWeight>> blockCoSet = null;
@@ -92,19 +91,22 @@ public class TweetAnalysis{
 		intervalIndices = new ArrayList<HashMap<Integer,HashSet<Long>>>(33);		
 
 		long preIndexingTime = System.currentTimeMillis();
-		// Do the indexing
+
+		//
+		// 1.0 Do the indexing
+		
 		for(String path : filePaths){
 			LOG.info("Stream number : " + (cnt+1) + "\t. Indexing " + path);
 			StatusStream stream = null;	FileSystem fs = FileSystem.get(new Configuration());Path file = new Path(path);
 			if (!fs.exists(file)) {	System.err.println("Error: " + file + " does not exist!"); System.exit(-1);}
 			if (fs.getFileStatus(file).isDir()) {stream = new HtmlStatusCorpusReader(file, fs);	}
 
-			// 1.0 build index
+			// build index
 			InvertedIndex ii = new InvertedIndex();
 			HashMap<Integer, HashSet<Long>> intervalTermIndex = ii.buildIndex(stream);
 			corpSize = corpusIndex.size();
 
-			//add interval index (both old and new terms with their document sets) 
+			// add interval index (both old and new terms with their document sets) 
 			InvertedIndex.mergeLocalIndex(intervalTermIndex);
 			intervalIndices.add(intervalTermIndex);
 
@@ -115,11 +117,16 @@ public class TweetAnalysis{
 		
 		LOG.info("Global corpus index terms: " + corpusIndex.size() + " " + ( corpusIndex.size() - corpSize) + " terms added. " + (docCount - indexDocCount) + " term-document occurences.");
 
-		// trim all local indexes
+		//
+		// 2.0 trim all local indexes
+		
 		ArrayList<HashMap<Integer, HashSet<Long>>> trimmedLocalIndexArray = InvertedIndex.trimLocalIndices(intervalIndices, lowerFreq, upperFreq);		
 		long preCosetTime = System.currentTimeMillis();
 		long totalCoset = 0;
-		// get Term Coset
+
+		//
+		// 3.0 get Term Cosets
+		
 		for(int i = 0; i < trimmedLocalIndexArray.size(); i++){
 			TermTermWeights ill = new TermTermWeights(trimmedLocalIndexArray.get(i));
 			long beforeCoset = System.currentTimeMillis();
@@ -127,14 +134,17 @@ public class TweetAnalysis{
 			long afterCoset = System.currentTimeMillis();
 			totalCoset += (afterCoset - beforeCoset);
 			
-			CosetSerializer.cosetSerializer(blockCoSet, output, (termCosetCounter + 1));
+			SerializationHelper.cosetSerializer(blockCoSet, output, (termCosetCounter + 1));
 			corpusCoSetArray.add(blockCoSet);			// add coset of particular day to array
 			termCosetCounter++;
 		}		
-		CosetSerializer.copusCosetSer(corpusCoSetArray, output);
+		SerializationHelper.copusCosetSer(corpusCoSetArray, output);
 		
 		long beforeJaccard = System.currentTimeMillis();
-		// Get Jaccard based on the TC calculated above using m = Arg
+		
+		//
+		// 4.0 Get Jaccard based on the TC calculated above using m = Arg
+		
 		jaccardSim = null;
 		jaccardSim = new Jaccard(trimmedLocalIndexArray.get(0).size());
 
@@ -152,10 +162,10 @@ public class TweetAnalysis{
 
 		// print frequency range
 		InvertedIndex.printFrequencies(TweetAnalysis.corpusIndex, output + "freqs.txt");
-		Serialization2.serialize(TermTermWeights.termBimap, output + "/termbimap.ser");
+		SerializationHelper.serialize(TermTermWeights.termBimap, output + "/termbimap.ser");
 //		TermTermWeights.serializeTermBimap(output + "/termbimap.ser");
-		Serialization2.serialize(corpusIndex, output + "globalIndex.ser");
-		Serialization2.serialize(intervalIndices, output + "LocalIndexArray.ser");
+		SerializationHelper.serialize(corpusIndex, output + "globalIndex.ser");
+		SerializationHelper.serialize(intervalIndices, output + "LocalIndexArray.ser");
 //		InvertedIndex.globalIndexSerialize(corpusIndex, output);
 //		InvertedIndex.localIndexArraySerialize(intervalIndices, output);
 		

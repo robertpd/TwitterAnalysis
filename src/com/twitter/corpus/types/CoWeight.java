@@ -2,17 +2,22 @@ package com.twitter.corpus.types;
 
 import java.io.Serializable;
 
+/**
+ * CoWeight stores term metadata, termId and correlate value
+ * @author dock
+ *
+ */
 public class CoWeight implements Serializable, Comparable<CoWeight> {
 	private static final long serialVersionUID = 5864579699695542248L;
 	public CoWeight(int t, double c){
 		this.termId = t;
-		this.correlate = c;
+		this.correlate = c;		// measure of correlation strength
 	}
 	public int termId;
 	public double correlate;
-	public Double getCorrelate(){
-		return this.correlate;
-	}
+	
+	
+	// Overrides to provide comparison functionality
 	@Override
 	public int compareTo(CoWeight other) {
 		if(this.correlate > other.correlate)

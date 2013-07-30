@@ -16,8 +16,14 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 
 import com.twitter.corpus.types.CoWeight;
-import com.twitter.corpus.types.Serialization2;
+import com.twitter.corpus.types.SerializationHelper;
 
+/**
+ * Functionality to calculate Jaccard  Values, Weighted and non-weighted values may be calculated
+ * Jaccard values provide a measure of the overlap between two sets, eg. term set for yesterday and today
+ * @author dock
+ *
+ */
 public class Jaccard {
 	private static final Logger LOG = Logger.getLogger(Jaccard.class);
 	public Jaccard(int size){
@@ -77,7 +83,6 @@ public class Jaccard {
 				}
 			}
 			catch (NullPointerException e) {
-				// gulp!
 			}
 			try{
 				if(cosetArray.get(1).get(term).size() >= cutoff){
@@ -88,7 +93,6 @@ public class Jaccard {
 				}
 			}
 			catch (NullPointerException e) {
-				//  gulp!
 			}
 
 			// set default jaccard to 0.0
@@ -200,7 +204,6 @@ public class Jaccard {
 				}
 			}
 			catch (NullPointerException e) {
-				// gulp!
 			}
 			try{
 				if(cosetArray.get(1).get(term).size() >= cutoff){
@@ -211,7 +214,6 @@ public class Jaccard {
 				}
 			}
 			catch (NullPointerException e) {
-				//  gulp!
 			}
 
 			// if either a or b is null, then jaccard is just 0. 0 is kept in the loop to provide continuity
@@ -259,7 +261,7 @@ public class Jaccard {
 
 			Double jac = 0.0;
 			// if either a or b is null, then jaccard is just z. 0 is kept in the loop to provide continuity
-			jac = getJaccard(a,b);
+			jac = calcJaccard(a,b);
 
 			// add jaccard value for the interval, if first time add term first
 //			if(jac != 0.0){
@@ -289,7 +291,14 @@ public class Jaccard {
 			}
 		}
 	}
-	private static Double getJaccard(ArrayList<CoWeight> a, ArrayList<CoWeight> b){
+	
+	/**
+	 * Calculate the Jaccard value between two term cosets
+	 * @param List a of terms
+	 * @param List b of terms
+	 * @return Jaccard value
+	 */
+	private static Double calcJaccard(ArrayList<CoWeight> a, ArrayList<CoWeight> b){
 		Double retVal = 0.0;
 		if(a != null && b != null){
 			HashSet<Integer> aMap = new HashSet<Integer>(a.size());
@@ -339,7 +348,6 @@ public class Jaccard {
 			}
 		}
 		catch (NullPointerException e) {
-			// gulp!
 		}
 		return retVal;
 	}
@@ -405,10 +413,10 @@ public class Jaccard {
 		LOG.info("Serializing Weighted Jaccards.");
 				
 		String path = outputPath + "/jaccardWeighted.ser";
-		Serialization2.serialize(jaccardListWeighted, path);
+		SerializationHelper.serialize(jaccardListWeighted, path);
 		
 		String path2 = outputPath + "/jaccardNon_Weighted.ser";
-		Serialization2.serialize(jaccardListNonWeighted, path2);
+		SerializationHelper.serialize(jaccardListNonWeighted, path2);
 
 		LOG.info("Finished serializing Weighted Jaccards.");
 	}

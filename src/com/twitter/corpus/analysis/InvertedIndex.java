@@ -20,6 +20,12 @@ import com.twitter.corpus.data.Status;
 import com.twitter.corpus.data.StatusStream;
 import com.twitter.corpus.types.ProcessedTweet;
 
+/**
+ * Build the inverted index for the corpus
+ * Contains methods to monitor statistics for the corpus
+ * Index methods include, merging, trimming, tfidf calculation
+ *
+ */
 public class InvertedIndex {
 	public InvertedIndex(){
 	}

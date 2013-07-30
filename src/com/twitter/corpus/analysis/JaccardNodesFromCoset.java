@@ -21,7 +21,7 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 
 import com.twitter.corpus.types.CoWeight;
-import com.twitter.corpus.types.Serialization2;
+import com.twitter.corpus.types.SerializationHelper;
 
 public class JaccardNodesFromCoset {
 	private static final Logger LOG = Logger.getLogger(JaccardNodesFromCoset.class);
@@ -37,7 +37,7 @@ public class JaccardNodesFromCoset {
 
 		ArrayList<HashMap<Integer, ArrayList<CoWeight>>> corpusCoSetArray = new ArrayList<HashMap<Integer, ArrayList<CoWeight>>>(33);
 		for(String path : filePaths){	
-			corpusCoSetArray.add((HashMap<Integer, ArrayList<CoWeight>>) Serialization2.deserialize(path));
+			corpusCoSetArray.add((HashMap<Integer, ArrayList<CoWeight>>) SerializationHelper.deserialize(path));
 		}
 
 		Jaccard jaccardNodes = new Jaccard(corpusCoSetArray.get(1).size(), "Nodes");
@@ -76,7 +76,7 @@ public class JaccardNodesFromCoset {
 				HashMap<Integer, HashMap<Integer, Double>> val = entry.getValue();
 				thresh.put(t, thresholdCounterDiscountIZero(val, i));
 			}
-			Serialization2.serialize(thresh, ppath + i + ".ser");
+			SerializationHelper.serialize(thresh, ppath + i + ".ser");
 			BufferedWriter bw = new BufferedWriter(new FileWriter("/home/dock/Documents/IR/AmazonResults/mRange3/tc_0.05/all/" + i + "thresh.csv"));
 			Iterator<Entry<Integer, Integer>> threshI = thresh.entrySet().iterator();
 			while(threshI.hasNext()){
@@ -93,7 +93,7 @@ public class JaccardNodesFromCoset {
 		printNodeNonZeroRank(nonZeroMap, "/home/dock/Documents/IR/AmazonResults/mRange3/tc_0.05/nodeSizesNoIZero.csv");
 
 		// get a set of terms to decode
-		HashSet<Integer> termsToDecode = (HashSet<Integer>) Serialization2.readFile("/home/dock/Documents/IR/AmazonResults/mRange3/tc_0.05/20nonZeroNodes.csv");
+		HashSet<Integer> termsToDecode = (HashSet<Integer>) SerializationHelper.readFile("/home/dock/Documents/IR/AmazonResults/mRange3/tc_0.05/20nonZeroNodes.csv");
 
 		Double threshold2 = 0.3;
 		HashMap<Integer, Integer> keeptrack = new HashMap<Integer, Integer>();
