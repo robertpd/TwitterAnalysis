@@ -23,8 +23,7 @@ Some issues faced during development:
 to the removal of stop words and other removable terms according to the distribution of terms in a corpus [Zipf's law] 
 (http://nlp.stanford.edu/IR-book/html/htmledition/zipfs-law-modeling-the-distribution-of-terms-1.html)
 * Memory management: memory constraints at the pre-processing stage required upto 16GB ram to complete processing, following this stage, 
-retained terms shrank to below 20% of original volume, improving completion times for subsequent stages. Tweaks to the JVM yielded 
-positive results while developing on a latop(2GB ram) but became insignificant when testing was moved to a larger machine
+retained terms shrank to below 20% of original volume, improving completion times for subsequent stages. Monitoring of the heap with VisualVM also provided significant insight into problem areas and allowed for tweaks to the code and JVM. Developing the application first on a memory constrained system added the benefit of a well designed system when deployed to a more powerful machine, greatly reducing overall execution time.
 
 ***
 
